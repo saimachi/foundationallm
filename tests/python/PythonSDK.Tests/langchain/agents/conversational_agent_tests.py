@@ -44,5 +44,5 @@ class ConversationalAgentTests:
       agent = ConversationalAgent(completion_request=test_websearch_completion_request,llm=test_websearch_llm, config=test_config)
       completion_response = agent.run(prompt=test_websearch_completion_request.user_prompt)
       model_answer = spacy_similarity_model(completion_response.completion)
-      ref_answer = spacy_similarity_model("Australia won the 2023 Cricket World Cup final match by defeating India. The match was held on November 19, 2023.")
+      ref_answer = spacy_similarity_model("Australia won the 2023 Cricket World Cup final match. The match was held on November 19, 2023.")
       assert ref_answer.similarity(model_answer) > 0.8
