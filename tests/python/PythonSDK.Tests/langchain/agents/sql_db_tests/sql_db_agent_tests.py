@@ -9,7 +9,6 @@ from foundationallm.langchain.language_models import LanguageModelFactory
 from foundationallm.langchain.agents import SqlDbAgent
 from foundationallm.langchain.data_sources.sql import SQLDatabaseConfiguration
 from foundationallm.config import Context
-import spacy
 
 @pytest.fixture
 def test_config():
@@ -28,20 +27,20 @@ def sql_data_source_config():
             port=os.getenv("TEST_MSSQL_DB_PORT", 1433),
             database_name=os.getenv("TEST_MSSQL_DB_NAME", "WideWorldImporters"),
             username=os.getenv("TEST_MSSQL_DB_USERNAME", "sa"),
-            # include_tables=["CustomerTransactions"],
+            include_tables=["CustomerTransactions", "Customers"],
+            schema="Sales",
             use_row_level_security=False
         )
 
 @pytest.fixture
 def test_sql_completion_request(sql_data_source_config):
      req = CompletionRequest(
-         # user_prompt="What is the ID of the customer who had the second highest total spent value over all transactions, excluding tax?",
-         user_prompt="List all the tables you can see.",
+         user_prompt="What is the ID of the customer who had the second highest total spent value over all transactions, excluding tax?",
          agent=Agent(
              name="wwi-sql",
              type="sql",
              description="Answers questions based on the provided SQL Database",
-             prompt_prefix="You are an answering machine that queries the provided Microsoft SQL Server database. Do not make anything up; if you cannot answer a question, let the user know politely. Only have single quotes on any sql command sent to the engine."
+             prompt_prefix="You are an answering machine that generates and executes queries targeting the WideWorldImporters Microsoft SQL Server database. Do not make anything up; if you cannot answer a question, let the user know politely."
          ),
          language_model=LanguageModel(
              type=LanguageModelType.OPENAI,
@@ -61,16 +60,11 @@ def test_sql_completion_request(sql_data_source_config):
 
 @pytest.fixture
 def test_sql_llm(test_sql_completion_request, test_config):
-    model_factory = LanguageModelFactory(language_model=test_sql_completion_request.language_model, config = test_config)
+    model_factory = LanguageModelFactory(language_model=test_sql_completion_request.language_model, config=test_config)
     return model_factory.get_llm()
-
-@pytest.fixture
-def spacy_similarity_model():
-    return spacy.load("en_core_web_sm")
 
 class SqlDbAgentTests:
     def test_sql_db_qa(self, test_sql_completion_request, test_sql_llm, test_config):
-        agent = SqlDbAgent(completion_request=test_sql_completion_request, llm=test_sql_llm, config=test_config, context=Context())
+        agent = SqlDbAgent(completion_request=test_sql_completion_request, llm=test_sql_llm, config=test_config, context=Context(), is_testing=True)
         completion_response = agent.run(prompt=test_sql_completion_request.user_prompt)
-        print(completion_response)
-        assert True
+        assert "401" in completion_response.completion
