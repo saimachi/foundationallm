@@ -2,7 +2,7 @@
 
 ## Introduction
 
-We will be using Microsoft's sample [World Wide Importers (WWI)](https://github.com/microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0) database to test that LangChain can enrich LLM models with context from SQL.
+We will be using Microsoft's sample [Wide World Importers (WWI)](https://github.com/microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0) database to test that LangChain can enrich LLM models with context from SQL.
 
 ## Procedure
 

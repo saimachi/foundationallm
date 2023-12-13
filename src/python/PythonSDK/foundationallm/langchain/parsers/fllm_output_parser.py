@@ -1,8 +1,6 @@
 import re
-from typing import Union, Any, List, Optional
-
+from typing import Union
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
-
 from langchain.agents.agent import AgentOutputParser
 from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
 
@@ -24,37 +22,25 @@ FINAL_ANSWER_AND_PARSABLE_ACTION_ERROR_MESSAGE = (
 
 
 class FLLMOutputParser(AgentOutputParser):
-
-    #agent : Any
-    text_to_replace : Any
-    default_action : str = None
-    available_tools : Optional[List[Any]] = None
-
-    """FLLM Output parser for the chat agent."""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        #self.agent = kwargs.get('agent')
-        self.text_to_replace = kwargs.get('text_to_replace')
-        self.default_action = kwargs.get('default_action')
-        self.available_tools = kwargs.get('available_tools')
-
-
     def get_format_instructions(self) -> str:
         return FORMAT_INSTRUCTIONS
 
     def parse(self, text: str) -> Union[AgentAction, AgentFinish]:
-
         regex = (
             r"Action\s*\d*\s*:[\s]*(.*?)[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
         )
-        
+
         action_match = re.search(regex, text, re.DOTALL)
-        
-        #remove any AI generated questions and go with the last result...
-        if text.find(QUESTION_ACTION) != -1 and (text.find(QUESTION_ACTION) < text.find(action_match.group(0))):
+
+        # remove any AI generated questions and go with the last result...
+        if text.find(QUESTION_ACTION) != -1 and (
+            text.find(QUESTION_ACTION) < text.find(action_match.group(0))
+        ):
             start_index = text.find(QUESTION_ACTION) + len(QUESTION_ACTION)
             end_index = text.find("\n", start_index)
-            text = "Final Answer: " + text.replace(f'{QUESTION_ACTION} {text[0:start_index].strip()}', '')
+            text = "Final Answer: " + text.replace(
+                f"{QUESTION_ACTION} {text[0:start_index].strip()}", ""
+            )
 
         includes_answer = FINAL_ANSWER_ACTION in text
 
@@ -73,15 +59,15 @@ class FLLMOutputParser(AgentOutputParser):
 
         if action_match:
             action = action_match.group(1).strip()
-            #action = self.default_action
             action_input = action_match.group(2)
             tool_input = action_input.strip(" ")
 
-            if ( action == 'sql_db_schema'):
-                if ( tool_input.startswith("'") and tool_input.endswith("'")):
+            if action == "sql_db_schema":
+                # Remove leading/trailing single quotes from SQL queries
+                if tool_input.startswith("'") and tool_input.endswith("'"):
                     tool_input = tool_input[1:-1]
-            
-            # ensure if its a well formed SQL query we don't remove any trailing " chars
+
+            # Ensure that if a well-formed SQL query is provided, we don't remove any trailing double quotes
             if tool_input.startswith("SELECT ") is False:
                 tool_input = tool_input.strip('"')
 
@@ -93,9 +79,7 @@ class FLLMOutputParser(AgentOutputParser):
             )
 
         if not re.search(r"Action\s*\d*\s*:[\s]*(.*?)", text, re.DOTALL):
-            return AgentFinish(
-                {"output": text}, text
-            )
+            return AgentFinish({"output": text}, text)
         elif not re.search(
             r"[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)", text, re.DOTALL
         ):

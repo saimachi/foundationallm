@@ -32,6 +32,8 @@ class SqlDbAgent(AgentBase):
             Application configuration class for retrieving configuration settings.
         context : Context
             User context under which to run the completion request.
+        is_testing : bool
+            Raises the iteration limit and enables a custom output parser for testing purposes
         """
         self.agent_prompt_prefix = completion_request.agent.prompt_prefix
         self.agent_prompt_suffix = completion_request.agent.prompt_suffix

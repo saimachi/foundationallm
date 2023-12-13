@@ -14,9 +14,8 @@
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <TestFramework>Pytest</TestFramework>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
-    <Environment>foundationallm-app-configuration-uri=fllmaks06-appconfig.azconfig.io
-INTEGRATION_TESTS_SA=fllmaks06sa
-INTEGRATION_TESTS_CONTAINER=testing</Environment>
+    <Environment>
+    </Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
