@@ -7,6 +7,7 @@ from langchain.agents.agent_types import AgentType
 from langchain.callbacks import get_openai_callback
 from langchain.prompts import PromptTemplate
 from langchain.tools.python.tool import PythonREPLTool
+from langchain.schema.output_parser import OutputParserException
 
 from foundationallm.config import Configuration
 from foundationallm.langchain.agents import AgentBase
@@ -24,8 +25,7 @@ class AnomalyDetectionAgent(AgentBase):
     Agent for performing anomaly detection.
     """
 
-    def __init__(self, completion_request: CompletionRequest,
-                 llm: LanguageModelBase, config: Configuration):
+    def __init__(self, completion_request: CompletionRequest, llm: LanguageModelBase, config: Configuration):
         """
         Initializes a anomaly detection agent.
 
@@ -90,14 +90,16 @@ class AnomalyDetectionAgent(AgentBase):
             llm = self.llm,
             df = self.df,
             verbose = True,
-            prefix = 'You are a helpful agent designed to retrieve statistics about data in a Pandas DataFrame named "df".'
+            prefix = 'You are a helpful agent designed to retrieve statistics about data in a Pandas DataFrame named "df".',
+            handle_parsing_errors='Get the final answer from the output without quotes, verify it is correct, and return that as the response!'
         )
 
         self.python_agent = create_python_agent(
             llm = self.llm,
             tool = PythonREPLTool(),
             agent_type = AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-            verbose = True
+            verbose = True,
+            handle_parsing_errors='Get the final answer from the output without quotes, verify it is correct, and return that as the response!'
         )
 
         self.tools = [
@@ -111,6 +113,12 @@ class AnomalyDetectionAgent(AgentBase):
 
         self.toolkit = AnomalyDetectionToolkit(df_agent=self.statistics_agent, py_agent=self.python_agent)
 
+        self.agent_prompt_suffix = """Begin!
+
+        Question: {input}
+        Thought: I should use the tools available to determine if they input record is anomalous. Validate the output is properly formatted or try again. Finally, generate a nice sentence that answers the question.
+        {agent_scratchpad}"""
+
         self.agent = initialize_agent(
             tools = self.tools + self.toolkit.get_tools(),
             llm = self.llm,
@@ -119,8 +127,10 @@ class AnomalyDetectionAgent(AgentBase):
             max_iterations = 10,
             early_stopping_method = 'generate',
             agent_kwargs={
-                'prefix': self.agent_prompt_prefix
-            }
+                'prefix': self.agent_prompt_prefix,
+                'suffix': self.agent_prompt_suffix
+            },
+            handle_parsing_errors='Get the final answer from the output without quotes, verify it is correct, and return that as the response!'
         )
 
     @property
@@ -150,11 +160,16 @@ class AnomalyDetectionAgent(AgentBase):
             the user_prompt, and token utilization and execution cost details.
         """
         with get_openai_callback() as cb:
+            try:
+                completion = self.agent.run(prompt)
+            except OutputParserException as e:
+                completion = str(e)
+
             return CompletionResponse(
-                completion = self.agent.run(prompt),
-                user_prompt= prompt,
-                completion_tokens = cb.completion_tokens,
-                prompt_tokens = cb.prompt_tokens,
-                total_tokens = cb.total_tokens,
-                total_cost = cb.total_cost
+                    completion = completion.replace('Could not parse LLM output: ', '').replace('`', ''),
+                    user_prompt= prompt,
+                    completion_tokens = cb.completion_tokens,
+                    prompt_tokens = cb.prompt_tokens,
+                    total_tokens = cb.total_tokens,
+                    total_cost = cb.total_cost
             )

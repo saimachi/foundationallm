@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using FoundationaLLM.Common.Models.Metadata;
 
 namespace FoundationaLLM.Common.Tests.Middleware
 {
@@ -65,14 +66,18 @@ namespace FoundationaLLM.Common.Tests.Middleware
             var claimsProviderService = Substitute.For<IUserClaimsProviderService>();
             var callContext = Substitute.For<ICallContext>();
             var middleware = new CallContextMiddleware(next: _ => Task.FromResult(0));
-            var agentHint = "test-agent-hint";
-            context.Request.Headers[Constants.HttpHeaders.AgentHint] = agentHint;
+            var agentHint = new Agent
+            {
+                Name = "test-agent-hint",
+                Private = false
+            };
+            context.Request.Headers[Constants.HttpHeaders.AgentHint] = JsonConvert.SerializeObject(agentHint);
 
             // Act
             await middleware.InvokeAsync(context, claimsProviderService, callContext);
 
             // Assert
-            callContext.Received(1).AgentHint = agentHint;
+            callContext.Received(1).AgentHint = Arg.Is<Agent>(x => x.Name == agentHint.Name && x.Private == agentHint.Private);
         }
     }
 }

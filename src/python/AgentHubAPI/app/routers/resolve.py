@@ -5,6 +5,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Header
 from foundationallm.config import Context
 from foundationallm.hubs.agent import AgentHub, AgentHubRequest, AgentHubResponse
+from foundationallm.models import AgentHint
 from app.dependencies import validate_api_key_header, handle_exception
 
 router = APIRouter(
@@ -17,7 +18,7 @@ router = APIRouter(
 
 @router.post('')
 async def resolve(request: AgentHubRequest, x_user_identity: Optional[str] = Header(None),
-                  x_agent_hint: Optional[str] = Header(None)) -> AgentHubResponse:
+                  x_agent_hint: str = Header(None)) -> AgentHubResponse:
     """
     Resolves the best agent to use for the specified user prompt.
 
@@ -37,6 +38,9 @@ async def resolve(request: AgentHubRequest, x_user_identity: Optional[str] = Hea
     """
     try:
         context = Context(user_identity=x_user_identity)
-        return AgentHub().resolve(request=request, user_context=context, hint=x_agent_hint)
+        if x_agent_hint is not None and len(x_agent_hint.strip()) > 0:
+            agent_hint = AgentHint.model_validate_json(x_agent_hint)
+            return AgentHub().resolve(request=request, user_context=context, hint=agent_hint)
+        return AgentHub().resolve(request=request, user_context=context)
     except Exception as e:
         handle_exception(e)

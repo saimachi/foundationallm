@@ -6,8 +6,6 @@ using FoundationaLLM.Core.Models.Configuration;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Models.Chat;
 using Microsoft.Azure.Cosmos.Fluent;
-using System.Runtime;
-using System.Runtime.CompilerServices;
 using Polly;
 using Polly.Retry;
 

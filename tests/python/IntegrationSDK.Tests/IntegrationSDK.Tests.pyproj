@@ -7,7 +7,8 @@
     </ProjectHome>
     <StartupFile>
     </StartupFile>
-    <SearchPath>..\..\..\src\python\IntegrationSDK</SearchPath>
+    <SearchPath>
+    </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>IntegrationSDK.Tests</Name>

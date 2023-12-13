@@ -1,3 +1,7 @@
+"""
+The DataSourceHubStorageManager class is responsible for fetching requested
+datasource metadata
+"""
 from typing import List
 from foundationallm.config import Configuration
 from foundationallm.storage import BlobStorageManager
@@ -7,14 +11,15 @@ class DataSourceHubStorageManager(BlobStorageManager):
     The DataSourceHubStorageManager class is responsible for fetching available datasource
         values from Azure Blob Storage.
     """
-    def __init__(self, config: Configuration = None):
+    def __init__(self, prefix:str=None, config: Configuration = None):
         connection_string = config.get_value(
                     "FoundationaLLM:DataSourceHub:StorageManager:BlobStorage:ConnectionString"
                     )
         container_name = config.get_value(
                     "FoundationaLLM:DataSourceHub:DataSourceMetadata:StorageContainer"
                     )
-
+        if prefix is not None:
+            container_name = f"{prefix}/{container_name}"
         super().__init__(blob_connection_string=connection_string,
                             container_name=container_name)
 

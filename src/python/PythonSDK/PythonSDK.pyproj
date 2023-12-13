@@ -25,6 +25,7 @@
   <ItemGroup>
     <Compile Include="foundationallm\config\context.py" />
     <Compile Include="foundationallm\config\user_identity.py" />
+    <Compile Include="foundationallm\models\agent_hint.py" />
     <Compile Include="foundationallm\langchain\language_models\openai\openai_model.py" />
     <Compile Include="foundationallm\langchain\parsers\fllm_output_parser.py" />
     <Compile Include="foundationallm\langchain\parsers\__init__.py" />
@@ -170,7 +171,6 @@
     <Folder Include="foundationallm\models\language_models\" />
     <Folder Include="foundationallm\models\orchestration\" />
     <Folder Include="foundationallm\hubs\" />
-    <Folder Include="foundationallm\resolvers\" />
     <Folder Include="foundationallm\storage\" />
   </ItemGroup>
   <ItemGroup>

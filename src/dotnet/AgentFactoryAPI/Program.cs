@@ -1,3 +1,4 @@
+using System.Net;
 using Asp.Versioning;
 using Azure.Identity;
 using FoundationaLLM.AgentFactory.Core.Interfaces;
@@ -14,6 +15,7 @@ using FoundationaLLM.Common.Middleware;
 using FoundationaLLM.Common.Models.Context;
 using FoundationaLLM.Common.OpenAPI;
 using FoundationaLLM.Common.Services;
+using FoundationaLLM.Common.Settings;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
@@ -198,13 +200,7 @@ namespace FoundationaLLM.AgentFactory.API
             };
             downstreamAPISettings.DownstreamAPIs[HttpClients.AgentHubAPI] = agentHubAPISettings;
 
-            // See: https://www.pollydocs.org/strategies/retry.html
-            var retryOptions = new HttpRetryStrategyOptions
-            {
-                BackoffType = DelayBackoffType.Exponential,
-                MaxRetryAttempts = 5,
-                UseJitter = true
-            };
+            var retryOptions = CommonHttpRetryStrategyOptions.GetCommonHttpRetryStrategyOptions();
 
             builder.Services
                     .AddHttpClient(HttpClients.AgentHubAPI,

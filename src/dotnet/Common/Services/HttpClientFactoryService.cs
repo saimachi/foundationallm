@@ -59,9 +59,10 @@ namespace FoundationaLLM.Common.Services
             }
 
             // Add the agent hint header if present.
-            if (!string.IsNullOrEmpty(_callContext.AgentHint))
+            if (_callContext.AgentHint != null)
             {
-                httpClient.DefaultRequestHeaders.Add(Constants.HttpHeaders.AgentHint, _callContext.AgentHint);
+                var serializedAgentHint = JsonConvert.SerializeObject(_callContext.AgentHint);
+                httpClient.DefaultRequestHeaders.Add(Constants.HttpHeaders.AgentHint, serializedAgentHint);
             }
 
             return httpClient;

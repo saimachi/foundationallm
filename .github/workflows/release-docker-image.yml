@@ -6,12 +6,6 @@ on:
       registry:
         type: string
         default: ghcr.io
-      docker_username:
-        type: string
-        default: ${{ github.actor }}
-      docker_password:
-        type: string
-        default: ${{ secrets.GITHUB_TOKEN }}
       image:
         type: string
         required: true
@@ -24,39 +18,6 @@ on:
 
 jobs:
   docker_image_build_and_push:
-    # strategy:
-    #   matrix:
-    #     include:
-    #     - name: agent-factory-api
-    #       context: ./src
-    #       dockerfile: ./src/dotnet/AgentFactoryAPI/Dockerfile
-    #     - name: agent-hub-api
-    #       context: ./src/python
-    #       dockerfile: ./src/python/AgentHubAPI/Dockerfile
-    #     - name: chat-ui
-    #       context: ./src/ui/UserPortal
-    #       dockerfile: ./src/ui/UserPortal/Dockerfile
-    #     - name: core-api
-    #       context: ./src
-    #       dockerfile: ./src/dotnet/CoreAPI/Dockerfile
-    #     - name: core-job
-    #       context: ./src
-    #       dockerfile: ./src/dotnet/CoreWorker/Dockerfile
-    #     - name: data-source-hub-api
-    #       context: ./src/python
-    #       dockerfile: ./src/python/DataSourceHubAPI/Dockerfile
-    #     - name: gatekeeper-api
-    #       context: ./src
-    #       dockerfile: ./src/dotnet/GatekeeperAPI/Dockerfile
-    #     - name: langchain-api
-    #       context: ./src/python
-    #       dockerfile: ./src/python/LangChainAPI/Dockerfile
-    #     - name: prompt-hub-api
-    #       context: ./src/python
-    #       dockerfile: ./src/python/PromptHubAPI/Dockerfile
-    #     - name: semantic-kernel-api
-    #       context: ./src
-    #       dockerfile: ./src/dotnet/SemanticKernelAPI/Dockerfile
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -76,26 +37,61 @@ jobs:
     - name: Log in to the Container registry
       uses: docker/login-action@v3
       with:
-        registry: ${{ github.events.inputs.registry }}
-        username: ${{ github.events.inputs.docker_username }}
-        password: ${{ github.events.inputs.docker_password }}
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@v5
       with:
         images: |
-          ${{ env.REGISTRY }}/${{ github.repository }}/${{ github.events.inputs.image }}
+          ghcr.io/${{ github.repository }}/${{ inputs.image }}
         tags: |
           type=raw,latest
           type=raw,release
-          type=sha
+          type=pep440,pattern={{version}},value=${{ steps.releaseVersion.outputs.release_tag }}
+          type=pep440,pattern={{major}}.{{minor}},value=${{ steps.releaseVersion.outputs.release_tag }}
+          type=pep440,pattern={{major}},value=${{ steps.releaseVersion.outputs.release_tag }}
+          type=sha,format=long
 
     - name: Build and push Docker images
       uses: docker/build-push-action@v5
       with:
-        context: ${{ github.events.inputs.context }}
-        file: ${{ github.events.inputs.dockerfile }}
+        context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         push: true
+
+  helm_chart_package_and_push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Fetching the Latest Release Tag number
+      id: releaseVersion
+      run: |
+        release_json=$(curl https://api.github.com/repos/${{ github.repository }}/releases)
+        release_tag=$(echo "$release_json" | jq -r '.[0].tag_name')
+        echo "release_tag: Latest Tag is : $release_tag"
+        echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Helm Chart Update, Package, and Push
+      run: |
+        cd ./deploy/helm/${{ inputs.image }}
+        sed -i "s/version\: 0\.0\.0/version\: ${{ steps.releaseVersion.outputs.release_tag }}/" Chart.yaml
+        sed -i "s/tag\: latest/tag\: ${{ steps.releaseVersion.outputs.release_tag }}/" values.yaml
+        helm package . --app-version ${{ steps.releaseVersion.outputs.release_tag }}
+        helm push ${{ inputs.image }}-${{ steps.releaseVersion.outputs.release_tag }}.tgz oci://ghcr.io/${{ github.repository }}/helm
