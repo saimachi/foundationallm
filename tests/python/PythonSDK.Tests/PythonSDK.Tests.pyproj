@@ -35,6 +35,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="langchain\agents\csv_agent_tests.py" />
+    <Compile Include="langchain\agents\sql_db_tests\sql_db_agent_tests.py" />
+    <Compile Include="langchain\agents\sql_db_tests\__init__.py" />
+    <Compile Include="langchain\agents\summary_agent_tests.py" />
     <Compile Include="langchain\message_history\message_history_tests.py" />
     <Compile Include="pytest.ini" />
     <Compile Include="langchain\agents\generic_resolver_agent_tests.py" />
@@ -48,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".pylintrc" />
+    <Content Include="langchain\agents\sql_db_tests\Setup.md" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +59,7 @@
     <Folder Include="hubs\agent\" />
     <Folder Include="hubs\data_source\" />
     <Folder Include="langchain\" />
+    <Folder Include="langchain\agents\sql_db_tests\" />
     <Folder Include="langchain\message_history\" />
     <Folder Include="config\" />
     <Folder Include="langchain\agents\" />
