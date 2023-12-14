@@ -52,8 +52,7 @@ class DataSourceRepository(Repository):
                     configs.append(SearchServiceDataSourceMetadata.model_validate_json(content))
                 elif common_datasource_metadata.underlying_implementation == \
                             UnderlyingImplementation.CSV:
-                    configs.append(CSVDataSourceMetadata.model_validate_json(
-                                    mgr.read_file_content(config_file)))
+                    configs.append(CSVDataSourceMetadata.model_validate_json(content))
             # if a datasource is not deserializable, skip it
             # pylint: disable=bare-except
             except:

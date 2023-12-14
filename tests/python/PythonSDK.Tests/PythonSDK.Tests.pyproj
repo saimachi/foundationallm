@@ -35,6 +35,7 @@
     <Compile Include="hubs\agent\agent_hub_storage_manager_tests.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="hubs\data_source\data_source_hub_tests.py" />
     <Compile Include="hubs\data_source\data_source_hub_storage_manager_tests.py" />
     <Compile Include="hubs\data_source\data_source_repository_tests.py" />
     <Compile Include="hubs\data_source\data_source_resolver_tests.py" />
