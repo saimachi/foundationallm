@@ -1,3 +1,4 @@
+using System.Net;
 using Asp.Versioning;
 using Azure.Identity;
 using FoundationaLLM.Common.Authentication;
@@ -8,6 +9,7 @@ using FoundationaLLM.Common.Middleware;
 using FoundationaLLM.Common.Models.Context;
 using FoundationaLLM.Common.OpenAPI;
 using FoundationaLLM.Common.Services;
+using FoundationaLLM.Common.Settings;
 using FoundationaLLM.Gatekeeper.Core.Interfaces;
 using FoundationaLLM.Gatekeeper.Core.Models.ConfigurationOptions;
 using FoundationaLLM.Gatekeeper.Core.Services;
@@ -192,13 +194,7 @@ namespace FoundationaLLM.Gatekeeper.API
                         "DownstreamPipeline",
                         static strategyBuilder =>
                         {
-                            // See: https://www.pollydocs.org/strategies/retry.html
-                            strategyBuilder.AddRetry(new HttpRetryStrategyOptions
-                            {
-                                BackoffType = DelayBackoffType.Exponential,
-                                MaxRetryAttempts = 5,
-                                UseJitter = true
-                            });
+                            CommonHttpRetryStrategyOptions.GetCommonHttpRetryStrategyOptions();
                         });
 
             var gatekeeperIntegrationAPISettings = new DownstreamAPIKeySettings

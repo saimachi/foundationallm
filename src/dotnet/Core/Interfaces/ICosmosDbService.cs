@@ -1,4 +1,5 @@
 ﻿using FoundationaLLM.Common.Models.Chat;
+using FoundationaLLM.Common.Models.Configuration.Users;
 using FoundationaLLM.Common.Models.Search;
 
 namespace FoundationaLLM.Core.Interfaces;
@@ -120,4 +121,21 @@ public interface ICosmosDbService
     /// <param name="completionPromptId">The id of the completion prompt to retrieve.</param>
     /// <returns></returns>
     Task<CompletionPrompt> GetCompletionPrompt(string sessionId, string completionPromptId);
+
+    /// <summary>
+    /// Returns the user profile for a given user via their UPN.
+    /// </summary>
+    /// <param name="upn">The user principal name used for retrieving the messages for
+    /// the signed in user.</param>
+    /// <param name="cancellationToken">Cancellation token for async calls.</param>
+    /// <returns></returns>
+    Task<UserProfile> GetUserProfileAsync(string upn, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Inserts or updates a user profile.
+    /// </summary>
+    /// <param name="userProfile">The user profile to upsert.</param>
+    /// <param name="cancellationToken">Cancellation token for async calls.</param>
+    /// <returns></returns>
+    Task UpsertUserProfileAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
 }

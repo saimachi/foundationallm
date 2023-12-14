@@ -1,3 +1,4 @@
+""" The DataSourceRepository is responsible for retrieving data source metadata from storage."""
 from typing import List
 from foundationallm.hubs import Repository
 from foundationallm.hubs.data_source import (
@@ -26,7 +27,7 @@ class DataSourceRepository(Repository):
                                 if empty or None, return all data sources.
         
         """
-        mgr = DataSourceHubStorageManager(config=self.config)
+        mgr = DataSourceHubStorageManager(prefix=self.container_prefix, config=self.config)
         config_files = []
         if pattern is None or len(pattern)== 0:
             config_files = mgr.list_blobs()
@@ -51,7 +52,10 @@ class DataSourceRepository(Repository):
                     configs.append(SearchServiceDataSourceMetadata.model_validate_json(content))
                 elif common_datasource_metadata.underlying_implementation == \
                             UnderlyingImplementation.CSV:
-                    configs.append(CSVDataSourceMetadata.model_validate_json(content))
+                    configs.append(CSVDataSourceMetadata.model_validate_json(
+                                    mgr.read_file_content(config_file)))
+            # if a datasource is not deserializable, skip it
+            # pylint: disable=bare-except
             except:
                 continue
         return configs
@@ -62,7 +66,7 @@ class DataSourceRepository(Repository):
         Args:
             name:str is the name of the data source as well as the name of the configuration file.
         """
-        mgr = DataSourceHubStorageManager(config=self.config)
+        mgr = DataSourceHubStorageManager(prefix=self.container_prefix, config=self.config)
         config_file = name + ".json"
         config = None
         try:
