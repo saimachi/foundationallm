@@ -7,8 +7,8 @@
   - [.NET projects](#net-projects)
     - [Core API](#core-api)
       - [Core API app settings](#core-api-app-settings)
-    - [CoreWorker](#CoreWorker)
-      - [CoreWorker app settings](#CoreWorker-app-settings)
+    - [CoreWorker](#coreworker)
+      - [CoreWorker app settings](#coreworker-app-settings)
     - [Gatekeeper API](#gatekeeper-api)
       - [Gatekeeper API app settings](#gatekeeper-api-app-settings)
     - [Agent Factory API](#agent-factory-api)
@@ -21,6 +21,8 @@
       - [Agent Hub API Environment Variables](#agent-hub-api-environment-variables)
     - [Data Source Hub API](#data-source-hub-api)
       - [Data Source Hub API Environment Variables](#data-source-hub-api-environment-variables)
+    - [Gatekeeper Integration API](#gatekeeper-integration-api)
+      - [Gatekeeper Integration API Environment Variables](#gatekeeper-integration-api-environment-variables)
     - [Prompt Hub API](#prompt-hub-api)
       - [Prompt Hub API Environment Variables](#prompt-hub-api-environment-variables)
     - [LangChain API](#langchain-api)
@@ -41,6 +43,7 @@
   - [Python 3.11](https://www.python.org/downloads/) or greater (learn more about [Python environments in Visual Studio](https://learn.microsoft.com/visualstudio/python/managing-python-environments-in-visual-studio?view=vs-2022))
   - Docker Desktop (with WSL for Windows machines) ([Mac install](https://docs.docker.com/desktop/install/mac-install/) or [Windows install](https://docs.docker.com/desktop/install/windows-install/))
   - Azure CLI ([v2.51.0 or greater](https://learn.microsoft.com/cli/azure/install-azure-cli))
+  - [Microsoft Azure PowerShell](https://learn.microsoft.com/powershell/azure/install-azure-powershell)
   - [Helm 3.11.1 or greater](https://helm.sh/docs/intro/install/)
 - Frontend (Vue.js (Nuxt) web app)
   - [Visual Studio Code](https://code.visualstudio.com/Download) (recommended for development)
@@ -426,6 +429,7 @@ The backend components consist of the .NET projects and the Python projects. The
       - CoreWorker
       - DataSourceHubAPI
       - GatekeeperAPI
+      - GatekeeperIntegrationAPI
       - LangChainAPI
       - PromptHubAPI
       - SemanticKernelAPI
@@ -438,7 +442,7 @@ The backend components consist of the .NET projects and the Python projects. The
 
 The frontend components consist of the Vue.js (Nuxt) web app.
 
-1. Open the `/src/UserPortal` folder in Visual Studio Code.
+1. Open the `/src/ui/UserPortal` folder in Visual Studio Code.
 
 2. Open the `.env` file and update the `LOCAL_API_URL` value to the URL of the local Core API service (https://localhost:63279). **Important:** Only set this value if you wish to debug the entire solution locally and bypass the App Config service value for the CORE API URL. If you do not wish to debug the entire solution locally, leave this value empty or comment it out.
 

@@ -36,6 +36,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="hubs\data_source\data_source_repository_tests.py" />
+    <Compile Include="hubs\data_source\data_source_resolver_tests.py" />
+    <Compile Include="hubs\prompt\prompt_resolver_tests.py" />
     <Compile Include="langchain\agents\blob_storage_agent_tests.py" />
     <Compile Include="langchain\agents\csv_agent_tests.py" />
     <Compile Include="langchain\message_history\message_history_tests.py" />
@@ -57,6 +59,7 @@
     <Folder Include="hubs\" />
     <Folder Include="hubs\agent\" />
     <Folder Include="hubs\data_source\" />
+    <Folder Include="hubs\prompt\" />
     <Folder Include="langchain\" />
     <Folder Include="langchain\message_history\" />
     <Folder Include="config\" />

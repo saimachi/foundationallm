@@ -1,3 +1,4 @@
+using System.Net;
 using Asp.Versioning;
 using FoundationaLLM.Common.OpenAPI;
 using FoundationaLLM.Common.Constants;
@@ -18,6 +19,7 @@ using Azure.Identity;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using FoundationaLLM.Common.Models.Context;
 using Microsoft.Extensions.Http.Resilience;
+using FoundationaLLM.Common.Settings;
 
 namespace FoundationaLLM.Core.API
 {
@@ -73,6 +75,7 @@ namespace FoundationaLLM.Core.API
 
             builder.Services.AddScoped<ICosmosDbService, CosmosDbService>();
             builder.Services.AddScoped<ICoreService, CoreService>();
+            builder.Services.AddScoped<IUserProfileService, UserProfileService>();
             builder.Services.AddScoped<IGatekeeperAPIService, GatekeeperAPIService>();
 
             builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
@@ -191,13 +194,7 @@ namespace FoundationaLLM.Core.API
                         "DownstreamPipeline",
                         static strategyBuilder =>
                         {
-                            // See: https://www.pollydocs.org/strategies/retry.html
-                            strategyBuilder.AddRetry(new HttpRetryStrategyOptions
-                            {
-                                BackoffType = DelayBackoffType.Exponential,
-                                MaxRetryAttempts = 5,
-                                UseJitter = true
-                            });
+                            CommonHttpRetryStrategyOptions.GetCommonHttpRetryStrategyOptions();
                         });
 
             builder.Services.AddSingleton<IDownstreamAPISettings>(downstreamAPISettings);

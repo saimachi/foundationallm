@@ -1,16 +1,15 @@
-﻿using FoundationaLLM.Common.Models;
-using FoundationaLLM.Common.Models.Chat;
-using FoundationaLLM.Common.Models.Search;
+﻿using FoundationaLLM.Common.Models.Chat;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Core.Interfaces;
 using FoundationaLLM.Core.Models.Configuration;
-using FoundationaLLM.Core.Utils;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using FoundationaLLM.Common.Models.Configuration.Users;
+using Polly;
+using Polly.Retry;
 
 namespace FoundationaLLM.Core.Services
 {
@@ -19,11 +18,14 @@ namespace FoundationaLLM.Core.Services
     /// </summary>
     public class CosmosDbService : ICosmosDbService
     {
-        private readonly Container _sessions;
-        private readonly Container _userSessions;
+        private Container _sessions;
+        private Container _userSessions;
+        private readonly Lazy<Task<Container>> _userProfiles;
+        private Task<Container> _userProfilesTask => _userProfiles.Value;
         private readonly Database _database;
         private readonly Dictionary<string, Container> _containers;
         private readonly CosmosDbSettings _settings;
+        private readonly ResiliencePipeline _resiliencePipeline;
         private readonly ILogger _logger;
 
         private const string SoftDeleteQueryRestriction = " (not IS_DEFINED(c.deleted) OR c.deleted = false)";
@@ -52,17 +54,32 @@ namespace FoundationaLLM.Core.Services
 
             if (!_settings.EnableTracing)
             {
-                var defaultTrace = Type.GetType("Microsoft.Azure.Cosmos.Core.Trace.DefaultTrace,Microsoft.Azure.Cosmos.Direct");
-                var traceSource = (TraceSource)defaultTrace?.GetProperty("TraceSource")?.GetValue(null)!;
+                var defaultTrace =
+                    Type.GetType("Microsoft.Azure.Cosmos.Core.Trace.DefaultTrace,Microsoft.Azure.Cosmos.Direct");
+                var traceSource = (TraceSource) defaultTrace?.GetProperty("TraceSource")?.GetValue(null)!;
                 traceSource.Switch.Level = SourceLevels.All;
                 traceSource.Listeners.Clear();
             }
+
+            _resiliencePipeline = new ResiliencePipelineBuilder().AddRetry(new RetryStrategyOptions
+            {
+                ShouldHandle = new PredicateBuilder().Handle<Exception>(),
+                MaxRetryAttempts = 6,
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true,
+                OnRetry = args =>
+                {
+                    var exception = args.Outcome.Exception!;
+                    _logger.LogWarning($"Cosmos DB resilience strategy handling: {exception.Message}");
+                    _logger.LogWarning($" ... automatically delaying for {args.RetryDelay.TotalMilliseconds}ms.");
+                    return default;
+                }
+            }).Build();
 
             CosmosSerializationOptions options = new()
             {
                 PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
             };
-
             var client = new CosmosClientBuilder(_settings.Endpoint, _settings.Key)
                 .WithSerializerOptions(options)
                 .WithConnectionModeGateway()
@@ -73,7 +90,6 @@ namespace FoundationaLLM.Core.Services
             _database = database ??
                         throw new ArgumentException("Unable to connect to existing Azure Cosmos DB database.");
 
-
             // Dictionary of container references for all containers listed in config.
             _containers = new Dictionary<string, Container>();
 
@@ -82,17 +98,26 @@ namespace FoundationaLLM.Core.Services
             foreach (var containerName in containers)
             {
                 var container = database?.GetContainer(containerName.Trim()) ??
-                                throw new ArgumentException("Unable to connect to existing Azure Cosmos DB container or database.");
+                                throw new ArgumentException(
+                                    "Unable to connect to existing Azure Cosmos DB container or database.");
 
                 _containers.Add(containerName.Trim(), container);
             }
 
             _sessions = database?.GetContainer(CosmosDbContainers.Sessions) ??
-                        throw new ArgumentException($"Unable to connect to existing Azure Cosmos DB container ({CosmosDbContainers.Sessions}).");
+                        throw new ArgumentException(
+                            $"Unable to connect to existing Azure Cosmos DB container ({CosmosDbContainers.Sessions}).");
             _userSessions = database?.GetContainer(CosmosDbContainers.UserSessions) ??
-                            throw new ArgumentException($"Unable to connect to existing Azure Cosmos DB container ({CosmosDbContainers.UserSessions}).");
+                            throw new ArgumentException(
+                                $"Unable to connect to existing Azure Cosmos DB container ({CosmosDbContainers.UserSessions}).");
+            _userProfiles = new Lazy<Task<Container>>(InitializeUserProfilesContainer);
+
             _logger.LogInformation("Cosmos DB service initialized.");
         }
+
+        private async Task<Container> InitializeUserProfilesContainer() =>
+            await _resiliencePipeline.ExecuteAsync<Container>(async token => await _database?.CreateContainerIfNotExistsAsync(new ContainerProperties(CosmosDbContainers.UserProfiles,
+                "/upn"), ThroughputProperties.CreateAutoscaleThroughput(1000), cancellationToken: token)!);
 
         /// <inheritdoc/>
         public async Task<List<Session>> GetSessionsAsync(string type, string upn, CancellationToken cancellationToken = default)
@@ -348,5 +373,28 @@ namespace FoundationaLLM.Core.Services
             await _sessions.ReadItemAsync<CompletionPrompt>(
                 id: completionPromptId,
                 partitionKey: new PartitionKey(sessionId));
+
+        /// <inheritdoc/>
+        public async Task<UserProfile> GetUserProfileAsync(string upn, CancellationToken cancellationToken = default)
+        {
+            var userProfiles = await _userProfilesTask;
+            var userProfile = await userProfiles.ReadItemAsync<UserProfile>(
+                id: upn,
+                partitionKey: new PartitionKey(upn),
+                cancellationToken: cancellationToken);
+
+            return userProfile;
+        }
+
+        /// <inheritdoc/>
+        public async Task UpsertUserProfileAsync(UserProfile userProfile, CancellationToken cancellationToken = default)
+        {
+            var userProfiles = await _userProfilesTask;
+            PartitionKey partitionKey = new(userProfile.UPN);
+            await userProfiles.UpsertItemAsync(
+                item: userProfile,
+                partitionKey: partitionKey,
+                cancellationToken: cancellationToken);
+        }
     }
 }

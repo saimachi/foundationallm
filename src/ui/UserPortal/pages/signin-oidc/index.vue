@@ -1,7 +1,7 @@
 <template>
 	<div class="login-page">
 		<div class="login-container">
-			<img :src="logoUrl" class="logo" />
+			<img :src="appConfigStore.logoUrl" class="logo" />
 			<Button icon="pi pi-microsoft" label="Sign in" size="large" @click="signIn"></Button>
 		</div>
 	</div>
@@ -24,10 +24,6 @@ export default {
 	computed: {
 		...mapStores(useAppConfigStore),
 		...mapStores(useAuthStore),
-
-		logoUrl() {
-			return this.appConfigStore.logoUrl;
-		},
 	},
 
 	methods: {
