@@ -1,11 +1,11 @@
 import pytest
-from unittest.mock import patch, call
+from unittest.mock import patch
 from foundationallm.config import Configuration
 from foundationallm.hubs.data_source import (
     DataSourceRepository,
     DataSourceHubStorageManager,
 )
-from azure.core.exceptions import ClientAuthenticationError
+from foundationallm.hubs.data_source.data_source_repository import SQLDataSourceMetadata
 
 
 @pytest.fixture
@@ -21,7 +21,7 @@ def data_source_repository(test_config):
 class DataSourceRepositoryTests:
     """
     DataSourceRepositoryTests verifies that DataSourceRepository appropriately handles fetching agent metadata
-        from storage providers, including gracefully recovering from errors.
+        from storage providers (Azure Blob Storage and mocked).
         
     This is an integration test class and expects the following environment variable to be set:
         foundationallm-app-configuration-uri.
@@ -48,7 +48,7 @@ class DataSourceRepositoryTests:
 
     def test_get_metadata_values(self, data_source_repository):
         """
-        This test asserts that get_metadata_values() is resilient to mocked error conditions.
+        This test asserts that get_metadata_values() deserializes data correctly and calls the necessary methods.
         
         It does not query Blob Storage.
         """
@@ -58,21 +58,13 @@ class DataSourceRepositoryTests:
                 DataSourceHubStorageManager, "read_file_content"
             ) as read_file_content,
         ):
-            # Valid JSON, Valid DataSourceMetadata/Invalid CSV (missing authentication data), File Not Found, and Blob Storage Exception
-            read_file_content.side_effect = [
-                '{"name": "SQL", "description": "Corporate SQL DB", "underlying_implementation": "sql", "dialect": "mssql"}',
-                '{"name": "CSV", "description": "Finance Spreadsheets", "underlying_implementation": "csv"}',
-                # File not found
-                None,
-                ClientAuthenticationError(),
-            ]
+            # Valid JSON
+            read_file_content.return_value = '{"name": "SQL", "description": "Corporate SQL DB", "underlying_implementation": "sql", "dialect": "mssql"}'
 
             # Custom pattern
-            metadata = data_source_repository.get_metadata_values(
-                ["ds-sql", "ds-csv", "ds-search", "ds-blob"]
-            )
+            metadata = data_source_repository.get_metadata_values(["ds-sql"])
             # Only one valid JSON file should be returned
-            assert len(metadata) == 1
+            assert type(metadata[0]) == SQLDataSourceMetadata
             # We supplied the pattern manually
             list_blobs.assert_not_called()
 
@@ -82,7 +74,7 @@ class DataSourceRepositoryTests:
 
     def test_get_metadata_by_name(self, data_source_repository):
         """
-        This test asserts that get_metadata_by_name() is resilient to mocked error conditions.
+        This test asserts that get_metadata_by_name() deserializes data correctly and calls the necessary methods.
         
         It does not query Blob Storage.
         """
@@ -92,26 +84,9 @@ class DataSourceRepositoryTests:
                 DataSourceHubStorageManager, "read_file_content"
             ) as read_file_content,
         ):
-            # Valid JSON, Valid DataSourceMetadata/Invalid CSV (missing authentication data), File Not Found, and Blob Storage Exception
-            read_file_content.side_effect = [
-                '{"name": "SQL", "description": "Corporate SQL DB", "underlying_implementation": "sql", "dialect": "mssql"}',
-                '{"name": "CSV", "description": "Finance Spreadsheets", "underlying_implementation": "csv"}',
-                # File not found
-                None,
-                ClientAuthenticationError(),
-            ]
+            read_file_content.return_value = '{"name": "SQL", "description": "Corporate SQL DB", "underlying_implementation": "sql", "dialect": "mssql"}'
 
             assert (
-                data_source_repository.get_metadata_by_name("ds-sql").dialect == "mssql"
+                type(data_source_repository.get_metadata_by_name("ds-sql")) == SQLDataSourceMetadata
             )
-            assert data_source_repository.get_metadata_by_name("ds-csv") is None
-            assert data_source_repository.get_metadata_by_name("ds-search") is None
-            assert data_source_repository.get_metadata_by_name("ds-blob") is None
-            read_file_content.assert_has_calls(
-                [
-                    call("ds-sql.json"),
-                    call("ds-csv.json"),
-                    call("ds-search.json"),
-                    call("ds-blob.json"),
-                ]
-            )
+            read_file_content.assert_called_with("ds-sql.json")

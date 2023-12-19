@@ -20,21 +20,13 @@ class AgentRepository(Repository):
             pattern = ""
         agent_files = mgr.list_blobs(path=pattern)
         agent_metadata = []
-        for agent_file in agent_files:
-            try:
-                agent_metadata.append(AgentMetadata.model_validate_json(
-                    mgr.read_file_content(agent_file)))
-            except Exception:
-                continue
-        return agent_metadata
+        return [AgentMetadata.model_validate_json(
+            mgr.read_file_content(agent_file)) for agent_file in agent_files]
 
     def get_metadata_by_name(self, name: str) -> AgentMetadata:
         mgr = AgentHubStorageManager(prefix=self.container_prefix, config=self.config)
         agent_file = name + ".json"
         agent = None
         if mgr.file_exists(agent_file):
-            try:
-                agent = AgentMetadata.model_validate_json(mgr.read_file_content(agent_file))
-            except Exception:
-                return None
+            agent = AgentMetadata.model_validate_json(mgr.read_file_content(agent_file))
         return agent

@@ -27,10 +27,6 @@ class DataSourceHubStorageManager(BlobStorageManager):
         return super().read_file_content(path).decode()
 
     def list_blobs(self):
-        blob_list = []
-        try:
-            blob_list = list(super().list_blobs(path=""))
-        except Exception as err:
-            return []
+        blob_list: List[dict] = list(super().list_blobs(path=""))
         blob_names = [blob["name"].split('/')[-1] for blob in blob_list]
         return blob_names

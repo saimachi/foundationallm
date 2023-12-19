@@ -39,20 +39,24 @@ class DataSourceRepository(Repository):
         for config_file in config_files:
             common_datasource_metadata = {}
             try:
-                content = mgr.read_file_content(config_file)
-                common_datasource_metadata = DataSourceMetadata.model_validate_json(content)
+                common_datasource_metadata = DataSourceMetadata.model_validate_json(
+                                    mgr.read_file_content(config_file))
                 if common_datasource_metadata.underlying_implementation == \
                             UnderlyingImplementation.SQL:
-                    configs.append(SQLDataSourceMetadata.model_validate_json(content))
+                    configs.append(SQLDataSourceMetadata.model_validate_json(
+                                    mgr.read_file_content(config_file)))
                 elif common_datasource_metadata.underlying_implementation == \
                             UnderlyingImplementation.BLOB_STORAGE:
-                    configs.append(BlobStorageDataSourceMetadata.model_validate_json(content))
+                    configs.append(BlobStorageDataSourceMetadata.model_validate_json(
+                                    mgr.read_file_content(config_file)))
                 elif common_datasource_metadata.underlying_implementation == \
                             UnderlyingImplementation.SEARCH_SERVICE:
-                    configs.append(SearchServiceDataSourceMetadata.model_validate_json(content))
+                    configs.append(SearchServiceDataSourceMetadata.model_validate_json(
+                                    mgr.read_file_content(config_file)))
                 elif common_datasource_metadata.underlying_implementation == \
                             UnderlyingImplementation.CSV:
-                    configs.append(CSVDataSourceMetadata.model_validate_json(content))
+                    configs.append(CSVDataSourceMetadata.model_validate_json(
+                                    mgr.read_file_content(config_file)))
             # if a datasource is not deserializable, skip it
             # pylint: disable=bare-except
             except:
@@ -67,21 +71,21 @@ class DataSourceRepository(Repository):
         """
         mgr = DataSourceHubStorageManager(prefix=self.container_prefix, config=self.config)
         config_file = name + ".json"
+        common_datasource_metadata = DataSourceMetadata.model_validate_json(
+                        mgr.read_file_content(config_file))
         config = None
-        try:
-            content = mgr.read_file_content(config_file)
-            common_datasource_metadata = DataSourceMetadata.model_validate_json(content)
-            if common_datasource_metadata.underlying_implementation == \
-                        UnderlyingImplementation.SQL:
-                config = SQLDataSourceMetadata.model_validate_json(content)
-            elif common_datasource_metadata.underlying_implementation == \
-                    UnderlyingImplementation.BLOB_STORAGE:
-                config = BlobStorageDataSourceMetadata.model_validate_json(content)
-            elif common_datasource_metadata.underlying_implementation == \
-                    UnderlyingImplementation.SEARCH_SERVICE:
-                config = SearchServiceDataSourceMetadata.model_validate_json(content)
-            elif common_datasource_metadata.underlying_implementation == UnderlyingImplementation.CSV:
-                config = CSVDataSourceMetadata.model_validate_json(content)
-        except Exception:    
-            return None
+        if common_datasource_metadata.underlying_implementation == \
+                    UnderlyingImplementation.SQL:
+            config = SQLDataSourceMetadata.model_validate_json(
+                        mgr.read_file_content(config_file))
+        elif common_datasource_metadata.underlying_implementation == \
+                UnderlyingImplementation.BLOB_STORAGE:
+            config = BlobStorageDataSourceMetadata.model_validate_json(
+                        mgr.read_file_content(config_file))
+        elif common_datasource_metadata.underlying_implementation == \
+                UnderlyingImplementation.SEARCH_SERVICE:
+            config = SearchServiceDataSourceMetadata.model_validate_json(
+                        mgr.read_file_content(config_file))
+        elif common_datasource_metadata.underlying_implementation == UnderlyingImplementation.CSV:
+            config = CSVDataSourceMetadata.model_validate_json(mgr.read_file_content(config_file))
         return config

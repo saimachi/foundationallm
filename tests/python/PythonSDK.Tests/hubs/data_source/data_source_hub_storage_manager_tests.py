@@ -3,7 +3,6 @@ from unittest.mock import patch
 from foundationallm.config import Configuration
 from foundationallm.hubs.data_source import DataSourceHubStorageManager
 from foundationallm.storage import BlobStorageManager
-from azure.core.exceptions import ClientAuthenticationError
 from azure.storage.blob import BlobProperties
 
 
@@ -19,8 +18,7 @@ def data_source_hub_storage_manager(test_config):
 
 class DataSourceHubStorageManagerTests:
     """
-    DataSourceHubStorageManagerTests validates DataSourceHubStorageManager's behavior and ensures
-        that it is resilient under Blob Storage errors.
+    DataSourceHubStorageManagerTests validates DataSourceHubStorageManager's behavior.
 
     This is an integration test class and expects the following environment variable to be set:
         foundationallm-app-configuration-uri.
@@ -32,16 +30,11 @@ class DataSourceHubStorageManagerTests:
         """
         list_blobs() queries the files in the provided Blob Storage virtual path.
 
-        It truncates the file path from the returned blob names, and it should return an empty list if an error occurs.
+        It truncates the file path from the returned blob names.
 
-        This function assumes that a valid Blob Storage path is provided; it will handle any exceptions raised due to an invalid path.
+        This function assumes that a valid Blob Storage path is provided.
         """
         with patch.object(BlobStorageManager, "list_blobs") as list_blobs:
-            list_blobs.side_effect = [
-                [BlobProperties(name="/data_sources/sql.json")],
-                ClientAuthenticationError(),
-            ]
+            list_blobs.return_value = [BlobProperties(name="/data_sources/sql.json")]
             assert data_source_hub_storage_manager.list_blobs() == ["sql.json"]
             list_blobs.assert_called_once_with(path="")
-            # Blob Storage Exception
-            assert data_source_hub_storage_manager.list_blobs() == []

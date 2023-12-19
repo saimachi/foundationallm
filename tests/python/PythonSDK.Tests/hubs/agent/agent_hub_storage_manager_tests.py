@@ -3,7 +3,6 @@ from unittest.mock import patch
 from foundationallm.config import Configuration
 from foundationallm.hubs.agent import AgentHubStorageManager
 from foundationallm.storage import BlobStorageManager
-from azure.core.exceptions import ClientAuthenticationError
 from azure.storage.blob import BlobProperties
 
 @pytest.fixture
@@ -16,8 +15,7 @@ def agent_hub_storage_manager(test_config):
 
 class AgentHubStorageManagerTests:
     """
-    AgentHubStorageManagerTests validates AgentHubStorageManager's behavior and ensures
-        that it is resilient under Blob Storage errors.
+    AgentHubStorageManagerTests validates AgentHubStorageManager's behavior.
         
     This is an integration test class and expects the following environment variable to be set:
         foundationallm-app-configuration-uri.
@@ -28,16 +26,11 @@ class AgentHubStorageManagerTests:
         """
         list_blobs() queries the files in the provided Blob Storage virtual path.
         
-        It truncates the file path from the returned blob names, and it should return an empty list if an error occurs.
+        It truncates the file path from the returned blob names.
         
-        This function assumes that a valid Blob Storage path is provided; it will handle any exceptions raised due to an invalid path.
+        This function will raise an exception if an invalid Blob Storage path is provided.
         """
         with patch.object(BlobStorageManager, "list_blobs") as list_blobs:
-            list_blobs.side_effect = [
-                [BlobProperties(name="/agents/default.json")],
-                ClientAuthenticationError()
-            ]
+            list_blobs.return_value = [BlobProperties(name="/agents/default.json")]
             assert agent_hub_storage_manager.list_blobs("/agents") == ["default.json"]
             list_blobs.assert_called_once_with(path="/agents")
-            # Blob Storage Exception
-            assert agent_hub_storage_manager.list_blobs("/agents") == []
