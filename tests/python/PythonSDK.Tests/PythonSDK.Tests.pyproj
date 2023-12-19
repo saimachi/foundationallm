@@ -14,8 +14,6 @@
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <TestFramework>Pytest</TestFramework>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
-    <Environment>
-    </Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,14 +25,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config\configuration_tests.py" />
-    <Compile Include="hubs\agent\agent_repository_tests.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="hubs\agent\agent_repository_tests.py" />
     <Compile Include="hubs\agent\agent_resolver_tests.py" />
     <Compile Include="hubs\agent\agent_hub_tests.py" />
-    <Compile Include="hubs\agent\agent_hub_storage_manager_tests.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="hubs\agent\agent_hub_storage_manager_tests.py" />
     <Compile Include="hubs\data_source\data_source_hub_tests.py" />
     <Compile Include="hubs\data_source\data_source_hub_storage_manager_tests.py" />
     <Compile Include="hubs\data_source\data_source_repository_tests.py" />

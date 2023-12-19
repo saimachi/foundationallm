@@ -19,7 +19,6 @@ class AgentRepository(Repository):
         if pattern is None:
             pattern = ""
         agent_files = mgr.list_blobs(path=pattern)
-        agent_metadata = []
         return [AgentMetadata.model_validate_json(
             mgr.read_file_content(agent_file)) for agent_file in agent_files]
 
