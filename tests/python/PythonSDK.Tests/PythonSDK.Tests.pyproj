@@ -41,6 +41,7 @@
     <Compile Include="langchain\tools\query_pandas_dataframe_tool_tests.py" />
     <Compile Include="pytest.ini" />
     <Compile Include="langchain\agents\generic_resolver_agent_tests.py" />
+    <Compile Include="storage\blob_storage_manager_tests.py" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\python\PythonSDK\PythonSDK.pyproj">
@@ -63,6 +64,7 @@
     <Folder Include="config\" />
     <Folder Include="langchain\agents\" />
     <Folder Include="langchain\tools\" />
+    <Folder Include="storage\" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
