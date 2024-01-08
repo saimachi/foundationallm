@@ -36,6 +36,7 @@
     <Compile Include="langchain\agents\csv_agent_tests.py" />
     <Compile Include="langchain\agents\sql_db_agent_tests.py" />
     <Compile Include="langchain\message_history\message_history_tests.py" />
+    <Compile Include="langchain\tools\secure_sql_database_query_tool_tests.py" />
     <Compile Include="pytest.ini" />
     <Compile Include="langchain\agents\generic_resolver_agent_tests.py" />
   </ItemGroup>
@@ -59,6 +60,7 @@
     <Folder Include="langchain\message_history\" />
     <Folder Include="config\" />
     <Folder Include="langchain\agents\" />
+    <Folder Include="langchain\tools\" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
