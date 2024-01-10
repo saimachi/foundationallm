@@ -6,14 +6,19 @@ items:
     href: deployment/index.md
   - name: Deployment - Starter
     href: deployment/deployment-starter.md
-  - name: Authentication setup Microsoft Entra ID
-    href: deployment/authentication-setup-entra.md
   - name: Azure App Configuration values
     href: deployment/app-configuration-values.md
   - name: Configuration for deployment
     href: deployment/deployment-configuration.md
   - name: Configure access control for services
     href: deployment/configure-access-control-for-services.md
+  - name: Authentication setup
+    href: deployment/authentication/index.md
+    items:
+    - name: Core authentication setup - Microsoft Entra ID
+      href: deployment/authentication/core-authentication-setup-entra.md
+    - name: Management authentication setup - Microsoft Entra ID
+      href: deployment/authentication/management-authentication-setup-entra.md
 - name: Development
   href: development/index.md
   items:

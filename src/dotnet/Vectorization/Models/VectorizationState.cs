@@ -16,13 +16,6 @@ namespace FoundationaLLM.Vectorization.Models
     public class VectorizationState
     {
         /// <summary>
-        /// The unique identifier of the content (i.e., document) being vectorized.
-        /// </summary>
-        [JsonPropertyOrder(1)]
-        [JsonPropertyName("content_id")]
-        public required string ContentId { get; set; }
-
-        /// <summary>
         /// The unique identifier of the current vectorization request. Subsequent vectorization requests
         /// referring to the same content will have different unique identifiers.
         /// </summary>
@@ -31,12 +24,19 @@ namespace FoundationaLLM.Vectorization.Models
         public required string CurrentRequestId { get; set; }
 
         /// <summary>
+        /// The <see cref="VectorizationContentIdentifier"/> object identifying the content being vectorized.
+        /// </summary>
+        [JsonPropertyOrder(1)]
+        [JsonPropertyName("content_identifier")]
+        public required VectorizationContentIdentifier ContentIdentifier { get; set; }
+
+        /// <summary>
         /// The list of log entries associated with actions executed by the vectorization pipeline.
         /// </summary>
         [JsonPropertyOrder(18)]
         [JsonPropertyName("log")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<VectorizationLogEntry> LogEntries { get; set; } = new List<VectorizationLogEntry>();
+        public List<VectorizationLogEntry> LogEntries { get; set; } = [];
 
         /// <summary>
         /// Adds a new generic log entry.
@@ -75,5 +75,17 @@ namespace FoundationaLLM.Vectorization.Models
         public void LogHandlerError(IVectorizationStepHandler handler, string requestId, Exception ex) =>
             LogEntries.Add(new VectorizationLogEntry(
                 requestId, handler.StepId, $"ERROR: {ex.Message}"));
+
+        /// <summary>
+        /// Creates a new <see cref="VectorizationState"/> instance based on a specified vectorization request.
+        /// </summary>
+        /// <param name="request">The <see cref="VectorizationRequest"/> instance for which the state is created.</param>
+        /// <returns>The <see cref="VectorizationState"/> created from the request.</returns>
+        public static VectorizationState FromRequest(VectorizationRequest request) =>
+            new()
+            {
+                CurrentRequestId = request.Id,
+                ContentIdentifier = request.ContentIdentifier
+            };
     }
 }

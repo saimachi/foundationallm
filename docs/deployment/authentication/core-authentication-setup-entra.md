@@ -1,18 +1,18 @@
-# Authentication setup: Microsoft Entra ID
+# Core API and User Portal authentication setup: Microsoft Entra ID
 
 FoundationaLLM comes with out-of-the-box support for Microsoft Entra ID authentication. This means that you can use your Microsoft Entra ID account to log in to the chat interface.
 
-## Creating the Microsoft Entra ID applications
+## Create the Microsoft Entra ID applications
 
-To enable Microsoft Entra ID authentication, you need to create two applications in the Microsoft Azure portal:
+To enable Microsoft Entra ID authentication for the Core API and user portal, you need to create two applications in the Microsoft Azure portal:
 
-- A client application that will be used by the chat interface to authenticate users.
+- A client application that will be used by the user portal chat interface to authenticate users.
 - An API application that will be used by the Core API to authenticate users.
 
 ### Pre-requisites
 
 > [!NOTE]
-> Make sure that you have [deployed the solution](../deployment/index.md) before proceeding with the steps below.
+> Make sure that you have [deployed the solution](../../deployment/index.md) before proceeding with the steps below.
 
 #### Setup App Configuration access
 
@@ -20,7 +20,7 @@ To enable Microsoft Entra ID authentication, you need to create two applications
 2. Navigate to the Resource Group that was created as part of the deployment.
     > [!NOTE]
     > If you performed an Azure Container Apps (ACA) or Azure Kubernetes Service (AKS) deployment, you will see an extra Resource Group that starts with `ME_` or `MC_` in addition to the Resource Group defined during the deployment. You will need to navigate to the Resource Group that **does not start with** `ME_` or `MC_` to access the App Configuration resource.
-3. Select the **App Configuration** resource and select **Configuration explorer** to view the values. If you cannot access the configurations, add your user account as an **App Configuration Data Owner** through Access Control (IAM). You need this role in order to update the configurations as a required part of the authentication setup. To add your user account to the appropriate role, follow the instructions in the [Configure access control for services](../deployment/configure-access-control-for-services.md#azure-app-configuration-service) document.
+3. Select the **App Configuration** resource and select **Configuration explorer** to view the values. If you cannot access the configurations, add your user account as an **App Configuration Data Owner** through Access Control (IAM). You need this role in order to update the configurations as a required part of the authentication setup. To add your user account to the appropriate role, follow the instructions in the [Configure access control for services](../../deployment/configure-access-control-for-services.md#azure-app-configuration-service) document.
 
 #### Obtain the URL for the chat UI application
 
@@ -46,7 +46,7 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 
     ![The HTTP application routing domain property is highlighted.](media/aks-http-app-routing-domain.png)
 
-### Creating the client application
+### Create the client application
 
 #### Register the client application in the Microsoft Entra ID admin center
 
@@ -56,7 +56,7 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
     ![The app registrations menu item in the left-hand menu is highlighted.](media/entra-app-registrations.png)
 
 3. On the page that appears, select **+ New registration**.
-4. When the **Register an application** page appears, enter a name for your application, such as *FoundationaLLM-Client*. You should indicate that this is for the client application by appending *-Client* to the name.
+4. When the **Register an application** page appears, enter a name for your application, such as *FoundationaLLM-Client*. You should indicate that this is for the chat client (User Portal) application by appending *-Client* to the name.
 5. Under **Supported account types**, select *Accounts in this organizational directory only*.
 6. Select **Register**.
 
@@ -96,7 +96,16 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 
     ![The steps to create a client secret are highlighted.](media/entra-client-app-secret.png)
 
-### Creating the API application
+#### Update the client application manifest
+
+1. Under **Manage**, select **Manifest**.
+2. Locate the `accessTokenAcceptedVersion` property and set its value to `2`.
+
+    ![The accessTokenAcceptedVersion property is highlighted.](media/entra-client-app-manifest.png)
+
+3. Select **Save** at the top of the page to save the changes.
+
+### Create the API application
 
 #### Register the API application in the Microsoft Entra ID admin center
 
@@ -118,9 +127,14 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 #### Implicit grant and hybrid flows for the API application
 
 1. Select **Authentication** under **Manage** in the left-hand menu.
-2. Check **Access tokens** and **ID tokens** under **Implicit grant**.
-3. Select **Configure** to apply the changes.
-4. Select **Save** at the bottom of the page to save the changes.
+2. Select **+ Add a platform** under **Platform configurations**. In the pane that opens, select **Web**.
+3. Under "Redirect URIs", enter `http://localhost` and select **Configure**. Please note that this value is not used in the FoundationaLLM solution, but is required in order to be able to select the access and ID tokens in the next step.
+
+    ![The redirect URIs value is displayed as described.](media/entra-app-api-web-redirect-uri.png)
+
+4. Check **Access tokens** and **ID tokens** under **Implicit grant**.
+5. Select **Configure** to apply the changes.
+6. Select **Save** at the bottom of the page to save the changes.
 
     ![Both the Access tokens and ID tokens checkboxes are checked and the Save button is highlighted.](media/entra-app-client-authentication-implicit-grant.png)
 
@@ -161,6 +175,36 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 4. Select **Add application** to complete the client application addition.
 
     ![The add a client application form is displayed as described.](media/entra-api-app-add-client-app.png)
+
+#### Update the API application manifest
+
+1. Under **Manage**, select **Manifest**.
+2. Locate the `accessTokenAcceptedVersion` property and set its value to `2`.
+
+    ![The accessTokenAcceptedVersion property is highlighted.](media/entra-client-app-manifest.png)
+
+3. Select **Save** at the top of the page to save the changes.
+
+### Add API permissions for the client application
+
+1. Browse to **Identity** > **Applications** > **App registrations**.
+
+    ![The app registrations menu item in the left-hand menu is highlighted.](media/entra-app-registrations.png)
+
+2. Select the `FoundationaLLM-Client` application that you [created earlier](#register-the-client-application-in-the-microsoft-entra-admin-center).
+3. Select **API permissions**.
+4. Select **+ Add a permission** under the "Configured permissions" section.
+5. In the "Request API permissions" pan, select the **My APIs** tab, then select the `FoundationaLLM` API application.
+
+    ![The FoundationaLLM API is selected under My APIs.](media/entra-app-add-api-permission.png)
+
+6. Select the `Data.Read` scope that you created earlier, then select **Add permissions**.
+
+    ![The Data.Read scope is selected.](media/entra-app-add-api-permission-scope.png)
+
+The client application's configured permissions should now look like the following:
+
+![The client application's configured permissions are displayed.](media/entra-app-configured-permissions.png)
 
 ### Update App Configuration settings
 

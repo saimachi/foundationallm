@@ -21,10 +21,9 @@ namespace Gatekeeper.Tests.Services
         public GatekeeperServiceTests()
         {
             _testedService = new GatekeeperService(
-                _agentFactoryAPIService, 
-                _refinementService, 
-                _contentSafetyService, 
-                _gatekeeperIntegrationAPIService, 
+                _agentFactoryAPIService,
+                _contentSafetyService,
+                _gatekeeperIntegrationAPIService,
                 _gatekeeperServiceSettings);
         }
 

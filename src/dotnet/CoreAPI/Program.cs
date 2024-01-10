@@ -37,15 +37,15 @@ namespace FoundationaLLM.Core.API
             builder.Configuration.AddEnvironmentVariables();
             builder.Configuration.AddAzureAppConfiguration(options =>
             {
-                options.Connect(builder.Configuration["FoundationaLLM:AppConfig:ConnectionString"]);
+                options.Connect(builder.Configuration[AppConfigurationKeys.FoundationaLLM_AppConfig_ConnectionString]);
                 options.ConfigureKeyVault(options =>
                 {
                     options.SetCredential(new DefaultAzureCredential());
                 });
-                options.Select("FoundationaLLM:APIs:*");
-                options.Select("FoundationaLLM:CosmosDB:*");
-                options.Select("FoundationaLLM:Branding:*");
-                options.Select("FoundationaLLM:CoreAPI:Entra:*");
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_APIs);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_CosmosDB);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Branding);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_CoreAPI_Entra);
             });
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
@@ -63,9 +63,9 @@ namespace FoundationaLLM.Core.API
             });
 
             builder.Services.AddOptions<CosmosDbSettings>()
-                .Bind(builder.Configuration.GetSection("FoundationaLLM:CosmosDB"));
+                .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_CosmosDB));
             builder.Services.AddOptions<ClientBrandingConfiguration>()
-                .Bind(builder.Configuration.GetSection("FoundationaLLM:Branding"));
+                .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Branding));
 
             // Register the downstream services and HTTP clients.
             RegisterDownstreamServices(builder);
@@ -84,7 +84,7 @@ namespace FoundationaLLM.Core.API
 
             builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
             {
-                ConnectionString = builder.Configuration["FoundationaLLM:APIs:CoreAPI:AppInsightsConnectionString"],
+                ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_CoreAPI_AppInsightsConnectionString],
                 DeveloperMode = builder.Environment.IsDevelopment()
             });
             //builder.Services.AddServiceProfiler();
@@ -174,13 +174,13 @@ namespace FoundationaLLM.Core.API
         {
             var downstreamAPISettings = new DownstreamAPISettings
             {
-                DownstreamAPIs = new Dictionary<string, DownstreamAPIKeySettings>()
+                DownstreamAPIs = []
             };
 
             var gatekeeperAPISettings = new DownstreamAPIKeySettings
             {
-                APIUrl = builder.Configuration[$"FoundationaLLM:APIs:{HttpClients.GatekeeperAPI}:APIUrl"]!,
-                APIKey = builder.Configuration[$"FoundationaLLM:APIs:{HttpClients.GatekeeperAPI}:APIKey"]!
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperAPI_APIKey]!
             };
             downstreamAPISettings.DownstreamAPIs[HttpClients.GatekeeperAPI] = gatekeeperAPISettings;
 
@@ -210,11 +210,11 @@ namespace FoundationaLLM.Core.API
                     },
                     identityOptions =>
                     {
-                        identityOptions.ClientSecret = builder.Configuration["FoundationaLLM:CoreAPI:Entra:ClientSecret"];
-                        identityOptions.Instance = builder.Configuration["FoundationaLLM:CoreAPI:Entra:Instance"] ?? "";
-                        identityOptions.TenantId = builder.Configuration["FoundationaLLM:CoreAPI:Entra:TenantId"];
-                        identityOptions.ClientId = builder.Configuration["FoundationaLLM:CoreAPI:Entra:ClientId"];
-                        identityOptions.CallbackPath = builder.Configuration["FoundationaLLM:CoreAPI:Entra:CallbackPath"];
+                        identityOptions.ClientSecret = builder.Configuration[AppConfigurationKeys.FoundationaLLM_CoreAPI_Entra_ClientSecret];
+                        identityOptions.Instance = builder.Configuration[AppConfigurationKeys.FoundationaLLM_CoreAPI_Entra_Instance] ?? "";
+                        identityOptions.TenantId = builder.Configuration[AppConfigurationKeys.FoundationaLLM_CoreAPI_Entra_TenantId];
+                        identityOptions.ClientId = builder.Configuration[AppConfigurationKeys.FoundationaLLM_CoreAPI_Entra_ClientId];
+                        identityOptions.CallbackPath = builder.Configuration[AppConfigurationKeys.FoundationaLLM_CoreAPI_Entra_CallbackPath];
                     });
                 //.EnableTokenAcquisitionToCallDownstreamApi()
                 //.AddInMemoryTokenCaches();
@@ -223,15 +223,13 @@ namespace FoundationaLLM.Core.API
             builder.Services.AddScoped<IUserClaimsProviderService, EntraUserClaimsProviderService>();
 
             // Configure the scope used by the API controllers:
-            var requiredScope = builder.Configuration["FoundationaLLM:CoreAPI:Entra:Scopes"] ?? "";
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequiredScope", policyBuilder =>
+            var requiredScope = builder.Configuration[AppConfigurationKeys.FoundationaLLM_CoreAPI_Entra_Scopes] ?? "";
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("RequiredScope", policyBuilder =>
                 {
                     policyBuilder.RequireAuthenticatedUser();
                     policyBuilder.RequireClaim("http://schemas.microsoft.com/identity/claims/scope", requiredScope.Split(' '));
                 });
-            });
         }
     }
 }

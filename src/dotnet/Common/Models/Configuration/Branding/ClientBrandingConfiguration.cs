@@ -60,7 +60,7 @@ namespace FoundationaLLM.Common.Models.Configuration.Branding
         /// </summary>
         public string? SecondaryTextColor { get; set; }
         /// <summary>
-        /// Comma-separated list of global agents..
+        /// Comma-separated list of global agents.
         /// </summary>
         public string? AllowAgentSelection { get; set; }
     }

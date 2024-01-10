@@ -39,14 +39,14 @@ namespace FoundationaLLM.Gatekeeper.API
             builder.Configuration.AddEnvironmentVariables();
             builder.Configuration.AddAzureAppConfiguration(options =>
             {
-                options.Connect(builder.Configuration["FoundationaLLM:AppConfig:ConnectionString"]);
+                options.Connect(builder.Configuration[AppConfigurationKeys.FoundationaLLM_AppConfig_ConnectionString]);
                 options.ConfigureKeyVault(options =>
                 {
                     options.SetCredential(new DefaultAzureCredential());
                 });
-                options.Select("FoundationaLLM:APIs:*");
-                options.Select("FoundationaLLM:Refinement:*");
-                options.Select("FoundationaLLM:AzureContentSafety:*");
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_APIs);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Refinement);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_AzureContentSafety);
             });
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
@@ -54,7 +54,7 @@ namespace FoundationaLLM.Gatekeeper.API
             // Add services to the container.
             builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
             {
-                ConnectionString = builder.Configuration["FoundationaLLM:APIs:GatekeeperAPI:AppInsightsConnectionString"],
+                ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperAPI_AppInsightsConnectionString],
                 DeveloperMode = builder.Environment.IsDevelopment()
             });
             //builder.Services.AddServiceProfiler();
@@ -67,7 +67,7 @@ namespace FoundationaLLM.Gatekeeper.API
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<APIKeyAuthenticationFilter>();
             builder.Services.AddOptions<APIKeyValidationSettings>()
-                .Bind(builder.Configuration.GetSection("FoundationaLLM:APIs:GatekeeperAPI"));
+                .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_APIs_GatekeeperAPI));
 
             // Register the downstream services and HTTP clients.
             RegisterDownstreamServices(builder);
@@ -75,11 +75,11 @@ namespace FoundationaLLM.Gatekeeper.API
             builder.Services.AddTransient<IAPIKeyValidationService, APIKeyValidationService>();
 
             builder.Services.AddOptions<RefinementServiceSettings>()
-                .Bind(builder.Configuration.GetSection("FoundationaLLM:Refinement"));
+                .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Refinement));
             builder.Services.AddScoped<IRefinementService, RefinementService>();
 
             builder.Services.AddOptions<AzureContentSafetySettings>()
-                .Bind(builder.Configuration.GetSection("FoundationaLLM:AzureContentSafety"));
+                .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_AzureContentSafety));
             builder.Services.AddScoped<IContentSafetyService, AzureContentSafetyService>();
 
             builder.Services.AddScoped<IAgentFactoryAPIService, AgentFactoryAPIService>();
@@ -91,7 +91,7 @@ namespace FoundationaLLM.Gatekeeper.API
             builder.Services.AddScoped<IUserClaimsProviderService, NoOpUserClaimsProviderService>();
 
             builder.Services.AddOptions<GatekeeperServiceSettings>()
-                .Bind(builder.Configuration.GetSection("FoundationaLLM:APIs:GatekeeperAPI:Configuration"));
+                .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_APIs_GatekeeperAPI_Configuration));
             builder.Services.AddScoped<IGatekeeperService, GatekeeperService>();
 
             builder.Services
@@ -158,7 +158,7 @@ namespace FoundationaLLM.Gatekeeper.API
                     }
                 });
 
-            bool.TryParse(builder.Configuration[$"FoundationaLLM:APIs:{HttpClients.GatekeeperAPI}:ForceHttpsRedirection"], out var forceHttpsRedirection);
+            _ = bool.TryParse(builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperAPI_ForceHttpsRedirection], out var forceHttpsRedirection);
             if (forceHttpsRedirection)
             {
                 app.UseHttpsRedirection();
@@ -180,13 +180,13 @@ namespace FoundationaLLM.Gatekeeper.API
         {
             var downstreamAPISettings = new DownstreamAPISettings
             {
-                DownstreamAPIs = new Dictionary<string, DownstreamAPIKeySettings>()
+                DownstreamAPIs = []
             };
 
             var agentFactoryAPISettings = new DownstreamAPIKeySettings
             {
-                APIUrl = builder.Configuration[$"FoundationaLLM:APIs:{HttpClients.AgentFactoryAPI}:APIUrl"]!,
-                APIKey = builder.Configuration[$"FoundationaLLM:APIs:{HttpClients.AgentFactoryAPI}:APIKey"]!
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_AgentFactoryAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_AgentFactoryAPI_APIKey]!
             };
 
             downstreamAPISettings.DownstreamAPIs[HttpClients.AgentFactoryAPI] = agentFactoryAPISettings;
@@ -203,8 +203,8 @@ namespace FoundationaLLM.Gatekeeper.API
 
             var gatekeeperIntegrationAPISettings = new DownstreamAPIKeySettings
             {
-                APIUrl = builder.Configuration[$"FoundationaLLM:APIs:{HttpClients.GatekeeperIntegrationAPI}:APIUrl"]!,
-                APIKey = builder.Configuration[$"FoundationaLLM:APIs:{HttpClients.GatekeeperIntegrationAPI}:APIKey"]!
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperIntegrationAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperIntegrationAPI_APIKey]!
             };
 
             downstreamAPISettings.DownstreamAPIs[HttpClients.GatekeeperIntegrationAPI] = gatekeeperIntegrationAPISettings;

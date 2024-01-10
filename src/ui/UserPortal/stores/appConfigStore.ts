@@ -77,8 +77,8 @@ export const useAppConfigStore = defineStore('appConfig', {
 
 			this.apiUrl = apiUrl;
 
-			this.isKioskMode = JSON.parse(isKioskMode);
-			this.allowAgentHint = JSON.parse(allowAgentHint)?.enabled;
+			this.isKioskMode = JSON.parse(isKioskMode.toLowerCase());
+			this.allowAgentHint = JSON.parse(allowAgentHint.toLowerCase())?.enabled;
 			this.agents = agents.split(', ');
 
 			this.auth.clientId = authClientId;

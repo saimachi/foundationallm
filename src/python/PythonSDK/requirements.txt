@@ -22,3 +22,4 @@ unstructured==0.10.22
 unstructured[all-docs]==0.10.22
 azure-appconfiguration-provider==1.0.0
 pylint==3.0.2
+azure-search-documents==11.4.0

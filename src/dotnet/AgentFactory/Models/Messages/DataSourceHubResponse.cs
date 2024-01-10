@@ -80,7 +80,7 @@ namespace FoundationaLLM.AgentFactory.Core.Models.Messages
         public List<string>? Files { get; set; }
 
         /// <summary>
-        /// Discriptor for the type of data in the data source.
+        /// Descriptor for the type of data in the data source.
         /// </summary>
         /// <example>Survey data for a CSV file that contains survey results.</example>
         [JsonProperty("data_description")]
@@ -115,5 +115,29 @@ namespace FoundationaLLM.AgentFactory.Core.Models.Messages
         /// </summary>
         [JsonProperty("row_level_security_enabled")]
         public bool? RowLevelSecurityEnabled { get; set; }
+
+        /// <summary>
+        /// The name of the index for Search Service configuration.
+        /// </summary>
+        [JsonProperty("index_name")]
+        public string? IndexName { get; set; }
+
+        /// <summary>
+        /// (Optional) The number of rows to return from the Search Service.
+        /// </summary>
+        [JsonProperty("top_n")]
+        public int? TopN { get; set; }
+
+        /// <summary>
+        /// (Optional) The name of the field to use for embedding in the Search Service.
+        /// </summary>
+        [JsonProperty("embedding_field_name")]
+        public string? EmbeddingFieldName { get; set; }
+
+        /// <summary>
+        /// (Optional) The name of the field to use for raw text in the Search Service.
+        /// </summary>
+        [JsonProperty("text_field_name")]
+        public string? TextFieldName { get; set; }
     }
 }

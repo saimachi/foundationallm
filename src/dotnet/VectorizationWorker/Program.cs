@@ -1,10 +1,15 @@
 using Asp.Versioning;
 using Azure.Identity;
+using FoundationaLLM.Common.Authentication;
+using FoundationaLLM.Common.Constants;
+using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.OpenAPI;
+using FoundationaLLM.Common.Settings;
 using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models.Configuration;
 using FoundationaLLM.Vectorization.Services.VectorizationStates;
 using FoundationaLLM.Vectorization.Worker;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,15 +18,22 @@ builder.Configuration.AddJsonFile("appsettings.json", false, true);
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddAzureAppConfiguration(options =>
 {
-    options.Connect(builder.Configuration["FoundationaLLM:AppConfig:ConnectionString"]);
+    options.Connect(builder.Configuration[AppConfigurationKeys.FoundationaLLM_AppConfig_ConnectionString]);
     options.ConfigureKeyVault(options =>
     {
         options.SetCredential(new DefaultAzureCredential());
     });
-    options.Select("FoundationaLLM:Vectorization:*");
+    options.Select(AppConfigurationKeyFilters.FoundationaLLM_Vectorization);
+    options.Select(AppConfigurationKeyFilters.FoundationaLLM_APIs_VectorizationWorker);
 });
 if (builder.Environment.IsDevelopment())
     builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
+
+builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
+{
+    ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_VectorizationWorker_AppInsightsConnectionString],
+    DeveloperMode = builder.Environment.IsDevelopment()
+});
 
 var allowAllCorsOrigins = "AllowAllOrigins";
 builder.Services.AddCors(policyBuilder =>
@@ -35,14 +47,29 @@ builder.Services.AddCors(policyBuilder =>
         });
 });
 
+// Add configurations to the container
+builder.Services.AddOptions<VectorizationWorkerSettings>()
+    .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_WorkerSettings));
+builder.Services.AddOptions<BlobStorageVectorizationStateServiceSettings>()
+    .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_StateServiceSettings));
+
+builder.Services.AddSingleton(
+    typeof(IConfigurationSection),
+    builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_Queues));
+
 // Add services to the container.
-builder.Services.AddSingleton<IVectorizationStateService, MemoryVectorizationStateService>();
+builder.Services.AddTransient<IAPIKeyValidationService, APIKeyValidationService>();
+builder.Services.AddSingleton<IVectorizationStateService, BlobStorageVectorizationStateService>();
 builder.Services.AddHostedService<Worker>();
 
-builder.Services.AddOptions<VectorizationWorkerSettings>()
-    .Bind(builder.Configuration.GetSection("FoundationaLLM:Vectorization:WorkerSettings"));
-
 builder.Services.AddControllers();
+
+// Add API Key Authorization
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<APIKeyAuthenticationFilter>();
+builder.Services.AddOptions<APIKeyValidationSettings>()
+    .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_APIs_VectorizationWorker));
+
 builder.Services
     .AddApiVersioning(options =>
     {

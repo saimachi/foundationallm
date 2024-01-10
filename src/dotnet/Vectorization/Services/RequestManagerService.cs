@@ -45,11 +45,10 @@ namespace FoundationaLLM.Vectorization.Services
             _logger = logger;
             _cancellationToken = cancellationToken;
 
-            if (!_requestSourceServices.ContainsKey(_settings.RequestSourceName)
-                || _requestSourceServices[_settings.RequestSourceName] == null)
+            if (!_requestSourceServices.TryGetValue(_settings.RequestSourceName, out IRequestSourceService? value) || value == null)
                 throw new VectorizationException($"Could not find a request source service for [{_settings.RequestSourceName}].");
 
-            _incomingRequestSourceService = _requestSourceServices[_settings.RequestSourceName];
+            _incomingRequestSourceService = value;
 
             _taskPool = new TaskPool(_settings.MaxHandlerInstances);
         }
@@ -57,7 +56,7 @@ namespace FoundationaLLM.Vectorization.Services
         /// <inheritdoc/>
         public async Task Run()
         {
-            _logger.LogInformation($"The request manager service associated with source [{_settings.RequestSourceName}] started processing requests.");
+            _logger.LogInformation("The request manager service associated with source [{RequestSourceName}] started processing requests.", _settings.RequestSourceName);
 
             while (true)
             {
@@ -76,8 +75,8 @@ namespace FoundationaLLM.Vectorization.Services
                         // thread pool thread, with no user code higher on the stack (for details, see
                         // https://devblogs.microsoft.com/dotnet/configureawait-faq/).
                         _taskPool.Add(
-                            requests.Select(request => Task.Run(
-                                async () => { await ProcessRequest(request); },
+                            requests.Select(r => Task.Run(
+                                async () => { await ProcessRequest(r.Request, r.MessageId, r.PopReceipt); },
                                 _cancellationToken)));
                     }
                     else
@@ -87,31 +86,33 @@ namespace FoundationaLLM.Vectorization.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error in request processing loop (request source name: {_settings.RequestSourceName}).");
+                    _logger.LogError(ex, "Error in request processing loop (request source name: {RequestSourceName}).", _settings.RequestSourceName);
                 }
             }
 
-            _logger.LogInformation($"The request manager service associated with source [{_settings.RequestSourceName}] finished processing requests.");
+            _logger.LogInformation("The request manager service associated with source [{RequestSourceName}] finished processing requests.", _settings.RequestSourceName);
         }
 
-        private async Task ProcessRequest(VectorizationRequest request)
+        private async Task ProcessRequest(VectorizationRequest request, string messageId, string popReceipt)
         {
             try
             {
                 await HandleRequest(request);
                 await AdvanceRequest(request);
 
-                await _incomingRequestSourceService.DeleteRequest(request.Id);
+                await _incomingRequestSourceService.DeleteRequest(messageId, popReceipt);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error processing request with id {request.Id}.");
+                _logger.LogError(ex, "Error processing request with id {RequestId}.", request.Id);
             }
         }
 
         private async Task HandleRequest(VectorizationRequest request)
         {
-            var state = await _vectorizationStateService.ReadState(request.Id);
+            var state = await _vectorizationStateService.HasState(request)
+                ? await _vectorizationStateService.ReadState(request)
+                : VectorizationState.FromRequest(request);
 
             var stepHandler = VectorizationStepHandlerFactory.Create(_settings.RequestSourceName, request[_settings.RequestSourceName]!.Parameters);
             await stepHandler.Invoke(request, state, _cancellationToken);
@@ -127,11 +128,10 @@ namespace FoundationaLLM.Vectorization.Services
             {
                 // The vectorization request still has steps to be processed
 
-                if (!_requestSourceServices.ContainsKey(nextStep)
-                    || _requestSourceServices[nextStep] == null)
+                if (!_requestSourceServices.TryGetValue(nextStep, out IRequestSourceService? value) || value == null)
                     throw new VectorizationException($"Could not find the [{nextStep}] request source service for request id {request.Id}.");
 
-                await _requestSourceServices[nextStep].SubmitRequest(request);
+                await value.SubmitRequest(request);
             }
         }
     }

@@ -1,37 +1,81 @@
-﻿using FoundationaLLM.Vectorization.Interfaces;
+﻿using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
+using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models;
+using FoundationaLLM.Vectorization.Models.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using System.Linq;
+using System.Text.Json;
 
 namespace FoundationaLLM.Vectorization.Services.RequestSources
 {
     public class StorageQueueRequestSourceService : IRequestSourceService
     {
-        private readonly string _sourceName;
+        private readonly RequestSourceServiceSettings _settings;
         private readonly ILogger<StorageQueueRequestSourceService> _logger;
 
+        private readonly QueueClient _queueClient;
+
         /// <inheritdoc/>
-        public string SourceName => _sourceName;
+        public string SourceName => _settings.Name;
 
         public StorageQueueRequestSourceService(
-            string sourceName,
+            RequestSourceServiceSettings settings,
             ILogger<StorageQueueRequestSourceService> logger)
         {
-            _sourceName = sourceName;
+            _settings = settings;
             _logger = logger;
+
+            var queueServiceClient = new QueueServiceClient(_settings.ConnectionString);
+            _queueClient = queueServiceClient.GetQueueClient(_settings.Name);
         }
 
         /// <inheritdoc/>
-        public Task DeleteRequest(string requestId) => throw new NotImplementedException();
+        public async Task<bool> HasRequests()
+        {
+            var message = await _queueClient.PeekMessageAsync();
+            return message.Value != null;
+        }
 
         /// <inheritdoc/>
-        public Task<bool> HasRequests() => throw new NotImplementedException();
+        public async Task<IEnumerable<(VectorizationRequest Request, string MessageId, string PopReceipt)>> ReceiveRequests(int count)
+        {
+            var receivedMessages = await _queueClient.ReceiveMessagesAsync(count, TimeSpan.FromSeconds(_settings.VisibilityTimeoutSeconds));
+
+            var result = new List<(VectorizationRequest, string, string)>();
+
+            if (receivedMessages.HasValue)
+            {
+                foreach (var m in receivedMessages.Value)
+                {
+                    try
+                    {
+                        var vectorizationRequest = JsonSerializer.Deserialize<VectorizationRequest>(m.Body.ToString());
+                        result.Add(new(
+                            vectorizationRequest!,
+                            m.MessageId,
+                            m.PopReceipt));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Cannot deserialize message with id {MessageId}.", m.MessageId);
+                    }
+                }
+            }
+
+            return result;
+        }
 
         /// <inheritdoc/>
-        public Task<IEnumerable<VectorizationRequest>> ReceiveRequests(int count) => throw new NotImplementedException();
+        public async Task DeleteRequest(string requestId, string popReceipt) =>
+            await _queueClient.DeleteMessageAsync(requestId, popReceipt);
 
         /// <inheritdoc/>
-        public Task SubmitRequest(VectorizationRequest request) => throw new NotImplementedException();
+        public async Task SubmitRequest(VectorizationRequest request)
+        {
+            var serializedMessage = JsonSerializer.Serialize(request);
+            await _queueClient.SendMessageAsync(serializedMessage);
+        }
     }
 }

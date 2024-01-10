@@ -9,3 +9,4 @@ class AgentType(str,Enum):
     CONVERSATIONAL = "conversational"
     SUMMARY = "summary"
     GENERIC_RESOLVER = "generic-resolver"
+    SEARCH_SERVICE = "search-service"
