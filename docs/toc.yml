@@ -51,6 +51,36 @@ items:
       href: setup-guides/agents/index.md
     - name: SQL database agent setup procedures
       href: setup-guides/agents/sql-database-agents.md
+- name: Operations
+  href: operations/index.md
+  items:
+  - name: Standard platform administration documentation
+    href: operations/index.md
+  - name: Backups & data resiliency
+    href: operations/backups.md
+  - name: Logging and auditing
+    href: operations/logs.md
+  - name: Guidance for creating release notes
+    href: operations/release-notes.md
+  - name: Platform security features & best practices
+    href: operations/security.md
+  - name: Troubleshooting & issue reporting guide
+    href: operations/troubleshooting.md
+  - name: Updating container versions in Standard Deployment
+    href: operations/update.md
+  - name: Vulnerabilities - Identification, communication, and remediation
+    href: operations/vulnerabilities.md
+  - name: Role-based access control (RBAC)
+    href: role-based-access-control/index.md
+    items:
+      - name: Understand FoundationaLLM role definitions
+        href: role-based-access-control/role-definitions.md
+      - name: Understand FoundationaLLM role assignments
+        href: role-based-access-control/role-assignments.md
+      - name: Understand scope for FoundationaLLM RBAC
+        href: role-based-access-control/scope.md
+      - name: Manage role assignments
+        href: role-based-access-control/role-management.md
 - name: API
   href: api/index.md
   items:

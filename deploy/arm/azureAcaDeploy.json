@@ -427,7 +427,7 @@
         },
         {
           "key": "FoundationaLLM:Management:Entra:Scopes",
-          "value": "api://FoundationaLLM-Auth/Data.Read",
+          "value": "api://FoundationaLLM-Management-Auth/Data.Manage",
           "contentType": null
         },
         {
@@ -537,7 +537,7 @@
         },
         {
           "key": "FoundationaLLM:ManagementAPI:Entra:Scopes",
-          "value": "Data.Read",
+          "value": "Data.Manage",
           "contentType": null
         },
         {
@@ -740,7 +740,7 @@
           "value": "{\n\t\"RequestManagers\": [\n\t\t{\n\t\t\t\"RequestSourceName\": \"extract\",\n\t\t\t\"MaxHandlerInstances\": 1\n\t\t},\n\t\t{\n\t\t\t\"RequestSourceName\": \"partition\",\n\t\t\t\"MaxHandlerInstances\": 1\n\t\t},\n\t\t{\n\t\t\t\"RequestSourceName\": \"embed\",\n\t\t\t\"MaxHandlerInstances\": 1\n\t\t},\n\t\t{\n\t\t\t\"RequestSourceName\": \"index\",\n\t\t\t\"MaxHandlerInstances\": 1\n\t\t}\n\t],\n\t\"QueuingEngine\": \"None\"\n}",
           "contentType": "application/json"
         }
-      ], 
+      ],
       "featureFlags": [
         {
           "key": "FoundationaLLM-AllowAgentHint",
@@ -795,7 +795,7 @@
         {
           "key": "agentfactory",
           "image": "ghcr.io/solliancenet/foundationallm/agent-factory-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -806,7 +806,7 @@
         {
           "key": "core",
           "image": "ghcr.io/solliancenet/foundationallm/core-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -817,7 +817,7 @@
         {
           "key": "management",
           "image": "ghcr.io/solliancenet/foundationallm/management-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -828,7 +828,7 @@
         {
           "key": "gatekeeper",
           "image": "ghcr.io/solliancenet/foundationallm/gatekeeper-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -839,7 +839,7 @@
         {
           "key": "semantickernel",
           "image": "ghcr.io/solliancenet/foundationallm/semantic-kernel-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -850,7 +850,7 @@
         {
           "key": "vectorization",
           "image": "ghcr.io/solliancenet/foundationallm/vectorization-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -866,7 +866,7 @@
         {
           "key": "corejob",
           "image": "ghcr.io/solliancenet/foundationallm/core-job",
-          "tag": "0.1",
+          "tag": "latest",
           "replicas": 1,
           "resources": {
             "cpu": 0.25,
@@ -876,7 +876,7 @@
         {
           "key": "vectorizationjob",
           "image": "ghcr.io/solliancenet/foundationallm/vectorization-job",
-          "tag": "0.1",
+          "tag": "latest",
           "replicas": 1,
           "resources": {
             "cpu": 0.25,
@@ -894,7 +894,7 @@
         {
           "key": "chatui",
           "image": "ghcr.io/solliancenet/foundationallm/chat-ui",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 3000,
           "replicas": 1,
           "resources": {
@@ -905,7 +905,7 @@
         {
           "key": "managementui",
           "image": "ghcr.io/solliancenet/foundationallm/management-ui",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 3000,
           "replicas": 1,
           "resources": {
@@ -921,7 +921,7 @@
         {
           "key": "agenthub",
           "image": "ghcr.io/solliancenet/foundationallm/agent-hub-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -932,7 +932,7 @@
         {
           "key": "datasourcehub",
           "image": "ghcr.io/solliancenet/foundationallm/data-source-hub-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -943,7 +943,7 @@
         {
           "key": "gatekeeperint",
           "image": "ghcr.io/solliancenet/foundationallm/gatekeeper-integration-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -954,18 +954,18 @@
         {
           "key": "langchain",
           "image": "ghcr.io/solliancenet/foundationallm/langchain-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
-          "replicas": 10,
+          "replicas": 1,
           "resources": {
-            "cpu": 0.5,
-            "memory": "2Gi"
+            "cpu": 4,
+            "memory": "16Gi"
           }
         },
         {
           "key": "prompthub",
           "image": "ghcr.io/solliancenet/foundationallm/prompt-hub-api",
-          "tag": "0.1",
+          "tag": "latest",
           "containerPort": 80,
           "replicas": 1,
           "resources": {
@@ -1521,7 +1521,7 @@
       "type": "Microsoft.OperationalInsights/workspaces",
       "apiVersion": "2021-12-01-preview",
       "name": "[variables('laSettings').name]",
-      "location": "eastus",
+      "location": "[parameters('location')]",
       "properties": {
         "sku": {
           "name": "Standalone"

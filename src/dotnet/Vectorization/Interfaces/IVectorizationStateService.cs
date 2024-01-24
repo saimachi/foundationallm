@@ -23,6 +23,14 @@ namespace FoundationaLLM.Vectorization.Interfaces
         Task<VectorizationState> ReadState(VectorizationRequest request);
 
         /// <summary>
+        /// Loads into the state the specified type of artifact(s).
+        /// </summary>
+        /// <param name="state">The vectorization state in which the artifacts will be loaded.</param>
+        /// <param name="artifactType">The type of artifact(s) to load.</param>
+        /// <returns></returns>
+        Task LoadArtifacts(VectorizationState state, VectorizationArtifactType artifactType);
+
+        /// <summary>
         /// Saves a specified vectorization state.
         /// </summary>
         /// <param name="state">The <see cref="VectorizationState"/> item to be saved.</param>

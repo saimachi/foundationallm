@@ -50,7 +50,7 @@ builder.Services.AddCors(policyBuilder =>
 // Add configurations to the container
 
 builder.Services.AddOptions<VectorizationWorkerSettings>()
-    .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_WorkerSettings));
+    .Bind(builder.Configuration.GetSection(AppConfigurationKeys.FoundationaLLM_Vectorization_VectorizationWorker));
 
 builder.Services.AddSingleton(
     typeof(IConfigurationSection),

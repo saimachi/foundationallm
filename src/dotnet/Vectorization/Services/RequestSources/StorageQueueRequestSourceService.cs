@@ -10,6 +10,9 @@ using System.Text.Json;
 
 namespace FoundationaLLM.Vectorization.Services.RequestSources
 {
+    /// <summary>
+    /// Implements a request source that uses Azure storage queues.
+    /// </summary>
     public class StorageQueueRequestSourceService : IRequestSourceService
     {
         private readonly RequestSourceServiceSettings _settings;
@@ -20,6 +23,11 @@ namespace FoundationaLLM.Vectorization.Services.RequestSources
         /// <inheritdoc/>
         public string SourceName => _settings.Name;
 
+        /// <summary>
+        /// Creates a new instance of the request source.
+        /// </summary>
+        /// <param name="settings">The <see cref="RequestSourceServiceSettings"/> object providing the settings.</param>
+        /// <param name="logger">The logger used for logging.</param>
         public StorageQueueRequestSourceService(
             RequestSourceServiceSettings settings,
             ILogger<StorageQueueRequestSourceService> logger)

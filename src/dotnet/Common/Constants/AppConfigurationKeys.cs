@@ -273,6 +273,26 @@ namespace FoundationaLLM.Common.Constants
         /// </summary>
         public const string FoundationaLLM_Branding_AccentColor = "FoundationaLLM:Branding:AccentColor";
         /// <summary>
+        /// The key for the FoundationaLLM:Branding:AccentTextColor app configuration setting.
+        /// </summary>
+        public const string FoundationaLLM_Branding_AccentTextColor = "FoundationaLLM:Branding:AccentTextColor";
+        /// <summary>
+        /// The key for the FoundationaLLM:Branding:PrimaryButtonBackgroundColor app configuration setting.
+        /// </summary>
+        public const string FoundationaLLM_Branding_PrimaryButtonBackgroundColor = "FoundationaLLM:Branding:PrimaryButtonBackgroundColor";
+        /// <summary>
+        /// The key for the FoundationaLLM:Branding:PrimaryButtonTextColor app configuration setting.
+        /// </summary>
+        public const string FoundationaLLM_Branding_PrimaryButtonTextColor = "FoundationaLLM:Branding:PrimaryButtonTextColor";
+        /// <summary>
+        /// The key for the FoundationaLLM:Branding:SecondaryButtonBackgroundColor app configuration setting.
+        /// </summary>
+        public const string FoundationaLLM_Branding_SecondaryButtonBackgroundColor = "FoundationaLLM:Branding:SecondaryButtonBackgroundColor";
+        /// <summary>
+        /// The key for the FoundationaLLM:Branding:SecondaryButtonTextColor app configuration setting.
+        /// </summary>
+        public const string FoundationaLLM_Branding_SecondaryButtonTextColor = "FoundationaLLM:Branding:SecondaryButtonTextColor";
+        /// <summary>
         /// The key for the FoundationaLLM:Branding:AllowAgentSelection app configuration setting.
         /// This value corresponds with the `FoundationaLLM-AllowAgentHint` feature flag. If the feature flag is `true`,
         /// then the User Portal UI uses these values to provide agent hints to the Agent Hub in completions-based
@@ -630,9 +650,13 @@ namespace FoundationaLLM.Common.Constants
         /// </summary>
         public const string FoundationaLLM_SemanticKernelAPI_OpenAI_ShortSummaryPromptName = "FoundationaLLM:SemanticKernelAPI:OpenAI.ShortSummaryPromptName";
         /// <summary>
-        /// The key for the FoundationaLLM:Vectorization:WorkerSettings app configuration setting.
+        /// The key section for the FoundationaLLM:Vectorization:ContentSourceManagerService app configuration setting.
         /// </summary>
-        public const string FoundationaLLM_Vectorization_WorkerSettings = "FoundationaLLM:Vectorization:WorkerSettings";
+        public const string FoundationaLLM_Vectorization_ContentSourceManagerService = "FoundationaLLM:Vectorization:ContentSourceManagerService";
+        /// <summary>
+        /// The key section for the FoundationaLLM:Vectorization:VectorizationWorker app configuration setting.
+        /// </summary>
+        public const string FoundationaLLM_Vectorization_VectorizationWorker = "FoundationaLLM:Vectorization:VectorizationWorker";
     }
 
     /// <summary>
@@ -716,6 +740,10 @@ namespace FoundationaLLM.Common.Constants
         /// </summary>
         public const string FoundationaLLM_CosmosDB = "FoundationaLLM:CosmosDB";
         /// <summary>
+        /// The key section for the FoundationaLLM:APIs:CoreAPI app configuration settings.
+        /// </summary>
+        public const string FoundationaLLM_APIs_CoreAPI = "FoundationaLLM:APIs:CoreAPI";
+        /// <summary>
         /// The key section for the FoundationaLLM:APIs:AgentFactoryAPI app configuration settings.
         /// </summary>
         public const string FoundationaLLM_APIs_AgentFactoryAPI = "FoundationaLLM:APIs:AgentFactoryAPI";
@@ -780,16 +808,20 @@ namespace FoundationaLLM.Common.Constants
         /// </summary>
         public const string FoundationaLLM_BlobStorageMemorySource = "FoundationaLLM:BlobStorageMemorySource";
         /// <summary>
+        /// The key section for the FoundationaLLM:Vectorization:ContentSources app configuration settings.
+        /// </summary>
+        public const string FoundationaLLM_Vectorization_ContentSources = "FoundationaLLM:Vectorization:ContentSources";
+        /// <summary>
+        /// The key section for the FoundationaLLM:Vectorization:Steps app configuration settings.
+        /// </summary>
+        public const string FoundationaLLM_Vectorization_Steps = "FoundationaLLM:Vectorization:Steps";
+        /// <summary>
         /// The key section for the FoundationaLLM:Vectorization:Queues app configuration settings.
         /// </summary>
         public const string FoundationaLLM_Vectorization_Queues = "FoundationaLLM:Vectorization:Queues";
         /// <summary>
-        /// The key section for the FoundationaLLM:Vectorization:StateServiceSettings app configuration settings.
+        /// The key section for the FoundationaLLM:Vectorization:StateService app configuration settings.
         /// </summary>
-        public const string FoundationaLLM_Vectorization_StateServiceSettings = "FoundationaLLM:Vectorization:StateServiceSettings";
-        /// <summary>
-        /// The key section for the FoundationaLLM:Vectorization:WorkerSettings app configuration settings.
-        /// </summary>
-        public const string FoundationaLLM_Vectorization_WorkerSettings = "FoundationaLLM:Vectorization:WorkerSettings";
+        public const string FoundationaLLM_Vectorization_StateService = "FoundationaLLM:Vectorization:StateService";
     }
 }

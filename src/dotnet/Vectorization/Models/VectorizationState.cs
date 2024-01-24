@@ -31,9 +31,16 @@ namespace FoundationaLLM.Vectorization.Models
         public required VectorizationContentIdentifier ContentIdentifier { get; set; }
 
         /// <summary>
+        /// The vectorization artifacts associated with the vectorization state.
+        /// </summary>
+        [JsonPropertyOrder(2)]
+        [JsonPropertyName("artifacts")]
+        public List<VectorizationArtifact> Artifacts { get; set; } = [];
+
+        /// <summary>
         /// The list of log entries associated with actions executed by the vectorization pipeline.
         /// </summary>
-        [JsonPropertyOrder(18)]
+        [JsonPropertyOrder(20)]
         [JsonPropertyName("log")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<VectorizationLogEntry> LogEntries { get; set; } = [];
@@ -87,5 +94,19 @@ namespace FoundationaLLM.Vectorization.Models
                 CurrentRequestId = request.Id,
                 ContentIdentifier = request.ContentIdentifier
             };
+
+        /// <summary>
+        /// Adds or replaces a vectorization artifact associated with the vectorization state.
+        /// </summary>
+        /// <param name="artifact">The <see cref="VectorizationArtifact"/> to be added or replaced.</param>
+        public void AddOrReplaceArtifact(VectorizationArtifact artifact)
+        {
+            var existingArtifact = Artifacts.SingleOrDefault(a => a.Type == artifact.Type & a.Position == artifact.Position);
+            if (existingArtifact != null)
+                Artifacts.Remove(existingArtifact);
+
+            artifact.IsDirty = true;
+            Artifacts.Add(artifact);
+        }
     }
 }

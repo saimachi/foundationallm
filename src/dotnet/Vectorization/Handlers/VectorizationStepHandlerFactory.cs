@@ -1,6 +1,8 @@
 ﻿using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Vectorization.Exceptions;
 using FoundationaLLM.Vectorization.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace FoundationaLLM.Vectorization.Handlers
 {
@@ -14,22 +16,25 @@ namespace FoundationaLLM.Vectorization.Handlers
         /// </summary>
         /// <param name="step">The identifier of the vectorization pipeline step for which the handler is created.</param>
         /// <param name="parameters">The parameters used to initialize the vectorization step handler.</param>
+        /// <param name="stepsConfiguration">The app configuration section containing the configuration for vectorization pipeline steps.</param>
+        /// <param name="contentSourceManagerService">The <see cref="IContentSourceManagerService"/> that manages content sources.</param>
+        /// <param name="stateService">The <see cref="IVectorizationStateService"/> that manages vectorization state.</param>
+        /// <param name="loggerFactory">The logger factory used to create loggers.</param>
         /// <returns>A class implementing <see cref="IVectorizationStepHandler"/>.</returns>
-        public static IVectorizationStepHandler Create(string step, Dictionary<string, string> parameters)
-        {
-            switch (step)
+        public static IVectorizationStepHandler Create(
+            string step,
+            Dictionary<string, string> parameters,
+            IConfigurationSection? stepsConfiguration,
+            IContentSourceManagerService contentSourceManagerService,
+            IVectorizationStateService stateService,
+            ILoggerFactory loggerFactory) =>
+            step switch
             {
-                case VectorizationSteps.Extract:
-                    return new ExtractionHandler(parameters);
-                case VectorizationSteps.Partition:
-                    return new PartitionHandler(parameters);
-                case VectorizationSteps.Embed:
-                    return new EmbeddingHandler(parameters);
-                case VectorizationSteps.Index:
-                    return new IndexingHandler(parameters);
-                default:
-                    throw new VectorizationException($"There is no handler available for the vectorization pipeline step [{step}].");
-            }
-        }
+                VectorizationSteps.Extract => new ExtractionHandler(parameters, stepsConfiguration, contentSourceManagerService, stateService, loggerFactory),
+                VectorizationSteps.Partition => new PartitionHandler(parameters, stepsConfiguration, contentSourceManagerService, stateService, loggerFactory),
+                VectorizationSteps.Embed => new EmbeddingHandler(parameters, stepsConfiguration, contentSourceManagerService, stateService, loggerFactory),
+                VectorizationSteps.Index => new IndexingHandler(parameters, stepsConfiguration, contentSourceManagerService, stateService, loggerFactory),
+                _ => throw new VectorizationException($"There is no handler available for the vectorization pipeline step [{step}]."),
+            };
     }
 }

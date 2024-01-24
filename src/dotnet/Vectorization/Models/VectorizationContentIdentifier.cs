@@ -13,11 +13,18 @@ namespace FoundationaLLM.Vectorization.Models
     public class VectorizationContentIdentifier
     {
         /// <summary>
-        /// The unique identifier of the content (i.e., document) being vectorized.
+        /// The multipart unique identifier of the the content (i.e. document) being vectorized.
         /// </summary>
         [JsonPropertyOrder(1)]
-        [JsonPropertyName("unique_id")]
-        public required string UniqueId { get; set; }
+        [JsonPropertyName("multipart_id")]
+        public required List<string> MultipartId { get; set; }
+
+        /// <summary>
+        /// The unique identifier of the content (i.e., document) being vectorized.
+        /// The identifier is determined by concatenating the parts from <see cref="MultipartId"/>.
+        /// </summary>
+        [JsonIgnore]
+        public string UniqueId => string.Join("/", MultipartId);
 
         /// <summary>
         /// The canonical identifier of the content being vectorized.

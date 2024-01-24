@@ -7,6 +7,7 @@ using FoundationaLLM.Common.OpenAPI;
 using FoundationaLLM.Common.Settings;
 using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models.Configuration;
+using FoundationaLLM.Vectorization.Services.ContentSources;
 using FoundationaLLM.Vectorization.Services.VectorizationStates;
 using FoundationaLLM.Vectorization.Worker;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
@@ -49,17 +50,23 @@ builder.Services.AddCors(policyBuilder =>
 
 // Add configurations to the container
 builder.Services.AddOptions<VectorizationWorkerSettings>()
-    .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_WorkerSettings));
+    .Bind(builder.Configuration.GetSection(AppConfigurationKeys.FoundationaLLM_Vectorization_VectorizationWorker));
 builder.Services.AddOptions<BlobStorageVectorizationStateServiceSettings>()
-    .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_StateServiceSettings));
+    .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_StateService));
+builder.Services.AddOptions<ContentSourceManagerServiceSettings>()
+    .Bind(builder.Configuration.GetSection(AppConfigurationKeys.FoundationaLLM_Vectorization_ContentSourceManagerService));
 
 builder.Services.AddSingleton(
-    typeof(IConfigurationSection),
-    builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_Queues));
+    typeof(IEnumerable<IConfigurationSection>),
+    new IConfigurationSection[] {
+        builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_Queues),
+        builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_Steps)
+    });
 
 // Add services to the container.
 builder.Services.AddTransient<IAPIKeyValidationService, APIKeyValidationService>();
 builder.Services.AddSingleton<IVectorizationStateService, BlobStorageVectorizationStateService>();
+builder.Services.AddSingleton<IContentSourceManagerService, ContentSourceManagerService>();
 builder.Services.AddHostedService<Worker>();
 
 builder.Services.AddControllers();

@@ -22,7 +22,7 @@ namespace FoundationaLLM.Vectorization.Interfaces
         /// <summary>
         /// Receives the specified number of requests.
         /// The received requests will be invisible for other clients for a default timeout of 30 seconds.
-        /// They should be removed from the source by calling <see cref="DeleteRequest(string)"/> before the timeout expires.
+        /// They should be removed from the source by calling <see cref="DeleteRequest(string, string)"/> before the timeout expires.
         /// </summary>
         /// <param name="count">The number of requests to receive.</param>
         /// <returns>A collection of tuples containg a <see cref="VectorizationRequest"/> object, a message id and a pop receipt.

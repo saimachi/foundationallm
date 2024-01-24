@@ -6,12 +6,16 @@
     <Nullable>enable</Nullable>
     <AssemblyName>FoundationaLLM.Vectorization</AssemblyName>
     <RootNamespace>FoundationaLLM.Vectorization</RootNamespace>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
     <PackageReference Include="Azure.Storage.Queues" Version="12.17.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.21.0" />
+    <PackageReference Include="PdfPig" Version="0.1.8" />
     <PackageReference Include="System.Memory.Data" Version="8.0.0" />
   </ItemGroup>
 

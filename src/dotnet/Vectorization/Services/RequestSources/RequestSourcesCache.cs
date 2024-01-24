@@ -3,11 +3,6 @@ using FoundationaLLM.Vectorization.Models.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FoundationaLLM.Vectorization.Services.RequestSources
 {
@@ -17,7 +12,8 @@ namespace FoundationaLLM.Vectorization.Services.RequestSources
     /// <remarks>
     /// Creates a new instance of the cache.
     /// </remarks>
-    /// <param name="vectorizationWorkerOptions">The <see cref="IOptions"/> instance containing the <see cref="VectorizationWorkerSettings"/> instance.</param>
+    /// <param name="vectorizationWorkerOptions">The <see cref="IOptions{TOptions}"/> instance containing the <see cref="VectorizationWorkerSettings"/> instance.</param>
+    /// <param name="queuesConfiguration">The <see cref="IConfigurationSection"/> containing settings for the queues.</param>
     /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> used to create new loggers for child objects.</param>
     public class RequestSourcesCache(
         IOptions<VectorizationWorkerSettings> vectorizationWorkerOptions,
