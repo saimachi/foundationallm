@@ -1,23 +1,28 @@
 using Asp.Versioning;
 using Azure.Identity;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Net.Http;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Middleware;
 using FoundationaLLM.Common.Models.Configuration.Branding;
+using FoundationaLLM.Common.Models.Configuration.Instance;
 using FoundationaLLM.Common.Models.Context;
 using FoundationaLLM.Common.OpenAPI;
 using FoundationaLLM.Common.Services;
+using FoundationaLLM.Common.Services.API;
 using FoundationaLLM.Common.Settings;
 using FoundationaLLM.Management.Interfaces;
 using FoundationaLLM.Management.Models.Configuration;
 using FoundationaLLM.Management.Services;
+using FoundationaLLM.Management.Services.APIServices;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
+using Polly;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace FoundationaLLM.Management.API
 {
@@ -40,11 +45,16 @@ namespace FoundationaLLM.Management.API
             {
                 options.Connect(builder.Configuration[AppConfigurationKeys.FoundationaLLM_AppConfig_ConnectionString]);
                 options.ConfigureKeyVault(options => { options.SetCredential(new DefaultAzureCredential()); });
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Instance);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_APIs);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_CosmosDB);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Branding);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_ManagementAPI_Entra);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Vectorization);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Agent);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Prompt);
             });
+
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
 
@@ -69,13 +79,31 @@ namespace FoundationaLLM.Management.API
                 .Configure(o =>
                     o.ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_AppConfig_ConnectionString]!);
 
+            builder.Services.AddInstanceProperties(builder.Configuration);
+
+            builder.Services.AddScoped<IAgentFactoryAPIService, AgentFactoryAPIService>();
+            builder.Services.AddScoped<IAgentHubAPIService, AgentHubAPIService>();
+            builder.Services.AddScoped<IDataSourceHubAPIService, DataSourceHubAPIService>();
+            builder.Services.AddScoped<IPromptHubAPIService, PromptHubAPIService>();
             builder.Services.AddScoped<IConfigurationManagementService, ConfigurationManagementService>();
+            builder.Services.AddScoped<ICacheManagementService, CacheManagementService>();
 
             builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             builder.Services.AddScoped<ICallContext, CallContext>();
-            //builder.Services.AddScoped<IHttpClientFactoryService, HttpClientFactoryService>();
+            builder.Services.AddScoped<IHttpClientFactoryService, HttpClientFactoryService>();
 
-            // Register the authentication services
+            //----------------------------
+            // Resource providers
+            //----------------------------
+
+            builder.Services.AddVectorizationResourceProvider(builder.Configuration);
+            builder.Services.AddAgentResourceProvider(builder.Configuration);
+            builder.Services.AddPromptResourceProvider(builder.Configuration);
+
+            // Activate all resource providers (give them a chance to initialize).
+            builder.Services.ActivateSingleton<IEnumerable<IResourceProviderService>>();
+
+            // Register the authentication services:
             RegisterAuthConfiguration(builder);
 
             builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
@@ -84,6 +112,10 @@ namespace FoundationaLLM.Management.API
                 DeveloperMode = builder.Environment.IsDevelopment()
             });
             //builder.Services.AddServiceProfiler();
+
+            // Register the downstream services and HTTP clients.
+            RegisterDownstreamServices(builder);
+
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
             {
                 options.SerializerSettings.ContractResolver = FoundationaLLM.Common.Settings
@@ -122,7 +154,47 @@ namespace FoundationaLLM.Management.API
 
                     // Integrate xml comments
                     options.IncludeXmlComments(filePath);
-                });
+
+                    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Id = "azure_auth",
+                                    Type = ReferenceType.SecurityScheme
+                                }
+                            },
+                            new[] {"user_impersonation"}
+                        }
+                    });                    
+
+                    options.AddSecurityDefinition("azure_auth", new OpenApiSecurityScheme
+                    {
+                        In = ParameterLocation.Header,
+                        Description = "Azure Active Directory Oauth2 Flow",
+                        Name = "azure_auth",
+                        Type = SecuritySchemeType.OAuth2,
+                        Flows = new OpenApiOAuthFlows
+                        {
+                            Implicit = new OpenApiOAuthFlow
+                            {
+                                AuthorizationUrl = new Uri("https://login.microsoftonline.com/common/oauth2/authorize"),
+                                Scopes = new Dictionary<string, string>
+                                {
+                                    {
+                                        "user_impersonation",
+                                        "impersonate your user account"
+                                    }
+                                }
+                            }
+                        },
+                        BearerFormat = "JWT",
+                        Scheme = "bearer"
+                    });
+                })
+                .AddSwaggerGenNewtonsoftSupport();
 
             var app = builder.Build();
 
@@ -141,7 +213,7 @@ namespace FoundationaLLM.Management.API
                     => await Results.Problem().ExecuteAsync(context)));
 
             // Configure the HTTP request pipeline.
-            app.UseSwagger();
+            app.UseSwagger(p => p.SerializeAsV2 = true);
             app.UseSwaggerUI(
                 options =>
                 {
@@ -154,12 +226,139 @@ namespace FoundationaLLM.Management.API
                         var name = description.GroupName.ToUpperInvariant();
                         options.SwaggerEndpoint(url, name);
                     }
+
+                    options.OAuthAdditionalQueryStringParams(new Dictionary<string, string>() { { "resource", builder.Configuration[AppConfigurationKeys.FoundationaLLM_Management_Entra_ClientId] } });
                 });
 
             app.UseHttpsRedirection();
             app.MapControllers();
 
             app.Run();
+        }
+
+        /// <summary>
+        /// Bind the downstream API settings to the configuration and register the HTTP clients.
+        /// The AddResilienceHandler extension method is used to add the standard Polly resilience
+        /// strategies to the HTTP clients.
+        /// </summary>
+        /// <param name="builder"></param>
+        private static void RegisterDownstreamServices(WebApplicationBuilder builder)
+        {
+            var downstreamAPISettings = new DownstreamAPISettings
+            {
+                DownstreamAPIs = new Dictionary<string, DownstreamAPIKeySettings>()
+            };
+            var retryOptions = CommonHttpRetryStrategyOptions.GetCommonHttpRetryStrategyOptions();
+
+            // AgentFactoryAPI:
+            var agentFactoryAPISettings = new DownstreamAPIKeySettings
+            {
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_AgentFactoryAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_AgentFactoryAPI_APIKey]!
+            };
+            downstreamAPISettings.DownstreamAPIs[HttpClients.AgentFactoryAPI] = agentFactoryAPISettings;
+
+            builder.Services
+                .AddHttpClient(HttpClients.AgentFactoryAPI,
+                    client => { client.BaseAddress = new Uri(agentFactoryAPISettings.APIUrl); })
+                .AddResilienceHandler(
+                    "DownstreamPipeline",
+                    strategyBuilder =>
+                    {
+                        strategyBuilder.AddRetry(retryOptions);
+                    });
+
+            // AgentHubAPI:
+            var agentHubAPISettings = new DownstreamAPIKeySettings
+            {
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_AgentHubAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_AgentHubAPI_APIKey]!
+            };
+            downstreamAPISettings.DownstreamAPIs[HttpClients.AgentHubAPI] = agentHubAPISettings;
+
+            builder.Services
+                    .AddHttpClient(HttpClients.AgentHubAPI,
+                        client => { client.BaseAddress = new Uri(agentHubAPISettings.APIUrl); })
+                    .AddResilienceHandler(
+                        "DownstreamPipeline",
+                        strategyBuilder =>
+                        {
+                            strategyBuilder.AddRetry(retryOptions);
+                        });
+
+            // DataSourceHubAPI:
+            var dataSourceHubAPISettings = new DownstreamAPIKeySettings
+            {
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_DataSourceHubAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_DataSourceHubAPI_APIKey]!
+            };
+            downstreamAPISettings.DownstreamAPIs[HttpClients.DataSourceHubAPI] = dataSourceHubAPISettings;
+
+            builder.Services
+                .AddHttpClient(HttpClients.DataSourceHubAPI,
+                    client => { client.BaseAddress = new Uri(dataSourceHubAPISettings.APIUrl); })
+                .AddResilienceHandler(
+                    "DownstreamPipeline",
+                    strategyBuilder =>
+                    {
+                        strategyBuilder.AddRetry(retryOptions);
+                    });
+
+            // PromptHubAPI:
+            var promptHubAPISettings = new DownstreamAPIKeySettings
+            {
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_PromptHubAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_PromptHubAPI_APIKey]!
+            };
+            downstreamAPISettings.DownstreamAPIs[HttpClients.PromptHubAPI] = promptHubAPISettings;
+
+            builder.Services
+                    .AddHttpClient(HttpClients.PromptHubAPI,
+                        client => { client.BaseAddress = new Uri(promptHubAPISettings.APIUrl); })
+                    .AddResilienceHandler(
+                        "DownstreamPipeline",
+                        strategyBuilder =>
+                        {
+                            strategyBuilder.AddRetry(retryOptions);
+                        });
+
+            // LangChainAPI:
+            var langChainAPISettings = new DownstreamAPIKeySettings
+            {
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_LangChainAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_LangChainAPI_APIKey]!
+            };
+            downstreamAPISettings.DownstreamAPIs[HttpClients.LangChainAPI] = langChainAPISettings;
+
+            builder.Services
+                    .AddHttpClient(HttpClients.LangChainAPI,
+                        client => { client.BaseAddress = new Uri(langChainAPISettings.APIUrl); })
+                    .AddResilienceHandler(
+                        "DownstreamPipeline",
+                        strategyBuilder =>
+                        {
+                            strategyBuilder.AddRetry(retryOptions);
+                        });
+
+            // SemanticKernelAPI:
+            var semanticKernelAPISettings = new DownstreamAPIKeySettings
+            {
+                APIUrl = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_SemanticKernelAPI_APIUrl]!,
+                APIKey = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_SemanticKernelAPI_APIKey]!
+            };
+            downstreamAPISettings.DownstreamAPIs[HttpClients.SemanticKernelAPI] = semanticKernelAPISettings;
+
+            builder.Services
+                    .AddHttpClient(HttpClients.SemanticKernelAPI,
+                        client => { client.BaseAddress = new Uri(semanticKernelAPISettings.APIUrl); })
+                    .AddResilienceHandler(
+                        "DownstreamPipeline",
+                        strategyBuilder =>
+                        {
+                            strategyBuilder.AddRetry(retryOptions);
+                        });
+
+            builder.Services.AddSingleton<IDownstreamAPISettings>(downstreamAPISettings);
         }
 
         /// <summary>

@@ -80,7 +80,8 @@ namespace FoundationaLLM.Common.Models.Configuration.Branding
         /// </summary>
         public string? SecondaryTextColor { get; set; }
         /// <summary>
-        /// Comma-separated list of global agents.
+        /// Comma-separated list of global agents. This is used for legacy support. New agents should
+        /// use the agent resource provider.
         /// </summary>
         public string? AllowAgentSelection { get; set; }
     }

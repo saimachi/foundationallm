@@ -18,13 +18,13 @@ namespace FoundationaLLM.Common.Services
     /// <remarks>
     ///  Initializes a new instance of the <see cref="BlobStorageService"/> with the specified options and logger.
     /// </remarks>
-    /// <param name="options">The options object containing the <see cref="BlobStorageServiceSettings"/> object with the settings.</param>
+    /// <param name="storageOptions">The options object containing the <see cref="BlobStorageServiceSettings"/> object with the settings.</param>
     /// <param name="logger">The logger used for logging.</param>
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public class BlobStorageService(
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        IOptions<BlobStorageServiceSettings> options,
-        ILogger<BlobStorageService> logger) : StorageServiceBase(options, logger), IStorageService
+        IOptions<BlobStorageServiceSettings> storageOptions,
+        ILogger<BlobStorageService> logger) : StorageServiceBase(storageOptions, logger), IStorageService
     {
         private BlobServiceClient _blobServiceClient;
 
@@ -60,6 +60,7 @@ namespace FoundationaLLM.Common.Services
             string containerName,
             string filePath,
             Stream fileContent,
+            string? contentType,
             CancellationToken cancellationToken = default)
         {
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
@@ -67,7 +68,16 @@ namespace FoundationaLLM.Common.Services
 
             fileContent.Seek(0, SeekOrigin.Begin);
 
-            BlobUploadOptions options = new();
+            BlobUploadOptions options = new()
+            {
+                HttpHeaders = new BlobHttpHeaders()
+                {
+                    ContentType = string.IsNullOrWhiteSpace(contentType)
+                        ? "application/json"
+                        : contentType
+                }
+            };
+
             await blobClient.UploadAsync(fileContent, options, cancellationToken).ConfigureAwait(false);
         }
 
@@ -76,11 +86,13 @@ namespace FoundationaLLM.Common.Services
             string containerName,
             string filePath,
             string fileContent,
+            string? contentType,
             CancellationToken cancellationToken = default) =>
             await WriteFileAsync(
                 containerName,
                 filePath,
                 new MemoryStream(Encoding.UTF8.GetBytes(fileContent)),
+                contentType,
                 cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>

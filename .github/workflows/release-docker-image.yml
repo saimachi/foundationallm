@@ -26,10 +26,10 @@ jobs:
     - name: Fetching the Latest Release Tag number
       id: releaseVersion
       run: |
-        release_json=$(curl https://api.github.com/repos/${{ github.repository }}/releases)
-        release_tag=$(echo "$release_json" | jq -r '.[0].tag_name')
-        echo "release_tag: Latest Tag is : $release_tag"
-        echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
+        GIT_RELEASE=$(echo ${{ github.ref_name }} |  cut -d'/' -f 2)
+        echo "GIT_RELEASE=$GIT_RELEASE" >> $GITHUB_ENV
+        echo "release_tag: Latest Tag is : $GIT_RELEASE"
+        echo "release_tag=$GIT_RELEASE" >> $GITHUB_OUTPUT
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -48,11 +48,7 @@ jobs:
         images: |
           ghcr.io/${{ github.repository }}/${{ inputs.image }}
         tags: |
-          type=raw,latest
-          type=raw,release
-          type=pep440,pattern={{version}},value=${{ steps.releaseVersion.outputs.release_tag }}
-          type=pep440,pattern={{major}}.{{minor}},value=${{ steps.releaseVersion.outputs.release_tag }}
-          type=pep440,pattern={{major}},value=${{ steps.releaseVersion.outputs.release_tag }}
+          type=semver,pattern={{version}},value=${{ steps.releaseVersion.outputs.release_tag }}
           type=sha,format=long
 
     - name: Build and push Docker images
@@ -63,6 +59,8 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         push: true
+        build-args: |
+          FOUNDATIONALLM_VERSION=${{ steps.releaseVersion.outputs.release_tag }}
 
   helm_chart_package_and_push:
     runs-on: ubuntu-latest
@@ -73,10 +71,10 @@ jobs:
     - name: Fetching the Latest Release Tag number
       id: releaseVersion
       run: |
-        release_json=$(curl https://api.github.com/repos/${{ github.repository }}/releases)
-        release_tag=$(echo "$release_json" | jq -r '.[0].tag_name')
-        echo "release_tag: Latest Tag is : $release_tag"
-        echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
+        GIT_RELEASE=$(echo ${{ github.ref_name }} |  cut -d'/' -f 2)
+        echo "GIT_RELEASE=$GIT_RELEASE" >> $GITHUB_ENV
+        echo "release_tag: Latest Tag is : $GIT_RELEASE"
+        echo "release_tag=$GIT_RELEASE" >> $GITHUB_OUTPUT
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -90,7 +88,7 @@ jobs:
 
     - name: Helm Chart Update, Package, and Push
       run: |
-        cd ./deploy/helm/${{ inputs.image }}
+        cd ./deploy/common/helm/${{ inputs.image }}
         sed -i "s/version\: 0\.0\.0/version\: ${{ steps.releaseVersion.outputs.release_tag }}/" Chart.yaml
         sed -i "s/tag\: latest/tag\: ${{ steps.releaseVersion.outputs.release_tag }}/" values.yaml
         helm package . --app-version ${{ steps.releaseVersion.outputs.release_tag }}

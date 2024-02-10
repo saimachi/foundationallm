@@ -1,0 +1,1283 @@
+[
+  {
+    "keyVault": false,
+    "featureFlag": true,
+    "isJson": false,
+    "key": ".appconfig.featureflag/FoundationaLLM-AllowAgentHint",
+    "value": "FoundationaLLM-AllowAgentHint"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AgentHub:AgentMetadata:StorageContainer",
+    "value": "agents"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AgentHub:StorageManager:BlobStorage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Agent:ResourceProviderService:Storage:AuthenticationType",
+    "value": "ConnectionString"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Agent:ResourceProviderService:Storage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:AgentFactoryAPI:APIKey",
+    "value": "agent-factory-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:AgentFactoryAPI:APIUrl",
+    "value": "${SERVICE_AGENT_FACTORY_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:AgentFactoryAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:AgentFactoryAPI:ForceHttpsRedirection",
+    "value": "false"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:AgentHubAPI:APIKey",
+    "value": "agent-hub-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:AgentHubAPI:APIUrl",
+    "value": "${SERVICE_AGENT_HUB_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:AgentHubAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:CoreAPI:APIUrl",
+    "value": "${SERVICE_CORE_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:CoreAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:CoreAPI:BypassGatekeeper",
+    "value": "false"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:DataSourceHubAPI:APIKey",
+    "value": "data-source-hub-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:DataSourceHubAPI:APIUrl",
+    "value": "${SERVICE_DATA_SOURCE_HUB_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:DataSourceHubAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperAPI:APIKey",
+    "value": "gatekeeper-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperAPI:APIUrl",
+    "value": "${SERVICE_GATEKEEPER_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperAPI:Configuration:EnableAzureContentSafety",
+    "value": "true"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperAPI:Configuration:EnableMicrosoftPresidio",
+    "value": "true"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperAPI:ForceHttpsRedirection",
+    "value": "false"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperIntegrationAPI:APIKey",
+    "value": "gatekeeper-integration-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperIntegrationAPI:APIUrl",
+    "value": "${SERVICE_GATEKEEPER_INTEGRATION_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:GatekeeperIntegrationAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:LangChainAPI:APIKey",
+    "value": "langchain-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:LangChainAPI:APIUrl",
+    "value": "${SERVICE_LANGCHAIN_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:LangChainAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:ManagementAPI:APIUrl",
+    "value": "${SERVICE_MANAGEMENT_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:ManagementAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Prompt:ResourceProviderService:Storage:AuthenticationType",
+    "value": "ConnectionString"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Prompt:ResourceProviderService:Storage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:PromptHubAPI:APIKey",
+    "value": "prompt-hub-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:PromptHubAPI:APIUrl",
+    "value": "${SERVICE_PROMPT_HUB_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:PromptHubAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:SemanticKernelAPI:APIKey",
+    "value": "semantic-kernel-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:SemanticKernelAPI:APIUrl",
+    "value": "${SERVICE_SEMANTIC_KERNEL_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:SemanticKernelAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:SemanticKernelAPI:ForceHttpsRedirection",
+    "value": "false"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:VectorizationAPI:APIKey",
+    "value": "vectorization-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:VectorizationAPI:APIUrl",
+    "value": "${SERVICE_VECTORIZATION_API_ENDPOINT_URL}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:VectorizationAPI:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:VectorizationAPI:ForceHttpsRedirection",
+    "value": "false"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:VectorizationWorker:APIKey",
+    "value": "vectorization-job-apikey"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:APIs:VectorizationWorker:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureContentSafety:APIKey",
+    "value": "content-safety-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureContentSafety:APIUrl",
+    "value": "${AZURE_CONTENT_SAFETY_ENDPOINT}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureContentSafety:HateSeverity",
+    "value": "2"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureContentSafety:SelfHarmSeverity",
+    "value": "2"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureContentSafety:SexualSeverity",
+    "value": "2"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureContentSafety:ViolenceSeverity",
+    "value": "2"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Completions:DeploymentName",
+    "value": "completions"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Completions:MaxTokens",
+    "value": "8096"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Completions:ModelName",
+    "value": "gpt-35-turbo"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Completions:ModelVersion",
+    "value": "0301"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Completions:Temperature",
+    "value": "0"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Embeddings:DeploymentName",
+    "value": "embeddings"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Embeddings:MaxTokens",
+    "value": "8191"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Embeddings:ModelName",
+    "value": "text-embedding-ada-002"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Embeddings:Temperature",
+    "value": "0"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Endpoint",
+    "value": "${AZURE_OPENAI_ENDPOINT}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Key",
+    "value": "openai-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:AzureOpenAI:API:Version",
+    "value": "2023-05-15"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:BlobStorageMemorySource:BlobStorageConnection",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:BlobStorageMemorySource:BlobStorageContainer",
+    "value": "memory-source"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:BlobStorageMemorySource:ConfigFilePath",
+    "value": "BlobMemorySourceConfig.json"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:AccentColor",
+    "value": "#fff"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:AccentTextColor",
+    "value": "#fff"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:AllowAgentSelection",
+    "value": "default, anomaly, hai, movies, sdzwa, weather, weather-sec"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:BackgroundColor",
+    "value": "#fff"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:CompanyName",
+    "value": "FoundationaLLM"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:FavIconUrl",
+    "value": "favicon.ico"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:KioskMode",
+    "value": "false"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:LogoText",
+    "value": "Logo Text"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:LogoUrl",
+    "value": "foundationallm-logo-white.svg"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:PageTitle",
+    "value": "FoundationaLLM Chat Copilot"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:PrimaryColor",
+    "value": "#131833"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:PrimaryTextColor",
+    "value": "#fff"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:SecondaryColor",
+    "value": "#334581"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:SecondaryTextColor",
+    "value": "#fff"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:PrimaryButtonBackgroundColor",
+    "value": "#5472d4"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:PrimaryButtonTextColor",
+    "value": "#fff"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:SecondaryButtonBackgroundColor",
+    "value": "#70829a"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Branding:SecondaryButtonTextColor",
+    "value": "#fff"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Chat:Entra:CallbackPath",
+    "value": "/signin-oidc"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Chat:Entra:ClientId",
+    "value": "${ENTRA_CHAT_UI_CLIENT_ID}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Chat:Entra:ClientSecret",
+    "value": "foundationallm-apis-chat-ui-entra-clientsecret"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Chat:Entra:Instance",
+    "value": "https://login.microsoftonline.com/"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Chat:Entra:Scopes",
+    "value": "${ENTRA_CHAT_UI_SCOPES}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Chat:Entra:TenantId",
+    "value": "${ENTRA_CHAT_UI_TENANT_ID}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearch:EndPoint",
+    "value": "${AZURE_COGNITIVE_SEARCH_ENDPOINT}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearch:IndexName",
+    "value": "vector-index"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearch:Key",
+    "value": "search-key"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearch:MaxVectorSearchResults",
+    "value": "10"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageConnection",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageContainer",
+    "value": "memory-source"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearchMemorySource:ConfigFilePath",
+    "value": "ACSMemorySourceConfig.json"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearchMemorySource:EndPoint",
+    "value": "${AZURE_COGNITIVE_SEARCH_ENDPOINT}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearchMemorySource:IndexName",
+    "value": "vector-index"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CognitiveSearchMemorySource:Key",
+    "value": "search-key"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CoreAPI:Entra:CallbackPath",
+    "value": "/signin-oidc"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CoreAPI:Entra:ClientId",
+    "value": "${ENTRA_CORE_API_CLIENT_ID}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CoreAPI:Entra:ClientSecret",
+    "value": "foundationallm-apis-core-api-entra-clientsecret"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CoreAPI:Entra:Instance",
+    "value": "https://login.microsoftonline.com/"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CoreAPI:Entra:Scopes",
+    "value": "Data.Read"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CoreAPI:Entra:TenantId",
+    "value": "${ENTRA_CORE_API_TENANT_ID}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CoreWorker:AppInsightsConnectionString",
+    "value": "appinsights-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CosmosDB:ChangeFeedLeaseContainer",
+    "value": "leases"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CosmosDB:Containers",
+    "value": "Sessions, UserSessions, UserProfiles"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CosmosDB:Database",
+    "value": "database"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CosmosDB:Endpoint",
+    "value": "${AZURE_COSMOS_DB_ENDPOINT}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CosmosDB:Key",
+    "value": "cosmos-key"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:CosmosDB:MonitoredContainers",
+    "value": "Sessions"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:DataSourceHub:DataSourceMetadata:StorageContainer",
+    "value": "data-sources"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:DataSourceHub:StorageManager:BlobStorage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:DataSources:AboutFoundationaLLM:BlobStorage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:DurableSystemPrompt:BlobStorageConnection",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:DurableSystemPrompt:BlobStorageContainer",
+    "value": "prompts"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Instance:Id",
+    "value": "${FOUNDATIONALLM_INSTANCE_ID}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:LangChain:CSVFile:URL",
+    "value": "foundationallm-langchain-csvfile-url"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:LangChain:SQLDatabase:TestDB:Password",
+    "value": "foundationallm-langchain-sqldatabase-testdb-password"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:LangChain:Summary:MaxTokens",
+    "value": "4097"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:LangChain:Summary:ModelName",
+    "value": "gpt-35-turbo"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:LangChainAPI:Key",
+    "value": "langchain-api-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Management:Entra:CallbackPath",
+    "value": "/management/signin-oidc"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Management:Entra:ClientId",
+    "value": "${ENTRA_MANAGEMENT_UI_CLIENT_ID}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Management:Entra:ClientSecret",
+    "value": "foundationallm-apis-management-ui-entra-clientsecret"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Management:Entra:Instance",
+    "value": "https://login.microsoftonline.com/"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Management:Entra:Scopes",
+    "value": "${ENTRA_MANAGEMENT_UI_SCOPES}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Management:Entra:TenantId",
+    "value": "${ENTRA_MANAGEMENT_UI_TENANT_ID}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:ManagementAPI:Entra:CallbackPath",
+    "value": "/signin-oidc"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:ManagementAPI:Entra:ClientId",
+    "value": "${ENTRA_MANAGEMENT_API_CLIENT_ID}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:ManagementAPI:Entra:ClientSecret",
+    "value": "foundationallm-apis-management-api-entra-clientsecret"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:ManagementAPI:Entra:Instance",
+    "value": "https://login.microsoftonline.com/"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:ManagementAPI:Entra:Scopes",
+    "value": "${ENTRA_MANAGEMENT_API_SCOPES}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:ManagementAPI:Entra:TenantId",
+    "value": "${ENTRA_MANAGEMENT_API_TENANT_ID}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:OpenAI:API:Endpoint",
+    "value": "${AZURE_OPENAI_ENDPOINT}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:OpenAI:API:Key",
+    "value": "openai-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:OpenAI:API:Temperature",
+    "value": "0"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:PromptHub:PromptMetadata:StorageContainer",
+    "value": "prompts"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:PromptHub:StorageManager:BlobStorage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Refinement",
+    "value": " "
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI:Key",
+    "value": "openai-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.ChatCompletionPromptName",
+    "value": "RetailAssistant.Default"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.CompletionsDeployment",
+    "value": "completions"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.CompletionsDeploymentMaxTokens",
+    "value": "8096"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.EmbeddingsDeployment",
+    "value": "embeddings"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.EmbeddingsDeploymentMaxTokens",
+    "value": "8191"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.Endpoint",
+    "value": "${AZURE_OPENAI_ENDPOINT}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.PromptOptimization.CompletionsMaxTokens",
+    "value": "300"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.PromptOptimization.CompletionsMinTokens",
+    "value": "50"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.PromptOptimization.MemoryMaxTokens",
+    "value": "3000"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.PromptOptimization.MemoryMinTokens",
+    "value": "1500"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.PromptOptimization.MessagesMaxToken",
+    "value": "3000"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.PromptOptimization.MessagesMinTokens",
+    "value": "100"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.PromptOptimization.SystemMaxTokens",
+    "value": "1500"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:SemanticKernelAPI:OpenAI.ShortSummaryPromptName",
+    "value": "Summarizer.TwoWords"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:Queues:Embed:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:Queues:Extract:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:Queues:Index:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:Queues:Partition:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:StateService:Storage:AuthenticationType",
+    "value": "ConnectionString"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:StateService:Storage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:ResourceProviderService:Storage:AuthenticationType",
+    "value": "ConnectionString"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:ResourceProviderService:Storage:ConnectionString",
+    "value": "storage-connection"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:SemanticKernelTextEmbeddingService:APIKey",
+    "value": "openai-apikey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:SemanticKernelTextEmbeddingService:APIVersion",
+    "value": "2023-05-15"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:SemanticKernelTextEmbeddingService:AuthenticationType",
+    "value": "APIKey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:SemanticKernelTextEmbeddingService:DeploymentName",
+    "value": "embeddings"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:SemanticKernelTextEmbeddingService:Endpoint",
+    "value": "${AZURE_OPENAI_ENDPOINT}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": true,
+    "key": "FoundationaLLM:Vectorization:VectorizationWorker",
+    "value": "${VECTORIZATION_WORKER_CONFIG}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:APIKey",
+    "value": "search-key"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:AuthenticationType",
+    "value": "APIKey"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:Endpoint",
+    "value": "${AZURE_COGNITIVE_SEARCH_ENDPOINT}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:QueryAPIKey",
+    "value": "search-key"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:VectorizationAPI:Entra:CallbackPath",
+    "value": "/signin-oidc"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:VectorizationAPI:Entra:ClientId",
+    "value": "${ENTRA_VECTORIZATION_API_CLIENT_ID}"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:VectorizationAPI:Entra:ClientSecret",
+    "value": "foundationallm-apis-management-api-entra-clientsecret"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:VectorizationAPI:Entra:Instance",
+    "value": "https://login.microsoftonline.com/"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:VectorizationAPI:Entra:Scopes",
+    "value": "${ENTRA_VECTORIZATION_API_SCOPES}"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
+    "isJson": false,
+    "key": "FoundationaLLM:VectorizationAPI:Entra:TenantId",
+    "value": "${ENTRA_VECTORIZATION_API_TENANT_ID}"
+  }
+]

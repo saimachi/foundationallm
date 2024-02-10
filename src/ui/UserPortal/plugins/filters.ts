@@ -7,6 +7,14 @@ const filters = {
 	timeAgo(date: Date): string {
 		return timeAgo.format(date);
 	},
+
+	enforceLeadingSlash(path: string) {
+		if (!path.startsWith('/') && !path.startsWith('http')) {
+			return '/' + path;
+		} else {
+			return path;
+		}
+	}
 };
 
 export default defineNuxtPlugin((nuxtApp) => {

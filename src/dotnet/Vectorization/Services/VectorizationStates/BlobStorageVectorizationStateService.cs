@@ -1,10 +1,12 @@
 ﻿using Azure.Core;
 using Azure.Storage.Blobs;
+using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Services;
 using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models;
 using FoundationaLLM.Vectorization.Models.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text;
@@ -15,41 +17,35 @@ namespace FoundationaLLM.Vectorization.Services.VectorizationStates
     /// <summary>
     /// Provides vectorization state persistence services using  Azure blob storage.
     /// </summary>
-    public class BlobStorageVectorizationStateService : VectorizationStateServiceBase, IVectorizationStateService
+    /// <remarks>
+    /// Creates a new vectorization state service instance.
+    /// </remarks>
+    /// <param name="storageService">The <see cref="IStorageService"/> that provides storage services.</param>
+    /// <param name="loggerFactory">The logger factory used to create loggers.</param>
+    public class BlobStorageVectorizationStateService(
+        [FromKeyedServices(DependencyInjectionKeys.FoundationaLLM_Vectorization_BlobStorageVectorizationStateService)] IStorageService storageService,
+        ILoggerFactory loggerFactory) : VectorizationStateServiceBase, IVectorizationStateService
     {
-        private readonly BlobStorageService _storageService;
-        private readonly BlobStorageVectorizationStateServiceSettings _settings;
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly IStorageService _storageService = storageService;
+        private readonly ILoggerFactory _loggerFactory = loggerFactory;
 
-        /// <summary>
-        /// Creates a new vectorization state service instance.
-        /// </summary>
-        /// <param name="options">The options used to configure the new instance.</param>
-        /// <param name="loggerFactory">The logger factory used to create loggers.</param>
-        public BlobStorageVectorizationStateService(
-            IOptions<BlobStorageVectorizationStateServiceSettings> options,
-            ILoggerFactory loggerFactory)
-        {
-            _settings = options.Value;
-            _loggerFactory = loggerFactory;
-            _storageService = new BlobStorageService(
-                Options.Create(_settings.Storage),
-                _loggerFactory.CreateLogger<BlobStorageService>());
-        }
+        private const string BLOB_STORAGE_CONTAINER_NAME = "vectorization-state";
 
         /// <inheritdoc/>
         public async Task<bool> HasState(VectorizationRequest request) =>
             await _storageService.FileExistsAsync(
-                _settings.StorageContainerName,
-                $"{GetPersistenceIdentifier(request.ContentIdentifier)}.json");
+                BLOB_STORAGE_CONTAINER_NAME,
+                $"{GetPersistenceIdentifier(request.ContentIdentifier)}.json",
+                default);
 
 
         /// <inheritdoc/>
         public async Task<VectorizationState> ReadState(VectorizationRequest request)
         {
             var content = await _storageService.ReadFileAsync(
-                _settings.StorageContainerName,
-                $"{GetPersistenceIdentifier(request.ContentIdentifier)}.json");
+                BLOB_STORAGE_CONTAINER_NAME,
+                $"{GetPersistenceIdentifier(request.ContentIdentifier)}.json",
+                default);
 
             return JsonSerializer.Deserialize<VectorizationState>(content)!;
         }
@@ -61,8 +57,9 @@ namespace FoundationaLLM.Vectorization.Services.VectorizationStates
                 if (!string.IsNullOrWhiteSpace(artifact.CanonicalId))
                     artifact.Content = Encoding.UTF8.GetString(
                         await _storageService.ReadFileAsync(
-                            _settings.StorageContainerName,
-                            artifact.CanonicalId));
+                            BLOB_STORAGE_CONTAINER_NAME,
+                            artifact.CanonicalId,
+                            default));
         }
 
         /// <inheritdoc/>
@@ -77,17 +74,21 @@ namespace FoundationaLLM.Vectorization.Services.VectorizationStates
                         $"{persistenceIdentifier}_{artifact.Type.ToString().ToLower()}_{artifact.Position:D6}.txt";
 
                     await _storageService.WriteFileAsync(
-                        _settings.StorageContainerName,
+                        BLOB_STORAGE_CONTAINER_NAME,
                         artifactPath,
-                        artifact.Content);
+                        artifact.Content!,
+                        default,
+                        default);
                     artifact.CanonicalId = artifactPath;
                 }
 
             var content = JsonSerializer.Serialize(state);
             await _storageService.WriteFileAsync(
-                _settings.StorageContainerName,
+                BLOB_STORAGE_CONTAINER_NAME,
                 $"{persistenceIdentifier}.json",
-                content);
+                content,
+                default,
+                default);
         }
     }
 }

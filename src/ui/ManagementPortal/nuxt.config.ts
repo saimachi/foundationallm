@@ -14,6 +14,7 @@ const buildLoadingTemplate = (() => {
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+	ssr: false,
 	devtools: { enabled: true },
 	modules: ['@pinia/nuxt'],
 	components: true,
@@ -24,10 +25,11 @@ export default defineNuxtConfig({
 				{
 					rel: 'icon',
 					type: 'image/x-icon',
-					href: process.env.BRANDING_FAV_ICON_URL ?? '/favicon.ico',
+					href: process.env.NUXT_APP_BASE_URL + (process.env.BRANDING_FAV_ICON_URL ?? 'favicon.ico'),
 				},
 			],
 		},
+		baseURL: process.env.BASE_URL || '/',
 	},
 	routeRules: {
 		'*': { ssr: false },
@@ -44,8 +46,11 @@ export default defineNuxtConfig({
 		...(buildLoadingTemplate
 			? {
 					loadingTemplate: () => buildLoadingTemplate,
-			  }
+				}
 			: {}),
 		port: 3001,
+	},
+	runtimeConfig: {
+		APP_CONFIG_ENDPOINT: process.env.APP_CONFIG_ENDPOINT,
 	},
 });

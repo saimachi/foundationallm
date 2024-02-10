@@ -77,6 +77,15 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 
 <!-- 8. Under **Front-channel logout URL**, enter `<YOUR_CHAT_APP_URL>/signout-oidc`. -->
 
+If you wish to [configure authentication in Postman](../../development/directly-calling-apis.md#postman-collection) for executing calls against the Core API, you will need to add a **Redirect URI** under **Mobile and desktop applications** for Postman. Enter `https://oauth.pstmn.io/v1/callback` for the URI. To do this, complete the following steps:
+
+1. Under **Platform configurations**, select **Add a platform**. In the pane that opens, select **Mobile and desktop applications**.
+2. Enter `https://oauth.pstmn.io/v1/callback` for the **Custom redirect URIs** value.
+
+    ![The Authentication left-hand menu item and redirect URIs are highlighted.](media/entra-app-client-authentication-uris-postman.png)
+
+3. Select **Configure** to apply the changes.
+
 #### Implicit grant and hybrid flows for the client application
 
 1. Check **Access tokens** and **ID tokens** under **Implicit grant**.
@@ -85,7 +94,7 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 
     ![Both the Access tokens and ID tokens checkboxes are checked and the Save button is highlighted.](media/entra-app-client-authentication-implicit-grant.png)
 
-#### Client secret for the client application
+<!-- #### Client secret for the client application
 
 1. Under **Manage**, select **Certificates & secrets**.
 2. Under **Client secrets**, select **+ New client secret**.
@@ -94,7 +103,7 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 5. Select **Add**.
 6. **Record the secret value** to add to your App Configuration settings later. Do this by selecting the **Copy to clipboard** icon next to the secret value.
 
-    ![The steps to create a client secret are highlighted.](media/entra-client-app-secret.png)
+    ![The steps to create a client secret are highlighted.](media/entra-client-app-secret.png) -->
 
 #### Update the client application manifest
 
@@ -138,7 +147,7 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 
     ![Both the Access tokens and ID tokens checkboxes are checked and the Save button is highlighted.](media/entra-app-client-authentication-implicit-grant.png)
 
-#### Client secret for the API application
+<!-- #### Client secret for the API application
 
 1. Under **Manage**, select **Certificates & secrets**.
 2. Under **Client secrets**, select **+ New client secret**.
@@ -147,7 +156,7 @@ If you performed an **Azure Kubernetes Service (AKS)** deployment, follow these 
 5. Select **Add**.
 6. **Record the secret value** to add to your App Configuration settings later. Do this by selecting the **Copy to clipboard** icon next to the secret value.
 
-    ![The steps to create a client secret are highlighted.](media/entra-api-app-secret.png)
+    ![The steps to create a client secret are highlighted.](media/entra-api-app-secret.png) -->
 
 #### Expose an API for the API application
 
@@ -233,7 +242,7 @@ The client application's configured permissions should now look like the followi
 
 9. Select **Apply** to save the changes.
 
-### Update Key Vault secrets
+<!-- ### Update Key Vault secrets
 
 Key Vault stores the secrets for the client and API applications. You need to update the secrets with the values that you recorded earlier.
 
@@ -243,7 +252,7 @@ Key Vault stores the secrets for the client and API applications. You need to up
 4. Open the `foundationallm-chat-entra-clientsecret` secret, then select **+ New Version**.
 5. Within the **Secret value** field, enter the **Client secret** of the client application that you [created earlier](#client-secret-for-the-client-application), then select **Create**.
 6. Open the `foundationallm-coreapi-entra-clientsecret` secret, then select **+ New Version**.
-7. Within the **Secret value** field, enter the **Client secret** of the API application that you [created earlier](#client-secret-for-the-api-application), then select **Create**.
+7. Within the **Secret value** field, enter the **Client secret** of the API application that you [created earlier](#client-secret-for-the-api-application), then select **Create**. -->
 
 ## Next steps
 

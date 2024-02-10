@@ -1,4 +1,6 @@
 FROM python:3.11-bookworm
+ARG FOUNDATIONALLM_VERSION
+ENV FOUNDATIONALLM_VERSION=${FOUNDATIONALLM_VERSION:-0.0.0}
 
 RUN apt-get update \
         && apt-get install -y curl apt-transport-https gnupg2 \
@@ -17,3 +19,4 @@ EXPOSE 80
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
 LABEL org.opencontainers.image.source=https://github.com/solliancenet/foundationallm
+LABEL ai.foundationallm.version=${FOUNDATIONALLM_VERSION:-0.0.0}

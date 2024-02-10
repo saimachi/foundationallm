@@ -1,4 +1,11 @@
-﻿using Asp.Versioning;
+﻿using System.Text;
+using Asp.Versioning;
+using FoundationaLLM.Agent.Models.Metadata;
+using FoundationaLLM.Agent.Models.Resources;
+using FoundationaLLM.Agent.ResourceProviders;
+using FoundationaLLM.Common.Constants;
+using FoundationaLLM.Common.Exceptions;
+using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Models.Configuration.Branding;
 using FoundationaLLM.Common.Models.Configuration.Users;
 using FoundationaLLM.Common.Models.Metadata;
@@ -7,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace FoundationaLLM.Core.API.Controllers
 {
@@ -22,16 +30,24 @@ namespace FoundationaLLM.Core.API.Controllers
     {
         private readonly IUserProfileService _userProfileService;
         private readonly ClientBrandingConfiguration _settings;
+        private readonly IResourceProviderService _agentResourceProvider;
 
         /// <summary>
         /// Constructor for the UserProfiles Controller.
         /// </summary>
         /// <param name="userProfileService">The Core service provides methods for managing the user profile.</param>
         /// <param name="settings">The branding configuration for the client.</param>
-        public UserProfilesController(IUserProfileService userProfileService,
-            IOptions<ClientBrandingConfiguration> settings)
+        public UserProfilesController(
+            IUserProfileService userProfileService,
+            IOptions<ClientBrandingConfiguration> settings,
+            IEnumerable<IResourceProviderService> resourceProviderServices)
         {
             _userProfileService = userProfileService;
+            var resourceProviderServicesDictionary = resourceProviderServices.ToDictionary<IResourceProviderService, string>(
+                rps => rps.Name);
+            if (!resourceProviderServicesDictionary.TryGetValue(ResourceProviderNames.FoundationaLLM_Agent, out var agentResourceProvider))
+                throw new ResourceProviderException($"The resource provider {ResourceProviderNames.FoundationaLLM_Agent} was not loaded.");
+            _agentResourceProvider = agentResourceProvider;
             _settings = settings.Value;
         }
 
@@ -47,11 +63,13 @@ namespace FoundationaLLM.Core.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("agents", Name = "GetAgents")]
-        public async Task<IEnumerable<Agent>> GetAgents()
+        public async Task<IEnumerable<Common.Models.Metadata.Agent>> GetAgents()
         {
-            var agents = new List<Agent>();
-            var globalAgentsList = _settings.AllowAgentSelection;
+            var agents = new List<Common.Models.Metadata.Agent>();
+            var legacyAgentsList = _settings.AllowAgentSelection;
+            var globalAgentsList = await _agentResourceProvider.GetResourcesAsync<AgentReference>($"/{AgentResourceTypeNames.AgentReferences}");
             UserProfile? userProfile;
+
             try
             {
                 userProfile = await _userProfileService.GetUserProfileAsync();
@@ -61,15 +79,27 @@ namespace FoundationaLLM.Core.API.Controllers
                 userProfile = null;
             }
             
-            if (!string.IsNullOrWhiteSpace(globalAgentsList))
+            if (globalAgentsList.Any())
             {
-                var globalAgents = globalAgentsList.Split(',');
-                agents.AddRange(globalAgents.Select(globalAgent => new Agent {Name = globalAgent.Trim(), Private = false}));
+                agents.AddRange(globalAgentsList.Select(globalAgent => new Common.Models.Metadata.Agent {Name = globalAgent.Name, Private = false}));
+            }
+
+            if (!string.IsNullOrWhiteSpace(legacyAgentsList))
+            {
+                var legacyAgents = legacyAgentsList.Split(',');
+                // Only add the agent if it does not already exist in the list of global agents.
+                foreach (var legacyAgent in legacyAgents)
+                {
+                    if (agents.All(agent => agent.Name != legacyAgent.Trim()))
+                    {
+                        agents.Add(new Common.Models.Metadata.Agent { Name = legacyAgent.Trim(), Private = false });
+                    }
+                }
             }
 
             if (userProfile?.PrivateAgents != null)
             {
-                agents.AddRange(userProfile.PrivateAgents.Select(agent => new Agent { Name = agent.Name, Private = true}));
+                agents.AddRange(userProfile.PrivateAgents.Select(agent => new Common.Models.Metadata.Agent { Name = agent.Name, Private = true}));
             }
 
             return agents;

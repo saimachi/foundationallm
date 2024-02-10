@@ -1,7 +1,6 @@
 ﻿using FoundationaLLM.AgentFactory.Core.Agents;
 using FoundationaLLM.AgentFactory.Core.Interfaces;
 using FoundationaLLM.AgentFactory.Core.Models.ConfigurationOptions;
-using FoundationaLLM.AgentFactory.Core.Models.Messages;
 using FoundationaLLM.AgentFactory.Core.Models.Orchestration;
 using FoundationaLLM.AgentFactory.Interfaces;
 using FoundationaLLM.AgentFactory.Models.ConfigurationOptions;
@@ -30,9 +29,12 @@ public class AgentFactoryService : IAgentFactoryService
     private readonly ILogger<AgentFactoryService> _logger;
     private readonly ILoggerFactory _loggerFactory;
 
+    private readonly Dictionary<string, IResourceProviderService> _resourceProviderServices;
+
     /// <summary>
     /// Constructor for the Agent Factory Service.
     /// </summary>
+    /// <param name="resourceProviderServices">A list of <see cref="IResourceProviderService"/> resource providers.</param>
     /// <param name="orchestrationServices"></param>
     /// <param name="cacheService">The <see cref="ICacheService"/> used to cache agent-related artifacts.</param>
     /// <param name="callContext">The call context of the request being handled.</param>
@@ -41,6 +43,7 @@ public class AgentFactoryService : IAgentFactoryService
     /// <param name="dataSourceHubService"></param>    
     /// <param name="loggerFactory">The logger factory used to create loggers.</param>
     public AgentFactoryService(
+        IEnumerable<IResourceProviderService> resourceProviderServices,
         IEnumerable<ILLMOrchestrationService> orchestrationServices,
         ICacheService cacheService,
         ICallContext callContext,
@@ -49,6 +52,9 @@ public class AgentFactoryService : IAgentFactoryService
         IDataSourceHubAPIService dataSourceHubService,
         ILoggerFactory loggerFactory)
     {
+        _resourceProviderServices = resourceProviderServices.ToDictionary<IResourceProviderService, string>(
+                rps => rps.Name);
+
         _orchestrationServices = orchestrationServices;
         _cacheService = cacheService;
         _callContext = callContext;
@@ -89,6 +95,7 @@ public class AgentFactoryService : IAgentFactoryService
                 completionRequest.SessionId ?? string.Empty,
                 _cacheService,
                 _callContext,
+                _resourceProviderServices,
                 _agentHubAPIService,
                 _orchestrationServices,
                 _promptHubAPIService,
@@ -123,6 +130,7 @@ public class AgentFactoryService : IAgentFactoryService
                 summaryRequest.SessionId ?? string.Empty,
                 _cacheService,
                 _callContext,
+                _resourceProviderServices,
                 _agentHubAPIService,
                 _orchestrationServices,
                 _promptHubAPIService,

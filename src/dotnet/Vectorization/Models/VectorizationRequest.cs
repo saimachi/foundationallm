@@ -1,4 +1,5 @@
-﻿using FoundationaLLM.Vectorization.Exceptions;
+﻿using FoundationaLLM.Common.Models.TextEmbedding;
+using FoundationaLLM.Vectorization.Exceptions;
 using System.Text.Json.Serialization;
 
 namespace FoundationaLLM.Vectorization.Models
@@ -9,19 +10,36 @@ namespace FoundationaLLM.Vectorization.Models
     public class VectorizationRequest
     {
         /// <summary>
-        /// The unique identifier of the vectorization request. Subsequent vectorization requests
-        /// referring to the same content will have different unique identifiers.
+        /// The unique identifier of the vectorization request.
+        /// The responsibility to create this identifier belongs to the initiator of the vectorization request.
         /// </summary>
-        [JsonPropertyOrder(0)]
+        [JsonPropertyOrder(-1)]
         [JsonPropertyName("id")]
-        public required string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
-        /// The <see cref="VectorizationContentIdentifier"/> object identifying the content being vectorized.
+        /// The unique identifier of the vectorization request.
+        /// The responsibility to create this identifier belongs to the FoundationaLLM.Vectorization resource manager.
+        /// Subsequent vectorization requests referring to the same content will have different unique identifiers.
+        /// </summary>
+        [JsonPropertyOrder(0)]
+        [JsonPropertyName("object_id")]
+        public string? ObjectId { get; set; }
+
+        /// <summary>
+        /// The <see cref="ContentIdentifier"/> object identifying the content being vectorized.
         /// </summary>
         [JsonPropertyOrder(1)]
         [JsonPropertyName("content_identifier")]
-        public required VectorizationContentIdentifier ContentIdentifier { get; set; }
+        public required ContentIdentifier ContentIdentifier { get; set; }
+
+        /// <summary>
+        /// The <see cref="VectorizationProcessingType"/> indicating how should the request be processed.
+        /// </summary>
+        [JsonPropertyOrder(2)]
+        [JsonPropertyName("processing_type")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public required VectorizationProcessingType ProcessingType { get; set; }
 
         /// <summary>
         /// The list of vectorization steps requested by the vectorization request.
@@ -36,14 +54,14 @@ namespace FoundationaLLM.Vectorization.Models
         /// </summary>
         [JsonPropertyOrder(11)]
         [JsonPropertyName("completed_steps")]
-        public required List<string> CompletedSteps { get; set; }
+        public List<string> CompletedSteps { get; set; } = [];
 
         /// <summary>
         /// The ordered list of the names of the vectorization steps that still need to be executed.
         /// </summary>
         [JsonPropertyOrder(12)]
         [JsonPropertyName("remaining_steps")]
-        public required List<string> RemainingSteps { get; set; }
+        public List<string> RemainingSteps { get; set; } = [];
 
         /// <summary>
         /// Indicates whether the vectorization process is complete or not.
@@ -52,21 +70,33 @@ namespace FoundationaLLM.Vectorization.Models
         public bool Complete => RemainingSteps.Count == 0;
 
         /// <summary>
-        /// Advances the vectorization pipeline to the next step, returning the name of the next step to execute.
-        /// The name returned is used to choose the next request source to which the vectorization request will be added.
+        /// The current step of the vectorization request.
         /// </summary>
-        /// <returns>The name of the next step to execute if there are steps left to execute or null if the processing
+        [JsonIgnore]
+        public string? CurrentStep => RemainingSteps.Count == 0
+            ? null
+            : RemainingSteps.First();
+
+        /// <summary>
+        /// Advances the vectorization pipeline to the next step.
+        /// The newly set current step is used to choose the next request source to which the vectorization request will be added.
+        /// </summary>
+        /// <returns>A tuple containing the name of the previous step and the name of the next step to execute if there are steps left to execute or null if the processing
         /// of the vectorization request is complete.</returns>
-        public string? MoveToNextStep()
+        public (string PreviousStep, string? CurrentStep) MoveToNextStep()
         {
-            var stepName = RemainingSteps.First();
+            if (RemainingSteps.Count == 0)
+                throw new VectorizationException($"Attempting to move to the next step when no steps remain for vectorization request with id {Id}.");
+
+            var previousStepName = RemainingSteps.First();
             RemainingSteps.RemoveAt(0);
-            CompletedSteps.Add(stepName);
+            CompletedSteps.Add(previousStepName);
 
-
-            return RemainingSteps.Count == 0
+            var nextStepName = RemainingSteps.Count == 0
                 ? null
                 : RemainingSteps[0];
+
+            return (previousStepName, nextStepName);
         }
 
         /// <summary>

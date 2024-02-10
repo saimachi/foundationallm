@@ -1,24 +1,34 @@
-from langchain.base_language import BaseLanguageModel
+from calendar import c
+from langchain_core.language_models import BaseLanguageModel
 from foundationallm.config import Configuration, Context
-from foundationallm.models.orchestration import CompletionRequest
+from foundationallm.models.orchestration import CompletionRequestBase
+from foundationallm.resources import ResourceProvider
 from foundationallm.langchain.agents import AgentBase
-from foundationallm.langchain.agents import AnomalyDetectionAgent
-from foundationallm.langchain.agents import CSVAgent
-from foundationallm.langchain.agents import SqlDbAgent
-from foundationallm.langchain.agents import SummaryAgent
-from foundationallm.langchain.agents import BlobStorageAgent
-from foundationallm.langchain.agents import ConversationalAgent
-from foundationallm.langchain.agents import GenericResolverAgent
-from foundationallm.langchain.agents import CXOAgent
-from foundationallm.langchain.agents import SearchServiceAgent
+from foundationallm.langchain.agents import (
+    AnomalyDetectionAgent,
+    CSVAgent,
+    SqlDbAgent,
+    SummaryAgent,
+    BlobStorageAgent,
+    GenericResolverAgent,
+    CXOAgent,
+    SearchServiceAgent,
+    KnowledgeManagementAgent
+)
 
 class AgentFactory:
     """
     Factory to determine which agent to use.
     """
 
-    def __init__(self, completion_request: CompletionRequest, llm: BaseLanguageModel,
-                 config: Configuration, context: Context):
+    def __init__(
+            self,
+            completion_request: CompletionRequestBase,
+            llm: BaseLanguageModel,
+            config: Configuration,
+            context: Context,
+            resource_provider: ResourceProvider=None
+        ):
         """
         Initializes an AgentFactory for selecting which agent to use for completion.
 
@@ -35,6 +45,9 @@ class AgentFactory:
         self.llm = llm
         self.config = config
         self.context = context
+        if resource_provider is None:
+            resource_provider = ResourceProvider(config=config)
+        self.resource_provider = resource_provider
 
     def get_agent(self) -> AgentBase:
         """
@@ -72,6 +85,12 @@ class AgentFactory:
             case 'cxo':
                 return CXOAgent(self.completion_request,
                                              llm=self.llm, config=self.config)
+            case 'knowledge-management':
+                return KnowledgeManagementAgent(
+                    self.completion_request,
+                    llm=self.llm,
+                    config=self.config,                                            
+                    resource_provider=self.resource_provider
+                )
             case _:
-                return ConversationalAgent(self.completion_request, llm=self.llm,
-                                           config=self.config)
+                raise ValueError(f'No agent found for the specified agent type: {self.agent.type}.')

@@ -1,11 +1,8 @@
-﻿using FoundationaLLM.Common.Constants;
+﻿using FoundationaLLM.Common.Models.TextEmbedding;
 using FoundationaLLM.Common.Services;
 using FoundationaLLM.Common.Settings;
-using FoundationaLLM.Vectorization.DataFormats.PDF;
-using FoundationaLLM.Vectorization.Exceptions;
 using FoundationaLLM.Vectorization.Interfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace FoundationaLLM.Vectorization.Services.ContentSources
 {
@@ -28,27 +25,26 @@ namespace FoundationaLLM.Vectorization.Services.ContentSources
             _storageSettings = storageSettings;
             _logger = loggerFactory.CreateLogger<DataLakeContentSourceService>();
             _dataLakeStorageService = new DataLakeStorageService(
-                Options.Create<BlobStorageServiceSettings>(_storageSettings),
+                _storageSettings,
                 loggerFactory.CreateLogger<DataLakeStorageService>());
         }
 
         /// <inheritdoc/>
-        public async Task<String> ExtractTextFromFileAsync(List<string> multipartId, CancellationToken cancellationToken)
-        {
-            ValidateMultipartId(multipartId, 3);
+        /// <remarks>
+        /// contentId[0] = the URL of the storage account.
+        /// contentId[1] = the container name.
+        /// contentId[2] = path of the file relative to the container name.
+        /// </remarks>
+        public async Task<string> ExtractTextFromFileAsync(ContentIdentifier contentId, CancellationToken cancellationToken)
+        {   
+            contentId.ValidateMultipartId(3);
 
             var binaryContent = await _dataLakeStorageService.ReadFileAsync(
-                multipartId[1],
-                multipartId[2],
+                contentId[1],
+                contentId[2],
                 cancellationToken);
 
-            var fileExtension = Path.GetExtension(multipartId[2]);
-
-            return fileExtension.ToLower() switch
-            {
-                FileExtensions.PDF => PDFTextExtractor.GetText(binaryContent),
-                _ => throw new VectorizationException($"The file type for {multipartId[2]} is not supported."),
-            };
+            return await ExtractTextFromFileAsync(contentId.FileName, binaryContent);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using FoundationaLLM.Common.Models.Metadata;
+using Newtonsoft.Json;
 
 namespace FoundationaLLM.AgentFactory.Core.Models.Orchestration.Metadata
 {
@@ -8,7 +9,7 @@ namespace FoundationaLLM.AgentFactory.Core.Models.Orchestration.Metadata
     public class DataSourceBase : MetadataBase
     {
         /// <summary>
-        /// Discriptor for the type of data in the data source.
+        /// Descriptor for the type of data in the data source.
         /// </summary>
         /// <example>Survey data for a CSV file that contains survey results.</example>
         [JsonProperty("data_description")]

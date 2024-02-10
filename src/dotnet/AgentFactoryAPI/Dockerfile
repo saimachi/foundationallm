@@ -1,10 +1,12 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+ARG FOUNDATIONALLM_VERSION
 WORKDIR /app
 EXPOSE 80
 
 ENV ASPNETCORE_URLS=http://+:80
 ENV ASPNETCORE_ENVIRONMENT=Development
+ENV FOUNDATIONALLM_VERSION=${FOUNDATIONALLM_VERSION:-0.0.0}
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
@@ -29,3 +31,4 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "FoundationaLLM.AgentFactory.API.dll"]
 LABEL org.opencontainers.image.source=https://github.com/solliancenet/foundationallm
+LABEL ai.foundationallm.version=${FOUNDATIONALLM_VERSION:-0.0.0}

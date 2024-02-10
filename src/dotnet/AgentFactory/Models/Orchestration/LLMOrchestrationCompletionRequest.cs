@@ -1,5 +1,5 @@
-﻿using FoundationaLLM.AgentFactory.Core.Models.Orchestration.Metadata;
-using FoundationaLLM.Common.Models.Chat;
+﻿using FoundationaLLM.Common.Models.Chat;
+using FoundationaLLM.Common.Models.Metadata;
 using Newtonsoft.Json;
 
 namespace FoundationaLLM.AgentFactory.Core.Models.Orchestration
@@ -15,7 +15,7 @@ namespace FoundationaLLM.AgentFactory.Core.Models.Orchestration
         /// Agent metadata
         /// </summary>
         [JsonProperty("agent")]
-        public Agent? Agent { get; set; }
+        public FoundationaLLM.AgentFactory.Core.Models.Orchestration.Metadata.Agent? Agent { get; set; }
 
         /// <summary>
         /// Data source metadata
