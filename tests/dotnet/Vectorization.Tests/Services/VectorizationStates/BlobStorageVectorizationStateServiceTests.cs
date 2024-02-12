@@ -111,7 +111,6 @@ namespace Vectorization.Tests.Services.VectorizationStates
                 "vectorization-state",
                 "SomeBusinessUnit/SomePDFData_state_ED58FB8030C071F5506903E0773C09DD_textpartition_000003.txt",
                 A<CancellationToken>._)).MustHaveHappenedOnceExactly();
-            // Should be non-null
             Assert.NotNull(state.Artifacts[2].Content);
         }
     }
