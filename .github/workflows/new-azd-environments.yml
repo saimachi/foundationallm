@@ -1,0 +1,26 @@
+name: Azure Authentication
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Azure CLI
+        uses: azure/login@v1
+
+      - name: Authenticate with Azure
+        run: az login --service-principal --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+      - name: Deploy AZD
+        run: |
+          # Install AZD
+          curl -fsSL https://aka.ms/install-azd.sh | bash
+          cd ./foundationallm/deploy/starter
+          az storage azcopy blob download --container azd-resources --account-name fllme2etestingresources -s ".azure/" -d ".azure/" --recursive
+          azd up
