@@ -1,12 +1,6 @@
 [
   {
     "keyVault": false,
-    "featureFlag": true,
-    "key": ".appconfig.featureflag/FoundationaLLM-AllowAgentHint",
-    "value": "FoundationaLLM-AllowAgentHint"
-  },
-  {
-    "keyVault": false,
     "featureFlag": false,
     "key": "FoundationaLLM:AgentHub:AgentMetadata:StorageContainer",
     "value": "agents"
@@ -424,12 +418,6 @@
     "featureFlag": false,
     "key": "FoundationaLLM:Branding:AccentTextColor",
     "value": "#fff"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:Branding:AllowAgentSelection",
-    "value": "default, anomaly, hai, movies, sdzwa, weather, weather-sec"
   },
   {
     "keyVault": false,
