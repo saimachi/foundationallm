@@ -1,7 +1,11 @@
-name: Azure Authentication
+name: E2E Test Deployment
 
 on:
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build:
