@@ -34,4 +34,5 @@ jobs:
           ls .azure
           ls .azure/$envName
           sed -e "s/\${ENV_NAME}/$envName/" ./.azure/$envName/env > ./.azure/$envName/.env
+          export AZURE_ENV_NAME=$envName
           azd up
