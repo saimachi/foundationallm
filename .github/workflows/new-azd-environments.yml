@@ -33,5 +33,5 @@ jobs:
           az storage azcopy blob download --container azd-resources --account-name fllme2etestingresources -s "*" -d ".azure/$envName/" --recursive
           ls .azure
           ls .azure/$envName
-          sed -e "s/\${ENV_NAME}/$envName/" ./azure/$envName/.env > ./azure/$envName/.env
+          sed -e "s/\${ENV_NAME}/$envName/" ./azure/$envName/env > ./azure/$envName/.env
           azd up
