@@ -686,6 +686,18 @@
   {
     "keyVault": false,
     "featureFlag": false,
+    "key": "FoundationaLLM:DataSource:ResourceProviderService:Storage:AuthenticationType",
+    "value": "ConnectionString"
+  },
+  {
+    "keyVault": true,
+    "featureFlag": false,
+    "key": "FoundationaLLM:DataSource:ResourceProviderService:Storage:ConnectionString",
+    "value": "foundationallm-datasource-resourceprovider-storage-connectionstring"
+  },
+  {
+    "keyVault": false,
+    "featureFlag": false,
     "key": "FoundationaLLM:DataSourceHub:DataSourceMetadata:StorageContainer",
     "value": "data-sources"
   },

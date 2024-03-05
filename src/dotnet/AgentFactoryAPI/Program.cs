@@ -58,6 +58,7 @@ namespace FoundationaLLM.AgentFactory.API
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_APIs);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_AgentFactory);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Agent);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_AzureOpenAI);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Events);
             });
             if (builder.Environment.IsDevelopment())

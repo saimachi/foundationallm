@@ -827,6 +827,20 @@
       "tags": {}
     },
     {
+      "key": "FoundationaLLM:DataSource:ResourceProviderService:Storage:AuthenticationType",
+      "value": "ConnectionString",
+      "label": null,
+      "content_type": "",
+      "tags": {}
+    },
+    {
+      "key": "FoundationaLLM:DataSource:ResourceProviderService:Storage:ConnectionString",
+      "value": "{\"uri\":\"${env:AZURE_KEY_VAULT_ENDPOINT}secrets/foundationallm-datasource-resourceprovider-storage-connectionstring\"}",
+      "label": null,
+      "content_type": "application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8",
+      "tags": {}
+    },
+    {
       "key": "FoundationaLLM:DurableSystemPrompt:BlobStorageConnection",
       "value": "{\"uri\":\"${env:AZURE_KEY_VAULT_ENDPOINT}secrets/storage-connection\"}",
       "label": null,

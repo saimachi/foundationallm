@@ -68,7 +68,7 @@ namespace FoundationaLLM.Core.API
                     policy =>
                     {
                         policy.AllowAnyOrigin();
-                        policy.WithHeaders("DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range", "Authorization", "X-AGENT-HINT");
+                        policy.WithHeaders("DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range", "Authorization");
                         policy.AllowAnyMethod();
                     });
             });

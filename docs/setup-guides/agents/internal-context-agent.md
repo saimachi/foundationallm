@@ -104,5 +104,3 @@ HTTP DELETE {{baseUrl}}/instances/{{instanceId}}/providers/FoundationaLLM.Agent/
 ## Validating an internal context agent
 
 Once configured, the internal context agent can be validated using an API call to the [Core API](../exposed-apis/core-api.md) or via the [User Portal](../quickstart.md).
-
->**Note**: When validating through the user portal, ensure the `FoundationaLLM-AllowAgentHint` feature is enabled in the app configuration service. You may need to refresh your user portal browser for the agent to display in the agents list for selection.

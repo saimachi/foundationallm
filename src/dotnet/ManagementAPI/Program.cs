@@ -62,6 +62,7 @@ namespace FoundationaLLM.Management.API
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Vectorization);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Agent);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Prompt);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_DataSource);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Events);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Configuration);
             });
@@ -80,7 +81,7 @@ namespace FoundationaLLM.Management.API
                     {
                         policy.AllowAnyOrigin();
                         policy.WithHeaders("DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since",
-                            "Cache-Control", "Content-Type", "Range", "Authorization", "X-AGENT-HINT");
+                            "Cache-Control", "Content-Type", "Range", "Authorization");
                         policy.AllowAnyMethod();
                     });
             });
@@ -128,6 +129,7 @@ namespace FoundationaLLM.Management.API
             builder.Services.AddVectorizationResourceProvider(builder.Configuration);
             builder.Services.AddAgentResourceProvider(builder.Configuration);
             builder.Services.AddPromptResourceProvider(builder.Configuration);
+            builder.Services.AddDataSourceResourceProvider(builder.Configuration);
 
             // Register the authentication services:
             RegisterAuthConfiguration(builder);

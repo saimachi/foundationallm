@@ -13,6 +13,7 @@ var secretNames = [
   'foundationallm-blobstoragememorysource-blobstorageconnection'
   'foundationallm-cognitivesearchmemorysource-blobstorageconnection'
   'foundationallm-configuration-resourceprovider-storage-connectionstring'
+  'foundationallm-datasource-resourceprovider-storage-connectionstring'
   'foundationallm-datasourcehub-storagemanager-blobstorage-connectionstring'
   'foundationallm-durablesystemprompt-blobstorageconnection'
   'foundationallm-prompt-resourceprovider-storage-connectionstring'

@@ -200,9 +200,3 @@ FoundationaLLM uses Azure App Configuration to store configuration values, Key V
 | `FoundationaLLM:VectorizationAPI:Entra:Instance` | Enter the URL to the service. | |
 | `FoundationaLLM:VectorizationAPI:Entra:Scopes` | api://FoundationaLLM-Vectorization/Data.Manage | |
 | `FoundationaLLM:VectorizationAPI:Entra:TenantId` | | |
-
-## Feature flags
-
-| Key                             | Default Value | Description                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FoundationaLLM-AllowAgentHint` | `false`       | Used for demo purposes. If the feature is enabled, the User Portal UI displays an agent hint selector for a chat session and sends an `X-AGENT-HINT` header with the selected agent name (if applicable) to all HTTP requests to the Core API. This header flows downstream to the Agent Hub, forcing the resolver to use the specified agent. The Agent Hub only uses this header value if this feature flag is enabled, as an added protective measure. |

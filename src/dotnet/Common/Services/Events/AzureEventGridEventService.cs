@@ -38,6 +38,10 @@ namespace FoundationaLLM.Common.Services.Events
             {
                 EventSetEventNamespaces.FoundationaLLM_ResourceProvider_Configuration,
                 null
+            },
+            {
+                EventSetEventNamespaces.FoundationaLLM_ResourceProvider_DataSource,
+                null
             }
         };
 

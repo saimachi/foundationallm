@@ -162,14 +162,12 @@ module cosmosDb './shared/cosmosdb.bicep' = {
 module cogSearch './shared/search.bicep' = {
   name: 'cogsearch'
   params: {
-    keyvaultName: keyVault.outputs.name
     location: location
     name: '${abbrs.searchSearchServices}${resourceToken}'
     sku: 'basic'
     tags: tags
   }
   scope: rg
-  dependsOn: [ keyVault ]
 }
 
 module dashboard './shared/dashboard-web.bicep' = {
@@ -414,6 +412,7 @@ module acaServices './app/acaService.bicep' = [for service in services: {
     tags: tags
     appConfigName: appConfig.outputs.name
     eventgridName: eventgrid.outputs.name
+    cogsearchName: cogSearch.outputs.name
     identityName: '${abbrs.managedIdentityUserAssignedIdentities}${service.name}-${resourceToken}'
     keyvaultName: keyVault.outputs.name
     applicationInsightsName: monitoring.outputs.applicationInsightsName
