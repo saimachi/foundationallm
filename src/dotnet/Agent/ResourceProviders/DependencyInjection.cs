@@ -47,6 +47,7 @@ namespace FoundationaLLM
             // Register validators.
             services.AddSingleton<IValidator<AgentBase>, AgentBaseValidator>();
             services.AddSingleton<IValidator<KnowledgeManagementAgent>, KnowledgeManagementAgentValidator>();
+            services.AddSingleton<IValidator<InternalContextAgent>, InternalContextAgentValidator>();
 
             services.AddSingleton<IResourceProviderService, AgentResourceProviderService>(sp =>
                 new AgentResourceProviderService(

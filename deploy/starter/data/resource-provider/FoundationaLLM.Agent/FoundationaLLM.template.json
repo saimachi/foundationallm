@@ -1,0 +1,28 @@
+{
+  "type": "internal-context",
+  "name": "FoundationaLLM",
+  "object_id": "/instances/${env:FOUNDATIONALLM_INSTANCE_ID}/providers/FoundationaLLM.Agent/agents/FoundationaLLM",
+  "description": "Useful for answering questions about FoundationaLLM.",
+  "language_model": {
+    "type": "openai",
+    "provider": "microsoft",
+    "temperature": 0,
+    "use_chat": true,
+    "api_endpoint": "FoundationaLLM:AzureOpenAI:API:Endpoint",
+    "api_key": "FoundationaLLM:AzureOpenAI:API:Key",
+    "api_version": "FoundationaLLM:AzureOpenAI:API:Version",
+    "version": "FoundationaLLM:AzureOpenAI:API:Completions:ModelVersion",
+    "deployment": "FoundationaLLM:AzureOpenAI:API:Completions:DeploymentName"
+  },
+  "sessions_enabled": true,
+  "conversation_history": {
+    "enabled": false,
+    "max_history": 5
+  },
+  "gatekeeper": {
+    "use_system_setting": false,
+    "options": []
+  },
+  "orchestrator": "LangChain",
+  "prompt_object_id": "/instances/${env:FOUNDATIONALLM_INSTANCE_ID}/providers/FoundationaLLM.Prompt/prompts/FoundationaLLM"
+}

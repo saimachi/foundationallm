@@ -137,22 +137,6 @@ namespace FoundationaLLM.Configuration.Catalog
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_CognitiveSearch_Key,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames
-                    .FoundationaLLM_CognitiveSearchMemorySource_Blobstorageconnection,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_CognitiveSearchMemorySource_Key,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
                 secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
                 minimumVersion: "0.3.0",
                 description: ""
@@ -171,12 +155,6 @@ namespace FoundationaLLM.Configuration.Catalog
             new(
                 secretName: Common.Constants.KeyVaultSecretNames
                     .FoundationaLLM_DataSourceHub_StorageManager_BlobStorage_ConnectionString,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames
-                    .FoundationaLLM_DurableSystemPrompt_BlobStorageConnection,
                 minimumVersion: "0.3.0",
                 description: ""
             ),

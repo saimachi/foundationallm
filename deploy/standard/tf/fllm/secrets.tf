@@ -76,11 +76,7 @@ resource "azurerm_key_vault_secret" "core_entra_clientsecret" {
   }
 }
 
-resource "azurerm_key_vault_secret" "search_key" {
-  name         = "foundationallm-cognitivesearch-key"
-  key_vault_id = data.azurerm_key_vault.keyvault_ops.id
-  value        = module.search.key
-}
+
 
 #data "azuread_application" "client_entra" {
 #  display_name = var.client_entra_application

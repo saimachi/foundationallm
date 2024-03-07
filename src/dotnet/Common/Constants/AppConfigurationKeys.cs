@@ -387,49 +387,6 @@ namespace FoundationaLLM.Common.Constants
         /// </summary>
         public const string FoundationaLLM_Chat_Entra_TenantId = "FoundationaLLM:Chat:Entra:TenantId";
         /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearch:EndPoint app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearch_EndPoint = "FoundationaLLM:CognitiveSearch:EndPoint";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearch:IndexName app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearch_IndexName = "FoundationaLLM:CognitiveSearch:IndexName";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearch:Key app configuration setting.
-        /// This is a Key Vault reference.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearch_Key = "FoundationaLLM:CognitiveSearch:Key";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearch:MaxVectorSearchResults app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearch_MaxVectorSearchResults = "FoundationaLLM:CognitiveSearch:MaxVectorSearchResults";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearchMemorySource:BlobStorageConnection app configuration setting.
-        /// This is a Key Vault reference.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_BlobStorageConnection = "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageConnection";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearchMemorySource:BlobStorageContainer app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_BlobStorageContainer = "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageContainer";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearchMemorySource:ConfigFilePath app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_ConfigFilePath = "FoundationaLLM:CognitiveSearchMemorySource:ConfigFilePath";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearchMemorySource:EndPoint app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_EndPoint = "FoundationaLLM:CognitiveSearchMemorySource:EndPoint";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearchMemorySource:IndexName app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_IndexName = "FoundationaLLM:CognitiveSearchMemorySource:IndexName";
-        /// <summary>
-        /// The key for the FoundationaLLM:CognitiveSearchMemorySource:Key app configuration setting.
-        /// This is a Key Vault reference.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_Key = "FoundationaLLM:CognitiveSearchMemorySource:Key";
-        /// <summary>
         /// The key for the FoundationaLLM:CoreAPI:Entra:CallbackPath app configuration setting.
         /// </summary>
         public const string FoundationaLLM_CoreAPI_Entra_CallbackPath = "FoundationaLLM:CoreAPI:Entra:CallbackPath";
@@ -498,15 +455,6 @@ namespace FoundationaLLM.Common.Constants
         /// This is a Key Vault reference.
         /// </summary>
         public const string FoundationaLLM_DataSources_AboutFoundationaLLM_BlobStorage_ConnectionString = "FoundationaLLM:DataSources:AboutFoundationaLLM:BlobStorage:ConnectionString";
-        /// <summary>
-        /// The key for the FoundationaLLM:DurableSystemPrompt:BlobStorageConnection app configuration setting.
-        /// This is a Key Vault reference.
-        /// </summary>
-        public const string FoundationaLLM_DurableSystemPrompt_BlobStorageConnection = "FoundationaLLM:DurableSystemPrompt:BlobStorageConnection";
-        /// <summary>
-        /// The key for the FoundationaLLM:DurableSystemPrompt:BlobStorageContainer app configuration setting.
-        /// </summary>
-        public const string FoundationaLLM_DurableSystemPrompt_BlobStorageContainer = "FoundationaLLM:DurableSystemPrompt:BlobStorageContainer";
         /// <summary>
         /// The key for the FoundationaLLM:LangChain:CSVFile:URL app configuration setting.
         /// This is a Key Vault reference.
@@ -832,14 +780,6 @@ namespace FoundationaLLM.Common.Constants
         /// </summary>
         public const string FoundationaLLM_AzureContentSafety = "FoundationaLLM:AzureContentSafety:*";
         /// <summary>
-        /// The key filter for the FoundationaLLM:DurableSystemPrompt:* app configuration settings.
-        /// </summary>
-        public const string FoundationaLLM_DurableSystemPrompt = "FoundationaLLM:DurableSystemPrompt:*";
-        /// <summary>
-        /// The key filter for the FoundationaLLM:CognitiveSearchMemorySource:* app configuration settings.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource = "FoundationaLLM:CognitiveSearchMemorySource:*";
-        /// <summary>
         /// The key filter for the FoundationaLLM:BlobStorageMemorySource:* app configuration settings.
         /// </summary>
         public const string FoundationaLLM_BlobStorageMemorySource = "FoundationaLLM:CoreAPI:BlobStorageMemorySource:*";
@@ -941,14 +881,6 @@ namespace FoundationaLLM.Common.Constants
         /// The key section for the FoundationaLLM:AzureContentSafety app configuration settings.
         /// </summary>
         public const string FoundationaLLM_AzureContentSafety = "FoundationaLLM:AzureContentSafety";
-        /// <summary>
-        /// The key section for the FoundationaLLM:DurableSystemPrompt app configuration settings.
-        /// </summary>
-        public const string FoundationaLLM_DurableSystemPrompt = "FoundationaLLM:DurableSystemPrompt";
-        /// <summary>
-        /// The key section for the FoundationaLLM:CognitiveSearchMemorySource app configuration settings.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource = "FoundationaLLM:CognitiveSearchMemorySource";
         /// <summary>
         /// The key section for the FoundationaLLM:BlobStorageMemorySource app configuration settings.
         /// </summary>

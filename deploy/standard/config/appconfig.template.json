@@ -548,66 +548,6 @@
   {
     "keyVault": false,
     "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearch:EndPoint",
-    "value": "{{cognitiveSearchEndpointUri}}"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearch:IndexName",
-    "value": "vector-index"
-  },
-  {
-    "keyVault": true,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearch:Key",
-    "value": "foundationallm-cognitivesearch-key"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearch:MaxVectorSearchResults",
-    "value": "10"
-  },
-  {
-    "keyVault": true,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageConnection",
-    "value": "foundationallm-storage-connectionstring"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageContainer",
-    "value": "memory-source"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearchMemorySource:ConfigFilePath",
-    "value": "ACSMemorySourceConfig.json"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearchMemorySource:EndPoint",
-    "value": "{{cognitiveSearchEndpointUri}}"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearchMemorySource:IndexName",
-    "value": "vector-index"
-  },
-  {
-    "keyVault": true,
-    "featureFlag": false,
-    "key": "FoundationaLLM:CognitiveSearchMemorySource:Key",
-    "value": "foundationallm-cognitivesearch-key"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
     "key": "FoundationaLLM:CoreAPI:Entra:CallbackPath",
     "value": "/signin-oidc"
   },
@@ -712,18 +652,6 @@
     "featureFlag": false,
     "key": "FoundationaLLM:DataSources:AboutFoundationaLLM:BlobStorage:ConnectionString",
     "value": "foundationallm-storage-connectionstring"
-  },
-  {
-    "keyVault": true,
-    "featureFlag": false,
-    "key": "FoundationaLLM:DurableSystemPrompt:BlobStorageConnection",
-    "value": "foundationallm-storage-connectionstring"
-  },
-  {
-    "keyVault": false,
-    "featureFlag": false,
-    "key": "FoundationaLLM:DurableSystemPrompt:BlobStorageContainer",
-    "value": "prompts"
   },
   {
     "keyVault": true,
@@ -1119,12 +1047,6 @@
     "value": "{{vectorizationConfig}}"
   },
   {
-    "keyVault": true,
-    "featureFlag": false,
-    "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:APIKey",
-    "value": "foundationallm-cognitivesearch-key"
-  },
-  {
     "keyVault": false,
     "featureFlag": false,
     "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:AuthenticationType",
@@ -1135,12 +1057,6 @@
     "featureFlag": false,
     "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:Endpoint",
     "value": "{{cognitiveSearchEndpointUri}}"
-  },
-  {
-    "keyVault": true,
-    "featureFlag": false,
-    "key": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:QueryAPIKey",
-    "value": "foundationallm-cognitivesearch-key"
   },
   {
     "keyVault": false,

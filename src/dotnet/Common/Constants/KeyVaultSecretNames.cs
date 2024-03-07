@@ -78,18 +78,6 @@ namespace FoundationaLLM.Common.Constants
         /// </summary>
         public const string FoundationaLLM_Chat_Entra_ClientSecret = "foundationallm-chat-entra-clientsecret";
         /// <summary>
-        /// The foundationallm-cognitivesearch-key Key Vault secret name.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearch_Key = "foundationallm-cognitivesearch-key";
-        /// <summary>
-        /// The foundationallm-cognitivesearchmemorysource-blobstorageconnection Key Vault secret name.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_Blobstorageconnection = "foundationallm-cognitivesearchmemorysource-blobstorageconnection";
-        /// <summary>
-        /// The foundationallm-cognitivesearchmemorysource-key Key Vault secret name.
-        /// </summary>
-        public const string FoundationaLLM_CognitiveSearchMemorySource_Key = "foundationallm-cognitivesearchmemorysource-key";
-        /// <summary>
         /// The foundationallm-coreapi-entra-clientsecret Key Vault secret name.
         /// </summary>
         public const string FoundationaLLM_Coreapi_Entra_ClientSecret = "foundationallm-coreapi-entra-clientsecret";
@@ -101,10 +89,6 @@ namespace FoundationaLLM.Common.Constants
         /// The foundationallm-datasourcehub-storagemanager-blobstorage-connectionstring Key Vault secret name.
         /// </summary>
         public const string FoundationaLLM_DataSourceHub_StorageManager_BlobStorage_ConnectionString = "foundationallm-datasourcehub-storagemanager-blobstorage-connectionstring";
-        /// <summary>
-        /// The foundationallm-durablesystemprompt-blobstorageconnection Key Vault secret name.
-        /// </summary>
-        public const string FoundationaLLM_DurableSystemPrompt_BlobStorageConnection = "foundationallm-durablesystemprompt-blobstorageconnection";
         /// <summary>
         /// The foundationallm-langchain-csvfile-url Key Vault secret name.
         /// </summary>

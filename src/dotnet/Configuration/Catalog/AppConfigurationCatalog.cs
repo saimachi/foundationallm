@@ -989,122 +989,6 @@ namespace FoundationaLLM.Configuration.Catalog
         ];
 
         /// <summary>
-        /// The Cognitive Search configuration entries for the solution.
-        /// </summary>
-        public static readonly List<AppConfigurationEntry> CognitiveSearch =
-        [
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearch_EndPoint,
-                minimumVersion: "0.3.0",
-                defaultValue: "Enter the URL to the service.",
-                description: "",
-                keyVaultSecretName: "",
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearch_IndexName,
-                minimumVersion: "0.3.0",
-                defaultValue: "vector-index",
-                description: "",
-                keyVaultSecretName: "",
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearch_Key,
-                minimumVersion: "0.3.0",
-                defaultValue: "Key Vault secret name: `foundationallm-cognitivesearch-key`",
-                description: "This is a Key Vault reference.",
-                keyVaultSecretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_CognitiveSearch_Key,
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearch_MaxVectorSearchResults,
-                minimumVersion: "0.3.0",
-                defaultValue: "10",
-                description: "",
-                keyVaultSecretName: "",
-                contentType: "text/plain",
-                sampleObject: null
-            )
-        ];
-
-        /// <summary>
-        /// The Cognitive Search Memory Source configuration entries for the solution.
-        /// </summary>
-        public static readonly List<AppConfigurationEntry> CognitiveSearchMemorySource =
-        [
-            new(
-                key: Common.Constants.AppConfigurationKeys
-                    .FoundationaLLM_CognitiveSearchMemorySource_BlobStorageConnection,
-                minimumVersion: "0.3.0",
-                defaultValue:
-                "Key Vault secret name: `foundationallm-cognitivesearchmemorysource-blobstorageconnection`",
-                description: "This is a Key Vault reference.",
-                keyVaultSecretName: Common.Constants.KeyVaultSecretNames
-                    .FoundationaLLM_CognitiveSearchMemorySource_Blobstorageconnection,
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys
-                    .FoundationaLLM_CognitiveSearchMemorySource_BlobStorageContainer,
-                minimumVersion: "0.3.0",
-                defaultValue: "memory-source",
-                description: "",
-                keyVaultSecretName: "",
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearchMemorySource_ConfigFilePath,
-                minimumVersion: "0.3.0",
-                defaultValue: "ACSMemorySourceConfig.json",
-                description: "",
-                keyVaultSecretName: "",
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearchMemorySource_EndPoint,
-                minimumVersion: "0.3.0",
-                defaultValue: "Enter the URL to the service.",
-                description: "",
-                keyVaultSecretName: "",
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearchMemorySource_IndexName,
-                minimumVersion: "0.3.0",
-                defaultValue: "vector-index",
-                description: "",
-                keyVaultSecretName: "",
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_CognitiveSearchMemorySource_Key,
-                minimumVersion: "0.3.0",
-                defaultValue: "Key Vault secret name: `foundationallm-cognitivesearchmemorysource-key`",
-                description: "This is a Key Vault reference.",
-                keyVaultSecretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_CognitiveSearchMemorySource_Key,
-                contentType: "text/plain",
-                sampleObject: null
-            )
-        ];
-
-        /// <summary>
         /// The Core API configuration entries for the solution.
         /// </summary>
         public static readonly List<AppConfigurationEntry> CoreAPI =
@@ -1312,33 +1196,6 @@ namespace FoundationaLLM.Configuration.Catalog
                 description: "This is a Key Vault reference.",
                 keyVaultSecretName: Common.Constants.KeyVaultSecretNames
                     .FoundationaLLM_DataSourceHub_StorageManager_BlobStorage_ConnectionString,
-                contentType: "text/plain",
-                sampleObject: null
-            )
-        ];
-
-        /// <summary>
-        /// The Durable System Prompt configuration entries for the solution.
-        /// </summary>
-        public static readonly List<AppConfigurationEntry> DurableSystemPrompt =
-        [
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_DurableSystemPrompt_BlobStorageConnection,
-                minimumVersion: "0.3.0",
-                defaultValue: "Key Vault secret name: `foundationallm-durablesystemprompt-blobstorageconnection`",
-                description: "This is a Key Vault reference.",
-                keyVaultSecretName: Common.Constants.KeyVaultSecretNames
-                    .FoundationaLLM_DurableSystemPrompt_BlobStorageConnection,
-                contentType: "text/plain",
-                sampleObject: null
-            ),
-
-            new(
-                key: Common.Constants.AppConfigurationKeys.FoundationaLLM_DurableSystemPrompt_BlobStorageContainer,
-                minimumVersion: "0.3.0",
-                defaultValue: "system-prompt",
-                description: "",
-                keyVaultSecretName: "",
                 contentType: "text/plain",
                 sampleObject: null
             )
@@ -1937,14 +1794,11 @@ namespace FoundationaLLM.Configuration.Catalog
             allEntries.AddRange(AzureOpenAI);
             allEntries.AddRange(BlobStorageMemorySource);
             allEntries.AddRange(Branding);
-            allEntries.AddRange(CognitiveSearch);
-            allEntries.AddRange(CognitiveSearchMemorySource);
             allEntries.AddRange(Configuration);
             allEntries.AddRange(CoreAPI);
             allEntries.AddRange(CoreWorker);
             allEntries.AddRange(CosmosDB);
             allEntries.AddRange(DataSourceHub);
-            allEntries.AddRange(DurableSystemPrompt);
             allEntries.AddRange(Event);
             allEntries.AddRange(Instance);
             allEntries.AddRange(LangChain);

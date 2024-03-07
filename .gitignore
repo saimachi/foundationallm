@@ -385,3 +385,4 @@ log
 **/vectorization-api-event-profile.json
 **/vectorization-worker-event-profile.json
 deploy/starter/.env
+**/management-api-event-profile.json

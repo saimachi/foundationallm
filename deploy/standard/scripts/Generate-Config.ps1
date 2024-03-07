@@ -13,33 +13,73 @@ Set-PSDebug -Trace 0 # Echo every command (0 to disable, 1 to enable, 2 to enabl
 Set-StrictMode -Version 3.0
 $ErrorActionPreference = "Stop"
 
-function EnsureAndReturnFirstItem($arr, $restype) {
-    if (-not $arr -or $arr.Length -ne 1) {
-        Write-Host "Fatal: No $restype found (or found more than one)" -ForegroundColor Red
-        exit 1
-    }
+function Invoke-AndRequireSuccess {
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$Message,
 
-    return $arr[0]
-}
+        [Parameter(Mandatory = $true, Position = 1)]
+        [ScriptBlock]$ScriptBlock
+    )
 
-function EnsureSuccess($message) {
+    $LASTEXITCODE = 0
+    Write-Host "${message}..." -ForegroundColor Blue
+    $result = & $ScriptBlock
+
     if ($LASTEXITCODE -ne 0) {
-        Write-Host $message -ForegroundColor Red
-        exit $LASTEXITCODE
+        throw "Failed ${message} (code: ${LASTEXITCODE})"
     }
+
+    return $result
 }
 
-function PopulateTemplate($tokens, $template, $output) {
-    Push-Location $($MyInvocation.InvocationName | Split-Path)
-    $templatePath = $(../../common/scripts/Join-Path-Recursively -pathParts $template.Split(","))
-    $outputFilePath = $(../../common/scripts/Join-Path-Recursively -pathParts $output.Split(","))
-    Write-Host "Generating $outputFilePath file..." -ForegroundColor Blue
-    & ../../common/scripts/Token-Replace.ps1 -inputFile $templatePath -outputFile $outputFilePath -tokens $tokens
-    Pop-Location
+function PopulateTemplate {
+    param(
+        [parameter(Mandatory = $true, Position = 0)][object]$tokens,
+        [parameter(Mandatory = $true, Position = 1)][string]$template,
+        [parameter(Mandatory = $true, Position = 2)][string]$output
+    )
+
+    $templatePath = $(
+        ../../common/scripts/Join-Path-Recursively `
+            -pathParts $template.Split(",")
+    ) | Resolve-Path
+    Write-Host "Template: $templatePath" -ForegroundColor Blue
+
+    $outputFilePath = $(
+        ../../common/scripts/Join-Path-Recursively `
+            -pathParts $output.Split(",")
+    )
+    # This works when output file doesn't exist
+    $outputFilePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($outputFilePath)
+    Write-Host "Output: $outputFilePath" -ForegroundColor Blue
+
+    ../../common/scripts/Token-Replace.ps1 `
+        -inputFile $templatePath `
+        -outputFile $outputFilePath `
+        -tokens $tokens
 }
 
-$svcResourceSuffix = "$project-$environment-$location-svc"
+# function EnsureAndReturnFirstItem($arr, $restype) {
+#     if (-not $arr -or $arr.Length -ne 1) {
+#         Write-Host "Fatal: No $restype found (or found more than one)" -ForegroundColor Red
+#         exit 1
+#     }
 
+#     return $arr[0]
+# }
+
+# function EnsureSuccess($message) {
+#     if ($LASTEXITCODE -ne 0) {
+#         Write-Host $message -ForegroundColor Red
+#         exit $LASTEXITCODE
+#     }
+# }
+
+
+
+$svcResourceSuffix = "${resourceSuffix}-svc"
+$tokens = @{}
 $services = @{
     agentfactoryapi          = @{
         miName         = "mi-agent-factory-api-$svcResourceSuffix"
@@ -122,174 +162,121 @@ $services = @{
     }
 }
 
-### Getting Resources
-$tokens = @{}
-
-$tokens.subscriptionId = $subscriptionId
-$tokens.storageResourceGroup = $resourceGroups.storage
+$tokens.chatEntraClientId = $entraClientIds.chat
+$tokens.coreApiHostname = $ingress.apiIngress.coreapi.host
+$tokens.coreEntraClientId = $entraClientIds.core
+$tokens.instanceId = $instanceId
+$tokens.managementApiEntraClientId = $entraClientIds.managementapi
+$tokens.managementApiHostname = $ingress.apiIngress.managementapi.host
+$tokens.managementEntraClientId = $entraClientIds.managementUi
 $tokens.opsResourceGroup = $resourceGroups.ops
+$tokens.storageResourceGroup = $resourceGroups.storage
+$tokens.subscriptionId = $subscriptionId
+$tokens.vectorizationApiEntraClientId = $entraClientIds.vectorizationapi
+$tokens.vectorizationApiHostname = $ingress.apiIngress.vectorizationapi.host
 
-$tenantId = $(az account show --query homeTenantId --output tsv)
+$tenantId = Invoke-AndRequireSuccess "Get Tenant ID" {
+    az account show --query homeTenantId --output tsv
+}
+$tokens.tenantId = $tenantId
 
-# Getting Vectorization Config
-$vectorizationConfig = $(
-    Get-Content -Raw -Path "../config/vectorization.json" | `
+$vectorizationConfig = Invoke-AndRequireSuccess "Get Vectorization Config" {
+    $content = Get-Content -Raw -Path "../config/vectorization.json" | `
         ConvertFrom-Json | `
         ConvertTo-Json -Compress -Depth 50
-).Replace('"', '\"')
+    return $content.Replace('"', '\"')
+}
+$tokens.vectorizationConfig = $vectorizationConfig
 
-## Getting OpenAI endpoint
-$apim = $(
+$apimUri = Invoke-AndRequireSuccess "Get OpenAI APIM endpoint" {
     az apim list `
         --resource-group $($resourceGroups.oai) `
-        --query "[].{name:name, uri: gatewayUrl, privateIPAddress:privateIpAddresses[0], fqdn:hostnameConfigurations[0].hostName}" `
-        --output json | `
-        ConvertFrom-Json
-)
-$apim = EnsureAndReturnFirstItem $apim "OpenAI Endpoint (APIM)"
-Write-Host "OpenAI Frontend Endpoint: $($apim.name)" -ForegroundColor Blue
-
-$appConfigInstances = @(
-    az appconfig show `
-        --name "appconfig-$resourceSuffix-ops" `
-        --resource-group $($resourceGroups.ops) `
-        --output json | `
-        ConvertFrom-Json
-)
-if ($appConfigInstances.Length -lt 1) {
-    Write-Host "$($PSCommandPath): Error getting app config" -ForegroundColor Red
-    exit 1
+        --query "[0].gatewayUrl" `
+        --output tsv
 }
+$tokens.openAiEndpointUri = $apimUri
 
-$appConfig = $appConfigInstances.name
-Write-Host "App Config: $appConfig" -ForegroundColor Blue
-
-$appConfigProperties = $(
-    az appconfig show `
+$appConfig = Invoke-AndRequireSuccess "Get AppConfig Instance" {
+    az appconfig list `
         --resource-group $($resourceGroups.ops) `
-        --name $appConfig `
-        --query '{endpoint:endpoint, privateEndpointId:privateEndpointConnections[0].privateEndpoint.id}' `
+        --query "[0].{name:name,endpoint:endpoint}" `
         --output json | `
         ConvertFrom-Json
-)
+}
+$tokens.appConfigName = $appConfig.name
+$tokens.appConfigEndpoint = $appConfig.endpoint
 
-$appConfigName = $appConfig
-$appConfigEndpoint = $appConfigProperties.endpoint
-$appConfigConnectionString = $(
+$appConfigCredential = Invoke-AndRequireSuccess "Get AppConfig Credential" {
     az appconfig credential list `
-        --name $appConfig `
+        --name $appConfig.name `
         --resource-group $($resourceGroups.ops) `
         --query "[?name=='Primary Read Only'].{connectionString: connectionString}" `
         --output json | `
         ConvertFrom-Json
-).connectionString
+}
+$tokens.appConfigConnectionString = $appConfigCredential.connectionString
 
-## Getting Cognitive search endpoint
-$cogSearch = $(
+$cogSearchName = Invoke-AndRequireSuccess "Get Cognitive Search endpoint" {
     az search service list `
         --resource-group $resourceGroups.vec `
-        --query "[].{name: name, privateEndpointId:privateEndpointConnections[0].properties.privateEndpoint.id}" `
-        --output json | `
-        ConvertFrom-Json
-)
-$cogSearch = EnsureAndReturnFirstItem $cogSearch "Cognitive Search"
-Write-Host "Cognitive Search Service: $($cogSearch.name)" -ForegroundColor Blue
-$cogSearchUri = "https://$($cogSearch.name).search.windows.net"
+        --query "[0].name" `
+        --output tsv
+}
+$tokens.cognitiveSearchEndpointUri = "https://$($cogSearchName).search.windows.net"
 
-## Getting Content Safety endpoint
-$contentSafety = $(
+$contentSafetyUri = Invoke-AndRequireSuccess "Get Content Safety endpoint" {
     az cognitiveservices account list `
         --resource-group $($resourceGroups.oai) `
-        --query "[?kind=='ContentSafety'].{name:name, uri: properties.endpoint, privateEndpointId:properties.privateEndpointConnections[0].properties.privateEndpoint.id}" `
-        --output json | `
-        ConvertFrom-Json
-)
-$contentSafety = EnsureAndReturnFirstItem $contentSafety "Content Safety"
-Write-Host "Content Safety Account: $($contentSafety.name)" -ForegroundColor Blue
+        --query "[?kind=='ContentSafety'].properties.endpoint" `
+        --output tsv
+}
+$tokens.contentSafetyEndpointUri = $contentSafetyUri
 
-## Getting CosmosDb info
-$docdb = $(
+$docDbEndpoint = Invoke-AndRequireSuccess "Get CosmosDB endpoint" {
     az cosmosdb list `
         --resource-group $($resourceGroups.storage) `
-        --query "[?kind=='GlobalDocumentDB'].{name: name, kind:kind, documentEndpoint:documentEndpoint, privateEndpointId:privateEndpointConnections[0].privateEndpoint.id}" `
-        --output json | `
-        ConvertFrom-Json
-)
-$docdb = EnsureAndReturnFirstItem $docdb "CosmosDB (Document Db)"
-Write-Host "Document Db Account: $($docdb.name)" -ForegroundColor Blue
+        --query "[?kind=='GlobalDocumentDB'].documentEndpoint" `
+        --output tsv
+}
+$tokens.cosmosEndpoint = $docDbEndpoint
 
-$eventGridNamespace = $(
+$eventGridNamespace = Invoke-AndRequireSuccess "Get Event Grid Namespace" {
     az eventgrid namespace list `
         --resource-group $($resourceGroups.app) `
+        --query "[0].{hostname:topicsConfiguration.hostname, id:id}" `
         --output json | `
         ConvertFrom-Json
-)
+}
+$tokens.eventGridNamespaceEndpoint = "https://$($eventGridNamespace.hostname)/"
+$tokens.eventGridNamespaceId = $eventGridNamespace.id
 
-$eventGridNamespace = EnsureAndReturnFirstItem $eventGridNamespace "Event Grid"
-
-$keyvault = $(
+$keyvaultUri = Invoke-AndRequireSuccess "Get Key Vault URI" {
     az keyvault list `
         --resource-group $($resourceGroups.ops) `
-        --output json | `
-        ConvertFrom-Json
-)
+        --query "[0].properties.vaultUri" `
+        --output tsv
+}
+$tokens.keyvaultUri = $keyvaultUri
 
-$keyvault = EnsureAndReturnFirstItem $keyvault "Key Vault"
-
-$tokens.cognitiveSearchEndpointUri = $cogSearchUri
-
-Write-Host "Getting ADLS Storage Account"
-$storageAccountAdls = $(
+$storageAccountAdlsName = Invoke-AndRequireSuccess "Get ADLS Storage Account" {
     az storage account list `
         --resource-group $($resourceGroups.storage) `
-        --query "[?kind=='StorageV2'].{name:name, privateEndpointIds:privateEndpointConnections[].privateEndpoint.id}" `
-        --output json | `
-        ConvertFrom-Json
-)
+        --query "[?kind=='StorageV2'].name" `
+        --output tsv
+}
+$tokens.storageAccountAdlsName = $storageAccountAdlsName
 
-$storageAccountAdls = EnsureAndReturnFirstItem $storageAccountAdls "Storage Account"
-
-## Getting managed identities
 foreach ($service in $services.GetEnumerator()) {
-    $mi = $(
+    $miClientId = Invoke-AndRequireSuccess "Get $($service.Key) managed identity" {
         az identity show `
             --resource-group $($resourceGroups.app) `
             --name $($service.Value.miName) `
-            --output json | `
-            ConvertFrom-Json
-    )
+            --query "clientId" `
+            --output tsv
+    }
 
-    EnsureSuccess "Error getting $($service.Key) managed identity!"
-    $service.Value.miClientId = $mi.clientId
-
-    Write-Host "$($service.Key) MI Client Id: $($service.Value.miClientId)" -ForegroundColor Yellow
+    $service.Value.miClientId = $miClientId
 }
-
-# Setting tokens
-$tokens.instanceId = $instanceId
-
-$tokens.chatEntraClientId = $entraClientIds.chat
-$tokens.coreEntraClientId = $entraClientIds.core
-$tokens.managementApiEntraClientId = $entraClientIds.managementapi
-$tokens.managementEntraClientId = $entraClientIds.managementUi
-$tokens.vectorizationApiEntraClientId = $entraClientIds.vectorizationapi
-
-$tokens.coreApiHostname = $ingress.apiIngress.coreapi.host
-$tokens.managementApiHostname = $ingress.apiIngress.managementapi.host
-$tokens.vectorizationApiHostname = $ingress.apiIngress.vectorizationapi.host
-
-$tokens.contentSafetyEndpointUri = $contentSafety.uri
-
-$tokens.openAiEndpointUri = $apim.uri
-
-$tokens.eventGridNamespaceEndpoint = "https://$($eventGridNamespace.topicsConfiguration.hostname)/"
-
-$tokens.eventGridNamespaceId = $eventGridNamespace.id
-$tokens.keyvaultUri = $keyvault.properties.vaultUri
-
-$tokens.cosmosEndpoint = $docdb.documentEndpoint
-$tokens.storageAccountAdlsName = $storageAccountAdls.name
-
 $tokens.agentFactoryApiMiClientId = $services["agentfactoryapi"].miClientId
 $tokens.agentHubApiMiClientId = $services["agenthubapi"].miClientId
 $tokens.chatUiMiClientId = $services["chatui"].miClientId
@@ -305,56 +292,39 @@ $tokens.promptHubApiMiClientId = $services["prompthubapi"].miClientId
 $tokens.semanticKernelApiMiClientId = $services["semantickernelapi"].miClientId
 $tokens.vectorizationApiMiClientId = $services["vectorizationapi"].miClientId
 $tokens.vectorizationJobMiClientId = $services["vectorizationjob"].miClientId
-$tokens.vectorizationConfig = $vectorizationConfig
 
-$tokens.tenantId = $tenantId
-$tokens.appConfigName = $appConfigName
-$tokens.appConfigEndpoint = $appConfigEndpoint
-$tokens.appConfigConnectionString = $appConfigConnectionString
+$eventGridProfiles = @{}
+$eventGridProfileNames = @(
+    "agent-factory-api-event-profile"
+    "core-api-event-profile"
+    "vectorization-api-event-profile"
+    "vectorization-worker-event-profile"
+    "management-api-event-profile"
+)
+foreach ($profileName in $eventGridProfileNames) {
+    Write-Host "Populating $profileName..." -ForegroundColor Blue
 
-## Showing Values that will be used
-Write-Host "===========================================================" -ForegroundColor Yellow
-Write-Host "appconfig.json file will be generated with values:"
-Write-Host ($tokens | ConvertTo-Json) -ForegroundColor Yellow
-Write-Host "===========================================================" -ForegroundColor Yellow
+    PopulateTemplate $tokens `
+        "..,config,$($profileName).template.json" `
+        "..,config,$($profileName).json"
 
-PopulateTemplate $tokens "..,config,agent-factory-api-event-profile.template.json" "..,config,agent-factory-api-event-profile.json"
-$tokens.agentFactoryApiEventGridProfile = $(
-    Get-Content -Raw -Path "../config/agent-factory-api-event-profile.json" | `
-        ConvertFrom-Json | `
-        ConvertTo-Json -Compress -Depth 50
-).Replace('"', '\"')
+    $eventGridProfiles[$profileName] = $(
+        Get-Content -Raw -Path "../config/$($profileName).json" | `
+            ConvertFrom-Json | `
+            ConvertTo-Json -Compress -Depth 50
+    ).Replace('"', '\"')
+}
 
-PopulateTemplate $tokens "..,config,core-api-event-profile.template.json" "..,config,core-api-event-profile.json"
-$tokens.coreApiEventGridProfile = $(
-    Get-Content -Raw -Path "../config/core-api-event-profile.json" | `
-        ConvertFrom-Json | `
-        ConvertTo-Json -Compress -Depth 50
-).Replace('"', '\"')
-
-$tokens.managementApiEventGridProfile = $(
-    Get-Content -Raw -Path "../config/management-api-event-profile.json" | `
-        ConvertFrom-Json | `
-        ConvertTo-Json -Compress -Depth 50
-).Replace('"', '\"')
-
-PopulateTemplate $tokens "..,config,vectorization-api-event-profile.template.json" "..,config,vectorization-api-event-profile.json"
-$tokens.vectorizationApiEventGridProfile = $(
-    Get-Content -Raw -Path "../config/vectorization-api-event-profile.json" | `
-        ConvertFrom-Json | `
-        ConvertTo-Json -Compress -Depth 50
-).Replace('"', '\"')
-
-PopulateTemplate $tokens "..,config,vectorization-worker-event-profile.template.json" "..,config,vectorization-worker-event-profile.json"
-$tokens.vectorizationWorkerEventGridProfile = $(
-    Get-Content -Raw -Path "../config/vectorization-worker-event-profile.json" | `
-        ConvertFrom-Json | `
-        ConvertTo-Json -Compress -Depth 50
-).Replace('"', '\"')
-
+$tokens.agentFactoryApiEventGridProfile = $eventGridProfiles["agent-factory-api-event-profile"]
+$tokens.coreApiEventGridProfile = $eventGridProfiles["core-api-event-profile"]
+$tokens.vectorizationApiEventGridProfile = $eventGridProfiles["vectorization-api-event-profile"]
+$tokens.vectorizationWorkerEventGridProfile = $eventGridProfiles["vectorization-worker-event-profile"]
+$tokens.managementApiEventGridProfile = $eventGridProfiles["management-api-event-profile"]
 
 PopulateTemplate $tokens "..,config,appconfig.template.json" "..,config,appconfig.json"
 PopulateTemplate $tokens "..,values,internal-service.template.yml" "..,values,microservice-values.yml"
+PopulateTemplate $tokens "..,data,resource-provider,FoundationaLLM.Agent,FoundationaLLM.template.json" "..,..,common,data,resource-provider,FoundationaLLM.Agent,FoundationaLLM.json"
+PopulateTemplate $tokens "..,data,resource-provider,FoundationaLLM.Prompt,FoundationaLLM.template.json" "..,..,common,data,resource-provider,FoundationaLLM.Prompt,FoundationaLLM.json"
 
 $($ingress.apiIngress).PSObject.Properties | ForEach-Object {
     $tokens.serviceHostname = $_.Value.host

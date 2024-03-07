@@ -143,27 +143,9 @@ locals {
       # value = data.azurerm_client_config.current.tenant_id
       value = ""
     }
-    "FoundationaLLM:CognitiveSearch:EndPoint" = {
-      value = module.search.endpoint
-    }
-    "FoundationaLLM:CognitiveSearch:IndexName" = {
-      value = "vector-index"
-    }
-    "FoundationaLLM:CognitiveSearch:MaxVectorSearchResults" = {
-      value = "10"
-    }
-    "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageContainer" = {
-      value = "memory-source"
-    }
-    "FoundationaLLM:CognitiveSearchMemorySource:ConfigFilePath" = {
-      value = "BlobMemorySourceConfig.json"
-    }
-    "FoundationaLLM:CognitiveSearchMemorySource:EndPoint" = {
-      value = module.search.endpoint
-    }
-    "FoundationaLLM:CognitiveSearchMemorySource:IndexName" = {
-      value = "vector-index"
-    }
+
+
+
     "FoundationaLLM:CoreAPI:Entra:CallbackPath" = {
       value = "/signin-oidc"
     }
@@ -199,9 +181,7 @@ locals {
     "FoundationaLLM:DataSourceHub:DataSourceMetadata:StorageContainer" = {
       value = "data-sources"
     }
-    "FoundationaLLM:DurableSystemPrompt:BlobStorageContainer" = {
-      value = "prompts"
-    }
+
     "FoundationaLLM:LangChain:Summary:MaxTokens" = {
       value = "4097"
     }
@@ -310,15 +290,8 @@ locals {
     "FoundationaLLM:Chat:Entra:ClientSecret" = {
       vault_key_reference = azurerm_key_vault_secret.client_entra_clientsecret.versionless_id
     }
-    "FoundationaLLM:CognitiveSearch:Key" = {
-      vault_key_reference = azurerm_key_vault_secret.search_key.versionless_id
-    }
-    "FoundationaLLM:CognitiveSearchMemorySource:BlobStorageConnection" = {
-      vault_key_reference = azurerm_key_vault_secret.storage_connection_string.versionless_id
-    }
-    "FoundationaLLM:CognitiveSearchMemorySource:Key" = {
-      vault_key_reference = azurerm_key_vault_secret.search_key.versionless_id
-    }
+
+
     "FoundationaLLM:CoreAPI:Entra:ClientSecret" = {
       vault_key_reference = azurerm_key_vault_secret.core_entra_clientsecret.versionless_id
     }
@@ -328,9 +301,7 @@ locals {
     "FoundationaLLM:DataSourceHub:StorageManager:BlobStorage:ConnectionString" = {
       vault_key_reference = azurerm_key_vault_secret.storage_connection_string.versionless_id
     }
-    "FoundationaLLM:DurableSystemPrompt:BlobStorageConnection" = {
-      vault_key_reference = azurerm_key_vault_secret.storage_connection_string.versionless_id
-    }
+
     "FoundationaLLM:LangChain:CSVFile:URL" = {
       vault_key_reference = azurerm_key_vault_secret.langchain_csvfile_url.versionless_id
     }

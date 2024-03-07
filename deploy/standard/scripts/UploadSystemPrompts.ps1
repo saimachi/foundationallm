@@ -1,25 +1,92 @@
 #!/usr/bin/pwsh
 
+<#
+.SYNOPSIS
+    Uploads system prompts to Azure storage containers.
+
+.DESCRIPTION
+    This script uploads system prompts to Azure storage containers. It ensures that the required containers exist and uploads the data to each container.
+
+.PARAMETER resourceGroup
+    Specifies the name of the resource group where the storage account is located. This parameter is mandatory.
+
+.PARAMETER location
+    Specifies the location of the storage account. This parameter is mandatory.
+
+.EXAMPLE
+    UploadSystemPrompts.ps1 -resourceGroup "myResourceGroup" -location "westus"
+#>
+
 Param(
-    [parameter(Mandatory=$true)][string]$resourceGroup,
-    [parameter(Mandatory=$true)][string]$location
+    [parameter(Mandatory = $true)][string]$resourceGroup,
+    [parameter(Mandatory = $true)][string]$location
 )
 
-Push-Location $($MyInvocation.InvocationName | Split-Path)
-Push-Location $(Join-Path .. "data")
+Set-PSDebug -Trace  0 # Echo every command (0 to disable, 1 to enable)
+Set-StrictMode -Version 3.0
+$ErrorActionPreference = "Stop"
 
-$storageAccount = $(az storage account list -g $resourceGroup -o json | ConvertFrom-Json).name
-az storage container create --account-name $storageAccount --name "agents" --only-show-errors
-az storage azcopy blob upload -c agents --account-name $storageAccount -s "./agents/*" --recursive --only-show-errors
+function Invoke-AndRequireSuccess {
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$Message,
 
-az storage container create --account-name $storageAccount --name "data-sources" --only-show-errors
-az storage azcopy blob upload -c data-sources --account-name $storageAccount -s "./data-sources/*" --recursive --only-show-errors
+        [Parameter(Mandatory = $true, Position = 1)]
+        [ScriptBlock]$ScriptBlock
+    )
 
-az storage container create --account-name $storageAccount --name "foundationallm-source" --only-show-errors
-az storage azcopy blob upload -c foundationallm-source --account-name $storageAccount -s "./foundationallm-source/*" --recursive --only-show-errors
+    Write-Host "${message}..." -ForegroundColor Blue
+    $result = & $ScriptBlock
 
-az storage container create --account-name $storageAccount --name "prompts" --only-show-errors
-az storage azcopy blob upload -c prompts --account-name $storageAccount -s "./prompts/*" --recursive --only-show-errors
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed ${message} (code: ${LASTEXITCODE})"
+    }
 
-Pop-Location
-Pop-Location
+    return $result
+}
+
+$scriptRoot = $MyInvocation.InvocationName | Split-Path
+Push-Location $(Join-Path $scriptRoot .. .. "common" "data")
+try {
+    $storageAccount = Invoke-AndRequireSuccess "Getting storage account name" {
+        az storage account list `
+            --resource-group $resourceGroup `
+            --query '[0].name' `
+            --output tsv
+    }
+
+    $data = @("agents", "data-sources", "foundationallm-source", "prompts", "resource-provider")
+    foreach ($container in $data) {
+        Invoke-AndRequireSuccess "Ensuring $($container) container exists" {
+            $container = az storage container show `
+                --account-name $storageAccount `
+                --name $container `
+                --auth-mode key `
+                --query "name" `
+                --output tsv `
+                --only-show-errors
+
+            if (-not $container) {
+                az storage container create `
+                    --account-name $storageAccount `
+                    --name $container `
+                    --only-show-errors
+            }
+            else {
+                Write-Host "Container '$($container)' already exists" -ForegroundColor Yellow
+            }
+        }
+
+        Invoke-AndRequireSuccess "Uploading $($container) data" {
+            az storage azcopy blob upload `
+                --container $container `
+                --account-name $storageAccount `
+                --source "./$($container)/*" `
+                --recursive `
+                --only-show-errors
+        }
+    }
+}
+finally {
+    Pop-Location
+}

@@ -17,6 +17,7 @@
 #>
 
 param (
+    [parameter(Mandatory = $true)][object]$resourceGroup,
     [parameter(Mandatory = $true)][string]$subscription
 )
 
@@ -99,11 +100,8 @@ function Get-Hosts-Default-Strategy {
     return $networkInterfaceFqdns
 }
 
-# Read the deployment manifest
-$manifest = $(Get-Content -Raw -Path ../Deployment-Manifest.json | ConvertFrom-Json)
-
 $hosts = @{}
-foreach ($resourceGroup in $manifest.resourceGroups.PSObject.Properties) {
+foreach ($resourceGroup in $resourceGroup.GetEnumerator()) {
     Write-Host "Finding Private Endpoints in Resource Group: $($resourceGroup.Name)" -ForegroundColor Green
 
     $privateEndpoints = Invoke-AndRequireSuccess "Get Private Endpoints in Resource Group: $($resourceGroup.Name)" {

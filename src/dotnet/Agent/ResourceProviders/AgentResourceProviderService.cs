@@ -50,8 +50,8 @@ namespace FoundationaLLM.Agent.ResourceProviders
                         AgentResourceTypeNames.Agents)
                 {
                     AllowedTypes = [
-                            new ResourceTypeAllowedTypes(HttpMethod.Get.Method, [], [], [typeof(KnowledgeManagementAgent)]),
-                            new ResourceTypeAllowedTypes(HttpMethod.Post.Method, [], [typeof(KnowledgeManagementAgent)], [typeof(ResourceProviderUpsertResult)]),
+                            new ResourceTypeAllowedTypes(HttpMethod.Get.Method, [], [], [typeof(AgentBase)]),
+                            new ResourceTypeAllowedTypes(HttpMethod.Post.Method, [], [typeof(AgentBase)], [typeof(ResourceProviderUpsertResult)]),
                             new ResourceTypeAllowedTypes(HttpMethod.Delete.Method, [], [], []),
                     ],
                     Actions = [
