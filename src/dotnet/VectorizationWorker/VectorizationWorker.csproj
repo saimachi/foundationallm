@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <InvariantGlobalization>false</InvariantGlobalization>
     <UserSecretsId>3f400000-a421-441d-8fcd-0809b85bc690</UserSecretsId>
     <AssemblyName>FoundationaLLM.Vectorization.Worker</AssemblyName>
     <RootNamespace>FoundationaLLM.Vectorization.Worker</RootNamespace>

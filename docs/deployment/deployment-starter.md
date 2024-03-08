@@ -50,7 +50,6 @@ Follow the steps below to deploy the solution to your Azure subscription.
     ```text
     cd foundationallm/deploy/starter
 
-    azd init
     az login            # Log into Azure CLI
     azd auth login      # Log into Azure Developer CLI
 
