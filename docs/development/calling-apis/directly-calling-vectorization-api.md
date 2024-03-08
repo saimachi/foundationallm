@@ -14,7 +14,7 @@ The ability to test the API endpoints of FoundationaLLM is a critical part of th
 To see the API endpoints available in FoundationaLLM, you can get your Vectorization API endpoint from your App Configuration resource in the portal and add `/swagger/` to the end of it. For example, if your Vectorization API endpoint is `https://fllmaca729vectorizationca.mountainrock-c554b849.eastus.azurecontainerapps.io`, then you would navigate to `https://fllmaca729vectorizationca.mountainrock-c554b849.eastus.azurecontainerapps.io/swagger/` to see the API endpoints.
 
 > [!NOTE]
-> The example link above is for a [starter deployment](../deployment/deployment-starter.md) of FoundationaLLM, which deploys the APIs to Azure Container Apps (ACA). If you are using the standard deployment that deploys the APIs to Azure Kubernetes Service (AKS), then you cannot currently access the Swagger UI for the APIs. However, you will be able to obtain the OpenAPI swagger.json file from the Vectorization API endpoint by navigating to `https://{{AKS URL}}/vectorization/swagger/v1/swagger.json`.
+> The example link above is for a [Quick Start deployment](../../deployment/deployment-quick-start.md) of FoundationaLLM, which deploys the APIs to Azure Container Apps (ACA). If you are using the standard deployment that deploys the APIs to Azure Kubernetes Service (AKS), then you cannot currently access the Swagger UI for the APIs. However, you will be able to obtain the OpenAPI swagger.json file from the Vectorization API endpoint by navigating to `https://{{AKS URL}}/vectorization/swagger/v1/swagger.json`.
 
 ### Install Postman
 

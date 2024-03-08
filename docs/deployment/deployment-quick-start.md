@@ -48,7 +48,7 @@ Follow the steps below to deploy the solution to your Azure subscription.
 3. Run the following commands to set the appropriate application registration settings for OIDC authentication.
 
     ```text
-    cd foundationallm/deploy/starter
+    cd foundationallm/deploy/quick-start
 
     azd init
     az login            # Log into Azure CLI
