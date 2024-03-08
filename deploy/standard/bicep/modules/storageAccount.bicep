@@ -166,12 +166,12 @@ resource blob 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
     isVersioningEnabled: !isDataLake
     restorePolicy: { enabled: false }
 
-    containerDeleteRetentionPolicy: isDataLake ? null : {
+    containerDeleteRetentionPolicy: {
       days: 30
       enabled: true
     }
 
-    deleteRetentionPolicy: isDataLake ? null : {
+    deleteRetentionPolicy: {
       allowPermanentDelete: false
       days: 30
       enabled: true

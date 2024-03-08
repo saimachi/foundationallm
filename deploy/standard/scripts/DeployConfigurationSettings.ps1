@@ -33,42 +33,15 @@ function Invoke-AndRequireSuccess {
 
 Push-Location $($MyInvocation.InvocationName | Split-Path)
 
-$config = Get-Content -Raw -Path $configurationFile | ConvertFrom-Json
-
-for ( $idx = 0; $idx -lt $config.count; $idx++ ) {
-    Write-Host $config[$idx].key -ForegroundColor Blue
-
-    if ($config[$idx].keyVault) {
-        Invoke-AndRequireSuccess "Setting Key Vault reference for $($config[$idx].key) to $($config[$idx].value)" {
-            $secretName = $config[$idx].value
-            az appconfig kv set-keyvault `
-                --key $config[$idx].key `
-                --name $name `
-                --secret-identifier https://$($keyvaultName).vault.azure.net/Secrets/$($secretName)/ `
-                --yes
-        }
-    }
-    elseif ($config[$idx].featureFlag) {
-        Invoke-AndRequireSuccess "Setting feature flag $($config[$idx].key) to $($config[$idx].value)" {
-            az appconfig feature set `
-                --feature $config[$idx].value `
-                --key $config[$idx].key `
-                --name $name `
-                --yes
-        }
-    }
-    else {
-        Invoke-AndRequireSuccess "Setting Key Value $($config[$idx].key) to $($config[$idx].value)" {
-            az appconfig kv set `
-                --key $config[$idx].key `
-                --name $name `
-                --value "$($config[$idx].value)" `
-                --yes
-        }
-    }
-
-    # Avoid rate limiting :(
-    Start-Sleep -Milliseconds 200
+Invoke-AndRequireSuccess "Loading AppConfig Values" {
+    az appconfig kv import `
+        --profile appconfig/kvset `
+        --name $name `
+        --source file `
+        --path $configurationFile `
+        --format json `
+        --yes `
+        --output none
 }
 
 Pop-Location
