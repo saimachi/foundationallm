@@ -45,7 +45,7 @@ Get up to speed with Foundationa**LLM** by reading the [documentation](https://d
 
 FoundationalLLM provides a simple command line driven approach to getting your first deployment up and running. Basically, it's two commands. After that, you can customize the solution, run it locally on your machine and update the deployment with your customizations.
 
-Follow the [Starter Deployment instructions](./docs/deployment/deployment-starter.md) to get Foundationa**LLM** deployed in your Azure subscription.
+Follow the [Quick Start Deployment instructions](./docs/deployment/deployment-quick-start.md) to get Foundationa**LLM** deployed in your Azure subscription.
 
 ## Contributing to FoundationaLLM
 
