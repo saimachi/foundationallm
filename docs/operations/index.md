@@ -1,7 +1,7 @@
 # Standard platform administration documentation
 
 1. **Environment Setup:**
-   - [Initial environment setup (Starter Deployment)](../deployment/deployment-starter.md)
+   - [Initial environment setup (Quick Start Deployment)](../deployment/deployment-quick-start.md)
    - [Initial environment setup (Standard Deployment)](https://github.com/solliancenet/foundationallm/blob/mg-terraform-iac/deploy/standard/bicep/README.md)
    - Configuration settings for different components:
      - [App Configuration Settings](../deployment/app-configuration-values.md)

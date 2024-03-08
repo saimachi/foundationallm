@@ -5,7 +5,7 @@ items:
   - name: Deployment options
     href: deployment/index.md
   - name: Deployment - Quick Start
-    href: deployment/deployment-starter.md
+    href: deployment/deployment-quick-start.md
   - name: Azure App Configuration values
     href: deployment/app-configuration-values.md
   - name: Configuration for deployment
