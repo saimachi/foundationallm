@@ -1,10 +1,13 @@
+from typing import Optional
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 from langchain_core.retrievers import BaseRetriever
 from foundationallm.config import Configuration
 from foundationallm.langchain.language_models.openai import OpenAIModel
+from foundationallm.models.orchestration import OrchestrationSettings
 from foundationallm.models.language_models import EmbeddingModel, LanguageModelType, LanguageModelProvider
 from foundationallm.resources import ResourceProvider
+from .agent_parameter_retriever_keys import FILTERS, TOP_N
 from .azure_ai_search_service_retriever import AzureAISearchServiceRetriever
 
 class RetrieverFactory:
@@ -16,12 +19,14 @@ class RetrieverFactory:
                 indexing_profile_object_id: str,
                 text_embedding_profile_object_id:str,
                 config: Configuration,
-                resource_provider: ResourceProvider
+                resource_provider: ResourceProvider,
+                settings: Optional[OrchestrationSettings] = None
                 ):
         self.config = config
         self.resource_provider = resource_provider
         self.indexing_profile = resource_provider.get_resource(indexing_profile_object_id)
         self.text_embedding_profile = resource_provider.get_resource(text_embedding_profile_object_id)
+        self.orchestration_settings = settings       
 
     def get_retriever(self) -> BaseRetriever:
         """
@@ -66,13 +71,24 @@ class RetrieverFactory:
                 )
             )
 
+        # defaults for agent parameters
+        top_n = self.indexing_profile.settings.top_n
+        filters = self.indexing_profile.settings.filters
+        # check for settings override       
+        if self.orchestration_settings is not None:
+            if self.orchestration_settings.agent_parameters is not None:
+                if TOP_N in self.orchestration_settings.agent_parameters:
+                    top_n = self.orchestration_settings.agent_parameters[TOP_N]                    
+                if FILTERS in self.orchestration_settings.agent_parameters:
+                    filters = self.orchestration_settings.agent_parameters[FILTERS]                    
+
         retriever = AzureAISearchServiceRetriever( 
             endpoint = self.config.get_value(self.indexing_profile.configuration_references.endpoint),
             index_name = self.indexing_profile.settings.index_name,
-            top_n = self.indexing_profile.settings.top_n,
+            top_n = top_n,
             embedding_field_name = self.indexing_profile.settings.embedding_field_name,
             text_field_name = self.indexing_profile.settings.text_field_name,
-            filters = self.indexing_profile.settings.filters,
+            filters = filters,
             credential = credential,            
             embedding_model = embedding_model
         )

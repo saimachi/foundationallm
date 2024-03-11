@@ -1,10 +1,8 @@
 param name string
 param location string = resourceGroup().location
 param tags object = {}
-
-param appConfigName string
-param eventgridName string
-param cogsearchName string
+param authRgName string
+param authStoreName string
 param identityName string
 param keyvaultName string
 param containerAppsEnvironmentName string
@@ -12,17 +10,11 @@ param applicationInsightsName string
 param exists bool
 @secure()
 param appDefinition object
-param hasIngress bool = false
+param hasIngress bool = true
 param envSettings array = []
 param secretSettings array = []
-param apiKeySecretName string
 param serviceName string
 param imageName string
-
-var secretNames = [
-  '${serviceName}-apikey'
-  apiKeySecretName
-]
 
 var formattedAppName = replace(name, '-', '')
 var truncatedAppName = substring(formattedAppName, 0, min(length(formattedAppName), 32))
@@ -52,62 +44,14 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing
   name: applicationInsightsName
 }
 
-resource appConfig 'Microsoft.AppConfiguration/configurationStores@2023-03-01' existing = {
-  name: appConfigName
-}
-
-resource appConfigReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: appConfig
-  name: guid(subscription().id, resourceGroup().id, identity.id, 'appConfigReaderRole')
-  properties: {
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions', '516239f1-63e1-4d78-a4de-a74fb236a071')
-      principalType: 'ServicePrincipal'
-      principalId: identity.properties.principalId
-  }
-}
-
-resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: keyvaultName
-}
-
-resource secretsUserRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: keyvault
-  name: guid(subscription().id, resourceGroup().id, identity.id, 'secretsUserRole')
-  properties: {
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
-      principalType: 'ServicePrincipal'
-      principalId: identity.properties.principalId
-  }
-}
-
-resource secretsAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2023-07-01' = {
-  parent: keyvault
-  name: 'add'
-  properties: {
-    accessPolicies: [
-      {
-        objectId: identity.properties.principalId
-        permissions: { secrets: [ 'get', 'list' ] }
-        tenantId: subscription().tenantId
-      }
-    ]
-  }
-}
-
-resource eventgrid 'Microsoft.EventGrid/namespaces@2023-12-15-preview' existing = {
-  name: eventgridName
-}
-
-resource eventGridContributorRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: eventgrid
-  name: guid(subscription().id, resourceGroup().id, identity.id, 'eventGridContributorRole')
-  properties: {
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions', '1e241071-0855-49ea-94dc-649edcd759de')
-      principalType: 'ServicePrincipal'
-      principalId: identity.properties.principalId
+module authRoles '../shared/auth-roles.bicep' = {
+  name: 'auth-roles'
+  scope: resourceGroup(authRgName)
+  params: {
+    authStoreName: authStoreName
+    keyvaultName: keyvaultName
+    identityId: identity.id
+    principalId: identity.properties.principalId
   }
 }
 
@@ -123,7 +67,7 @@ resource app 'Microsoft.App/containerApps@2023-04-01-preview' = {
   name: truncatedAppName
   location: location
   tags: union(tags, {'azd-service-name':  serviceName })
-  dependsOn: [ secretsAccessPolicy, appConfigReaderRole ]
+  dependsOn: [ authRoles ]
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: { '${identity.id}': {} }
@@ -186,33 +130,6 @@ resource app 'Microsoft.App/containerApps@2023-04-01-preview' = {
     workloadProfileName: 'Warm'
   }
 }
-
-resource apiKey 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = [
-  for secretName in secretNames: {
-    name: secretName
-    parent: keyvault
-    tags: tags
-    properties: {
-      value: uniqueString(subscription().id, resourceGroup().id, app.id, serviceName)
-    }
-  }
-]
-
-resource search 'Microsoft.Search/searchServices@2022-09-01' existing = {
-  name: cogsearchName
-}
-
-resource searchIndexDataReaderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: search
-  name: guid(subscription().id, resourceGroup().id, identity.id, 'searchIndexDataReaderRole')
-  properties: {
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions', '1407120a-92aa-4202-b7e9-c0e197c71c8f')
-    principalType: 'ServicePrincipal'
-    principalId: identity.properties.principalId
-  }
-}
-
 
 output defaultDomain string = containerAppsEnvironment.properties.defaultDomain
 output name string = app.name

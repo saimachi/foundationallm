@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Immutable;
 
 namespace FoundationaLLM.Common.Constants
 {
@@ -11,6 +7,19 @@ namespace FoundationaLLM.Common.Constants
     /// </summary>
     public static class FileExtensions
     {
+        /// <summary>
+        /// Allowed file extensions for vectorization.
+        /// </summary>
+        public static readonly ImmutableArray<string> AllowedFileExtensions = [
+            Text,
+            JSON,
+            Markdown,
+            Word,
+            PowerPoint,
+            Excel,
+            PDF
+        ];
+
         /// <summary>
         /// File extension for text files.
         /// </summary>

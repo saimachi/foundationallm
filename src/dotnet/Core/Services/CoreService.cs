@@ -114,6 +114,7 @@ public partial class CoreService(
             var completionRequest = new CompletionRequest
             {
                 SessionId = orchestrationRequest.SessionId,
+                AgentName = orchestrationRequest.AgentName,
                 UserPrompt = orchestrationRequest.UserPrompt,
                 MessageHistory = messageHistoryList,
                 Settings = orchestrationRequest.Settings

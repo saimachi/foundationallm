@@ -17,16 +17,44 @@ The sessionless completion endpoint enables users to query agents without first 
     "user_prompt": "What are your capabilities?",
     "settings": {
         "agent_name": "internal-context",
-        "model_settings": {
+        "model_parameters": {
             "temperature": 0.4,
-            "deployment_name": "completions"
+            "deployment_name": "completions",
+            "top_k": 5,
+            "top_p": 0.9,
+            "do_sample": true,
+            "max_new_tokens": 100,
+            "return_full_text": true,
+            "ignore_eos": true
+        },
+        "agent_parameters": {
+            "index_filter_expression": "search.ismatch('FoundationaLLM', 'Text')",
+            "index_top_n": 5
         }
     }
 }
 ```
 
 > [!NOTE]
-> The `settings` object is optional and can be used to specify the agent name and model settings. If the `settings` object is not provided, the Core API will use the default agent and its model settings.
+> The `settings` object provides to override various parameters at runtime, and is optional. Within `settings` both `model_parameters` and `settings.agent_parameters` (along with their members) are optional. If not provided, the Core API will use the default model and agent settings.
+
+**model_parameters:**
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `temperature` | `float` | Controls randomness. Lowering the temperature means that the model will produce more repetitive and deterministic responses. Increasing the temperature will result in more unexpected or creative responses. Try adjusting temperature or Top P but not both. This value should be a float between 0.0 and 1.0. |
+| `deployment_name` | `string` | The deployment name for the language model. |
+| `top_k` | `int` | The number of highest probability vocabulary tokens to keep for top-k-filtering. Default value is null, which disables top-k-filtering. |
+| `top_p` | `float` | The cumulative probability of parameter highest probability vocabulary tokens to keep for nucleus sampling. Top P (or Top Probabilities) is imilar to temperature, this controls randomness but uses a different method. Lowering Top P will narrow the model’s token selection to likelier tokens. Increasing Top P will let the model choose from tokens with both high and low likelihood. Try adjusting temperature or Top P but not both. |
+| `do_sample` | `bool` | Whether or not to use sampling; use greedy decoding otherwise. |
+| `max_new_tokens` | `int` | Sets a limit on the number of tokens per model response. The API supports a maximum of number of tokens (depending on the deployment) shared between the prompt (including system message, examples, message history, and user query) and the model's response. One token is roughly 4 characters for typical English text. |
+| `return_full_text` | `bool` | Whether or not to return the full text (prompt + response) or only the generated part (response). Default value is false. |
+| `ignore_eos` | `bool` | Whether to ignore the End of Sequence(EOS) token and continue generating tokens after the EOS token is generated. Defaults to False. |
+
+**agent_parameters:**
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `index_filter_expression` | `string` | This value should be a string representing the search filter expression to limit documents to be searched by the index retriever |
+| `index_top_n` | `int` | Controls the number of search results to return from an index for prompt augmentation. |
 
 **Payload Headers:**
 

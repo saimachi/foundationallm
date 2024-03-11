@@ -47,4 +47,9 @@ public static class HttpClients
     /// Named client with matching configuration for the Vectorization API.
     /// </summary>
     public const string VectorizationAPI = "VectorizationAPI";
+
+    /// <summary>
+    /// Named client with matching configuration for a direct connection to Azure AI.
+    /// </summary>
+    public const string AzureAIDirect = "AzureAIDirect";
 }

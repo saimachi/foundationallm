@@ -426,6 +426,12 @@ namespace FoundationaLLM.Common.Services.ResourceProviders
 
             var tokens = resourcePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
+            if (tokens.Length == 6 && !allowAction)
+            {
+                // This is an object id, not a resource path.
+                tokens = tokens[4..];
+            }
+
             var result = new List<ResourceTypeInstance>();
             var currentResourceTypes = GetResourceTypes();
             var currentIndex = 0;

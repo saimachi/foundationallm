@@ -1,5 +1,10 @@
 targetScope = 'subscription'
 
+param adminGroupObjectId string
+
+param authAppRegistration object
+param authClientSecret string
+
 param appRegistrations array
 
 param createDate string = utcNow('u')
@@ -21,8 +26,10 @@ param principalId string
 @secure()
 param serviceDefinition object
 
+param authService object
 param services array
 
+param authServiceExists bool
 param servicesExist object
 
 /********** Locals **********/
@@ -87,6 +94,12 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   tags: tags
 }
 
+resource authRg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+  name: 'rg-auth-${environmentName}'
+  location: location
+  tags: tags
+}
+
 resource customerOpenAiResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (!deployOpenAi) {
   scope: subscription(existingOpenAiInstance.subscriptionId)
   name: existingOpenAiInstance.resourceGroup
@@ -109,6 +122,62 @@ module appConfig './shared/app-config.bicep' = {
   }
   scope: rg
   dependsOn: [ keyVault ]
+}
+
+module authKeyvault './shared/keyvault.bicep' = {
+  name: 'auth-kv'
+  params: {
+    location: location
+    name: '${abbrs.keyVaultVaults}auth${resourceToken}'
+    tags: tags
+    principalId: principalId
+    secrets: [
+      {
+        name: 'foundationallm-authorizationapi-appinsights-connectionstring'
+        value: monitoring.outputs.applicationInsightsConnectionString
+      }
+      {
+        name: 'foundationallm-authorizationapi-entra-instance'
+        value: authAppRegistration.instance
+      }
+      {
+        name: 'foundationallm-authorizationapi-entra-tenantid'
+        value: authAppRegistration.tenantId
+      }
+      {
+        name: 'foundationallm-authorizationapi-entra-clientid'
+        value: authAppRegistration.clientId
+      }
+      {
+        name: 'foundationallm-authorizationapi-entra-clientsecret'
+        value: authClientSecret
+      }
+      {
+        name: 'foundationallm-authorizationapi-entra-scopes'
+        value: authAppRegistration.scopes
+      }
+      {
+        name: 'foundationallm-authorizationapi-storage-accountname'
+        value: authStore.outputs.name
+      }
+      {
+        name: 'foundationallm-authorizationapi-instanceids'
+        value: instanceId
+      }
+    ]
+  }
+  scope: authRg
+}
+
+module authStore './shared/authorization-store.bicep' = {
+  name: 'auth-store'
+  params: {
+    adminGroupObjectId: adminGroupObjectId
+    location: location
+    name: '${abbrs.storageStorageAccounts}auth${resourceToken}'
+    tags: tags
+  }
+  scope: authRg
 }
 
 module contentSafety './shared/content-safety.bicep' = {
@@ -277,16 +346,6 @@ module openAiSecrets './shared/openai-secrets.bicep' = {
   }
 }
 
-module registry './shared/registry.bicep' = {
-  name: 'registry'
-  params: {
-    location: location
-    tags: tags
-    name: '${abbrs.containerRegistryRegistries}${resourceToken}'
-  }
-  scope: rg
-}
-
 module storage './shared/storage.bicep' = {
   name: 'storage'
   params: {
@@ -403,6 +462,34 @@ module appsEnv './shared/apps-env.bicep' = {
   scope: rg
 }
 
+module authAcaService './app/authAcaService.bicep' = {
+  name: authService.name
+  params: {
+    name: '${abbrs.appContainerApps}authapi${resourceToken}'
+    location: location
+    tags: tags
+    authRgName: authRg.name
+    authStoreName: authStore.outputs.name
+    identityName: '${abbrs.managedIdentityUserAssignedIdentities}auth-api-${resourceToken}'
+    keyvaultName: authKeyvault.outputs.name
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    containerAppsEnvironmentName: appsEnv.outputs.name
+    exists: authServiceExists == 'true'
+    appDefinition: serviceDefinition
+    hasIngress: true
+    imageName: authService.image
+    envSettings: [
+      {
+        name: 'FoundationaLLM__AuthorizationAPI__KeyVaultUri'
+        value: authKeyvault.outputs.endpoint
+      }
+    ]
+    serviceName: 'auth-api'
+  }
+  scope: rg
+  dependsOn: [ authStore, keyVault, monitoring ]
+}
+
 @batchSize(3)
 module acaServices './app/acaService.bicep' = [for service in services: {
   name: service.name
@@ -417,7 +504,6 @@ module acaServices './app/acaService.bicep' = [for service in services: {
     keyvaultName: keyVault.outputs.name
     applicationInsightsName: monitoring.outputs.applicationInsightsName
     containerAppsEnvironmentName: appsEnv.outputs.name
-    containerRegistryName: registry.outputs.name
     exists: servicesExist['${service.name}'] == 'true'
     appDefinition: serviceDefinition
     hasIngress: service.hasIngress
@@ -444,7 +530,6 @@ module acaServices './app/acaService.bicep' = [for service in services: {
 
 output AZURE_APP_CONFIG_NAME string = appConfig.outputs.name
 output AZURE_COGNITIVE_SEARCH_ENDPOINT string = cogSearch.outputs.endpoint
-output AZURE_CONTAINER_REGISTRY_ENDPOINT string = registry.outputs.loginServer
 output AZURE_CONTENT_SAFETY_ENDPOINT string = contentSafety.outputs.endpoint
 output AZURE_COSMOS_DB_ENDPOINT string = cosmosDb.outputs.endpoint
 output AZURE_EVENT_GRID_ENDPOINT string = eventgrid.outputs.endpoint
@@ -479,6 +564,8 @@ output ENTRA_VECTORIZATION_API_TENANT_ID string = appRegistrations[indexOf(appRe
 output FOUNDATIONALLM_INSTANCE_ID string = instanceId
 
 var serviceNames = [for service in services: service.name]
+
+output SERVICE_AUTH_API_ENDPOINT_URL string = authAcaService.outputs.uri
 
 output SERVICE_AGENT_FACTORY_API_ENDPOINT_URL string = acaServices[indexOf(serviceNames, 'agent-factory-api')].outputs.uri
 output SERVICE_AGENT_HUB_API_ENDPOINT_URL string = acaServices[indexOf(serviceNames, 'agent-hub-api')].outputs.uri

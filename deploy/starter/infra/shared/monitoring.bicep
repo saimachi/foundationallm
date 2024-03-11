@@ -51,6 +51,7 @@ resource connectionSecretRef 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = [
 ]
 
 output applicationInsightsName string = applicationInsights.name
+output applicationInsightsConnectionString string = applicationInsights.properties.ConnectionString
 output applicationInsightsConnectionSecretName string = connectionSecretRef[0].name
 output applicationInsightsConnectionSecretRef string = connectionSecretRef[0].properties.secretUri
 output logAnalyticsWorkspaceId string = logAnalytics.id

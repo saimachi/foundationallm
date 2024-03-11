@@ -23,5 +23,17 @@ namespace FoundationaLLM.Vectorization.Models.Configuration
         /// </summary>
         [JsonPropertyOrder(1)]
         public int MaxHandlerInstances { get; set; }
+
+        /// <summary>
+        /// The wait time after processing a request from the queue in seconds.
+        /// </summary>
+        [JsonPropertyOrder(3)]
+        public int QueueProcessingPace { get; set; } = 5;
+
+        /// <summary>
+        /// The interval in seconds to poll the queue for new requests, when the request queue is empty.
+        /// </summary>
+        [JsonPropertyOrder(4)]
+        public int QueuePollingInterval { get; set; } = 60;
     }
 }

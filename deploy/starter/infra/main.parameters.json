@@ -2,6 +2,20 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+      "adminGroupObjectId": {
+        "value": "${ADMIN_GROUP_OBJECT_ID}"
+      },
+      "authAppRegistration": {
+        "value": {
+          "instance": "${ENTRA_AUTH_API_INSTANCE}",
+          "clientId": "${ENTRA_AUTH_API_CLIENT_ID}",
+          "scopes": "${ENTRA_AUTH_API_SCOPES}",
+          "tenantId": "${ENTRA_AUTH_API_TENANT_ID}"
+        }
+      },
+      "authClientSecret": {
+        "value": "${ENTRA_AUTH_API_CLIENT_SECRET}"
+      },
       "appRegistrations": {
         "value": [
           {
@@ -52,6 +66,9 @@
           "subscriptionId": "${OPENAI_SUBSCRIPTION_ID}"
         }
       },
+      "authServiceExists": {
+        "value": "${SERVICE_AUTHAPI_RESOURCE_EXISTS=false}"
+      },
       "servicesExist": {
         "value": {
           "agent-factory-api": "${SERVICE_AGENTFACTORYAPI_RESOURCE_EXISTS=false}",
@@ -74,6 +91,12 @@
       "serviceDefinition": {
         "value": {
           "settings": []
+        }
+      },
+      "authService": {
+        "value": {
+          "name": "auth-api",
+          "image": "mcr.microsoft.com/k8se/quickstart:latest"
         }
       },
       "services": {

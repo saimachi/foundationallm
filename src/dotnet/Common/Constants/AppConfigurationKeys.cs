@@ -803,9 +803,14 @@ namespace FoundationaLLM.Common.Constants
         /// The key filter for the FoundationaLLM:DataSource:* app configuration settings.
         /// </summary>
         public const string FoundationaLLM_DataSource = "FoundationaLLM:DataSource:*";
+        /// <summary>
         /// The key filter for the FoundationaLLM:AzureOpenAI:* app configuration settings.
         /// </summary>
         public const string FoundationaLLM_AzureOpenAI = "FoundationaLLM:AzureOpenAI:*";
+        /// <summary>
+        /// The key filter for the FoundationaLLM:AzureAI:* app configuration settings.
+        /// </summary>
+        public const string FoundationaLLM_AzureAI = "FoundationaLLM:AzureAI:*";
     }
 
     /// <summary>

@@ -69,6 +69,7 @@ namespace FoundationaLLM.Vectorization.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message);
                 return new VectorizationProcessingResult(vectorizationRequest.ObjectId!, false, ex.Message);
             }
         }
@@ -76,33 +77,37 @@ namespace FoundationaLLM.Vectorization.Services
         private void ValidateRequest(VectorizationRequest vectorizationRequest)
         {
             if (vectorizationRequest == null)
-                HandleValidationError("The vectorization request should not be null.");
+                throw new VectorizationException("The vectorization request should not be null.");
 
             if (String.IsNullOrWhiteSpace(vectorizationRequest!.Id))
-                HandleValidationError("The vectorization request id should not be null.");
+                throw new VectorizationException("The vectorization request id should not be null.");
 
             if (vectorizationRequest.ContentIdentifier == null
                 || String.IsNullOrWhiteSpace(vectorizationRequest.ContentIdentifier.UniqueId)
                 || String.IsNullOrWhiteSpace(vectorizationRequest.ContentIdentifier.CanonicalId))
-                HandleValidationError("The vectorization request content identifier is invalid.");
+                throw new VectorizationException("The vectorization request content identifier is invalid.");
 
             if (vectorizationRequest.Steps == null || vectorizationRequest.Steps.Count == 0)
-                HandleValidationError("The list of the vectorization steps should not be empty.");
+                throw new VectorizationException("The list of the vectorization steps should not be empty.");
 
             if (vectorizationRequest.Steps!.Select(x=>x.Id).Distinct().Count() != vectorizationRequest.Steps!.Count)
-                HandleValidationError("The list of vectorization steps must contain unique names.");
+                throw new VectorizationException("The list of vectorization steps must contain unique names.");
 
             if (vectorizationRequest.CompletedSteps != null && vectorizationRequest.CompletedSteps!.Count > 0)
-                HandleValidationError("The completed steps of the vectorization request must be empty.");
+                throw new VectorizationException("The completed steps of the vectorization request must be empty.");
 
             if (vectorizationRequest.RemainingSteps == null || vectorizationRequest.RemainingSteps.Count == 0)
-                HandleValidationError("The list of the remaining steps of the vectorization request should not be empty.");
-        }
+                throw new VectorizationException("The list of the remaining steps of the vectorization request should not be empty.");
+            
+            // Validate the file extension is supported by vectorization
+            string fileNameExtension = Path.GetExtension(vectorizationRequest.ContentIdentifier!.FileName);            
+            if (string.IsNullOrWhiteSpace(fileNameExtension))
+                throw new VectorizationException("The file does not have an extension.");
 
-        private void HandleValidationError(string validationError)
-        {
-            _logger.LogError(validationError);
-            throw new VectorizationException(validationError);
+            if(!FileExtensions.AllowedFileExtensions
+                .Select(ext => ext.ToLower())
+                .Contains(fileNameExtension.ToLower()))
+                throw new VectorizationException($"The file extension {fileNameExtension} is not supported.");
         }
 
         private async Task<VectorizationProcessingResult> ProcessRequestInternal(VectorizationRequest request)

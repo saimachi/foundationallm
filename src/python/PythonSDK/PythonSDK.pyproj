@@ -35,6 +35,7 @@
     <Compile Include="foundationallm\langchain\data_sources\cxo\__init__.py" />
     <Compile Include="foundationallm\langchain\data_sources\search_service\search_service_configuration.py" />
     <Compile Include="foundationallm\langchain\data_sources\search_service\__init__.py" />
+    <Compile Include="foundationallm\langchain\retrievers\agent_parameter_retriever_keys.py" />
     <Compile Include="foundationallm\langchain\retrievers\retriever_factory.py" />
     <Compile Include="foundationallm\langchain\retrievers\search_service_filter_retriever.py" />
     <Compile Include="foundationallm\langchain\retrievers\azure_ai_search_service_retriever.py" />
@@ -141,6 +142,7 @@
     <Compile Include="foundationallm\models\orchestration\internal_context_completion_request.py" />
     <Compile Include="foundationallm\models\orchestration\knowledge_management_completion_request.py" />
     <Compile Include="foundationallm\models\orchestration\message_history_item.py" />
+    <Compile Include="foundationallm\models\orchestration\orchestration_settings.py" />
     <Compile Include="foundationallm\models\orchestration\__init__.py" />
     <Compile Include="foundationallm\models\resource_providers\prompts\prompt.py" />
     <Compile Include="foundationallm\models\resource_providers\prompts\__init__.py" />

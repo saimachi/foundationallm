@@ -90,10 +90,14 @@ namespace FoundationaLLM.Vectorization.Services
                             requests.Select(r => Task.Run(
                                 () => { ProcessRequest(r.Request, r.MessageId, r.PopReceipt, _cancellationToken).ConfigureAwait(false); },
                                 _cancellationToken)));
+                                                
+                        await Task.Delay(TimeSpan.FromSeconds(_settings.QueueProcessingPace));
                     }
-
-                    // Wait a predefined amount of time before attempting to receive requests again.
-                    await Task.Delay(TimeSpan.FromMinutes(1));
+                    else
+                    {                        
+                        // Wait a predefined amount of time before attempting to receive requests again.
+                        await Task.Delay(TimeSpan.FromSeconds(_settings.QueuePollingInterval));
+                    }
                 }
                 catch (Exception ex)
                 {

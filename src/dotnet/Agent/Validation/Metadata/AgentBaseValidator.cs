@@ -24,7 +24,7 @@ namespace FoundationaLLM.Agent.Validation.Metadata
                     .SetValidator(new LanguageModelValidator()!);
             });
             //RuleFor(x => x.ConversationHistory).NotNull().When(x => x.SessionsEnabled);
-            RuleFor(x => x.Orchestrator).NotEmpty().WithMessage("The agent's orchestrator is required.");
+            RuleFor(x => x.OrchestrationSettings!.Orchestrator).NotEmpty().WithMessage("The agent's orchestrator is required.");
         }
     }
 }

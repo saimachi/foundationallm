@@ -1,13 +1,11 @@
 ﻿using FoundationaLLM.Agent.Constants;
+using FoundationaLLM.AgentFactory.Core.Interfaces;
 using FoundationaLLM.AgentFactory.Interfaces;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Exceptions;
 using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Models.Agents;
-using FoundationaLLM.Common.Models.Cache;
-using FoundationaLLM.Common.Models.Hubs;
 using FoundationaLLM.Common.Models.Orchestration;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -46,11 +44,11 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
             ILoggerFactory loggerFactory)
         {
             var logger = loggerFactory.CreateLogger<OrchestrationBuilder>();
-            if (completionRequest.Settings?.AgentName == null)
+            if (completionRequest.AgentName == null)
                 logger.LogInformation("The AgentBuilder is starting to build an agent without an agent name.");
             else
                 logger.LogInformation("The AgentBuilder is starting to build an agent with the following agent name: {AgentName}.",
-                    completionRequest.Settings?.AgentName);
+                    completionRequest.AgentName);
 
             if (!resourceProviderServices.TryGetValue(ResourceProviderNames.FoundationaLLM_Agent, out var agentResourceProvider))
                 throw new ResourceProviderException($"The resource provider {ResourceProviderNames.FoundationaLLM_Agent} was not loaded.");
@@ -58,11 +56,11 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
             // TODO: Implement a cleaner pattern for handling missing resources
             AgentBase? agentBase = default;
 
-            if (!string.IsNullOrWhiteSpace(completionRequest.Settings?.AgentName))
+            if (!string.IsNullOrWhiteSpace(completionRequest.AgentName))
             {
                 try
                 {
-                    var agents = await agentResourceProvider.HandleGetAsync($"/{AgentResourceTypeNames.Agents}/{completionRequest.Settings?.AgentName}");
+                    var agents = await agentResourceProvider.HandleGetAsync($"/{AgentResourceTypeNames.Agents}/{completionRequest.AgentName}");
                     agentBase = ((List<AgentBase>)agents)[0];
                 }
                 catch (ResourceProviderException)
@@ -72,70 +70,25 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "The AgentBuilder failed to properly retrieve the agent: /{Agents}/{AgentName}",
-                        AgentResourceTypeNames.Agents, completionRequest.Settings?.AgentName);
+                        AgentResourceTypeNames.Agents, completionRequest.AgentName);
                     throw;
                 }
             }
 
             ILLMOrchestrationService? orchestrationService = null;
 
-            if (agentBase == null)
-            {
-                // Using the old way to build agents
-
-                //var agentResponse = callContext.AgentHint != null
-                //    ? await cacheService.Get<AgentHubResponse>(
-                //        new CacheKey(callContext.AgentHint.Name!, CacheCategories.Agent),
-                //        async () => { return await agentHubAPIService.ResolveRequest(
-                //            completionRequest.UserPrompt,
-                //            completionRequest.SessionId ?? string.Empty); },
-                //        false,
-                //        TimeSpan.FromHours(1))
-                //    : await agentHubAPIService.ResolveRequest(
-                //        completionRequest.UserPrompt,
-                //        completionRequest.SessionId ?? string.Empty);
-
-                //var agentInfo = agentResponse!.Agent;
-
-                //if (agentResponse is { Agent: not null })
-                //{
-                //    logger.LogInformation("The AgentBuilder received the following agent from the AgentHub: {AgentName}.",
-                //        agentResponse.Agent!.Name);
-                //}
-
-                //// TODO: Extend the Agent Hub API service response to include the orchestrator
-                //var orchestrationType = string.IsNullOrWhiteSpace(agentResponse.Agent!.Orchestrator)
-                //    ? "LangChain"
-                //    : agentInfo!.Orchestrator;
-
-                //var validType = Enum.TryParse<LLMOrchestrationService>(orchestrationType, out LLMOrchestrationService llmOrchestrationType);
-                //if (!validType)
-                //    throw new ArgumentException($"The agent factory does not support the {orchestrationType} orchestration type.");
-                //orchestrationService = SelectOrchestrationService(llmOrchestrationType, orchestrationServices);
-
-                //OrchestrationBase? orchestration = null;
-                //orchestration = new LegacyOrchestration(
-                //    agentInfo!,
-                //    cacheService, callContext,
-                //    orchestrationService, promptHubAPIService, dataSourceHubAPIService,
-                //    loggerFactory.CreateLogger<LegacyOrchestration>());
-
-                //await orchestration.Configure(completionRequest);
-
-                //return orchestration;
-
-                return null;
-            }
-
+            if (agentBase == null) return null;
+            
             if (agentBase.AgentType == typeof(KnowledgeManagementAgent) || agentBase.AgentType == typeof(InternalContextAgent))
             {
-                var orchestrationType = string.IsNullOrWhiteSpace(agentBase.Orchestrator)
-                    ? "LangChain"
-                    : agentBase.Orchestrator;
+                var orchestrationType = string.IsNullOrWhiteSpace(agentBase.OrchestrationSettings?.Orchestrator)
+                    ? LLMOrchestrationService.LangChain.ToString()
+                    : agentBase.OrchestrationSettings?.Orchestrator;
 
-                var validType = Enum.TryParse<LLMOrchestrationService>(orchestrationType, out LLMOrchestrationService llmOrchestrationType);
+                var validType = Enum.TryParse(orchestrationType, out LLMOrchestrationService llmOrchestrationType);
                 if (!validType)
                     throw new ArgumentException($"The agent factory does not support the {orchestrationType} orchestration type.");
+
                 orchestrationService = SelectOrchestrationService(llmOrchestrationType, orchestrationServices);
 
                 // Hydrate overridable values from config and assign them back to the agent's LanguageModel.
@@ -143,22 +96,22 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
                 agentBase.LanguageModel!.Deployment = deploymentName;
 
                 // Extract any override settings and apply them to the agent's LanguageModel.
-                if (completionRequest.Settings?.ModelSettings != null)
+                if (completionRequest.Settings?.ModelParameters != null && agentBase.LanguageModel != null)
                 {
-                    foreach (var key in completionRequest.Settings?.ModelSettings?.Keys!)
+                    foreach (var key in completionRequest.Settings?.ModelParameters?.Keys!)
                     {
                         switch (key)
                         {
-                            case ModelSettingsKeys.Deployment_Name:
-                                agentBase.LanguageModel!.Deployment = completionRequest.Settings?.ModelSettings?.GetValueOrDefault(key)!.ToString();
+                            case ModelParameterKeys.DeploymentName:
+                                agentBase.LanguageModel!.Deployment = completionRequest.Settings?.ModelParameters?.GetValueOrDefault(key)!.ToString();
                                 break;
-                            case ModelSettingsKeys.Temperature:
-                                agentBase.LanguageModel!.Temperature = Convert.ToSingle(completionRequest.Settings?.ModelSettings?.GetValueOrDefault(key, 0f)!.ToString());
+                            case ModelParameterKeys.Temperature:
+                                agentBase.LanguageModel!.Temperature = Convert.ToSingle(completionRequest.Settings?.ModelParameters?.GetValueOrDefault(key, 0f)!.ToString());
                                 break;
                         }
                     }
                 }
-
+                
                 if(agentBase.AgentType == typeof(KnowledgeManagementAgent))
                 {
                     var kmOrchestration = new KnowledgeManagementOrchestration(
@@ -177,7 +130,8 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
                 {
                     var icOrchestration = new InternalContextOrchestration(
                         (InternalContextAgent)agentBase!,
-                        cacheService, callContext,
+                        cacheService,
+                        callContext,
                         orchestrationService,
                         promptHubAPIService,
                         dataSourceHubAPIService,
@@ -186,7 +140,6 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
 
                     return icOrchestration;
                 }
-
             }
 
             return null;
@@ -207,6 +160,7 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
 
             orchestrationServiceType = orchestrationType switch
             {
+                LLMOrchestrationService.AzureAIDirect => typeof(IAzureAIDirectService),
                 LLMOrchestrationService.LangChain => typeof(ILangChainService),
                 LLMOrchestrationService.SemanticKernel => typeof(ISemanticKernelService),
                 _ => throw new ArgumentException($"The orchestration type {orchestrationType} is not supported."),

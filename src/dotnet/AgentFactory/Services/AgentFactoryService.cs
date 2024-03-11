@@ -102,7 +102,7 @@ public class AgentFactoryService : IAgentFactoryService
                 _loggerFactory);
 
             return orchestration == null
-                ? throw new OrchestrationException($"The orchestration builder was not able to create an orchestration for agent [{completionRequest.Settings?.AgentName ?? string.Empty }].")
+                ? throw new OrchestrationException($"The orchestration builder was not able to create an orchestration for agent [{completionRequest.AgentName ?? string.Empty }].")
                 : await orchestration.GetCompletion(completionRequest);
         }
         catch (Exception ex)

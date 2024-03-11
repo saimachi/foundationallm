@@ -6,6 +6,10 @@
     public enum LLMOrchestrationService
     {
         /// <summary>
+        /// Azure AI orchestration service
+        /// </summary>
+        AzureAIDirect,
+        /// <summary>
         /// LangChain orchestration service
         /// </summary>
         LangChain,

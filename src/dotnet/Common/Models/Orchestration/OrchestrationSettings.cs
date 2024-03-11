@@ -8,14 +8,28 @@ namespace FoundationaLLM.Common.Models.Orchestration
     public class OrchestrationSettings
     {
         /// <summary>
-        /// The name of the selected agent.
+        /// The agent's LLM orchestrator type.
         /// </summary>
-        [JsonPropertyName("agent_name")]
-        public string AgentName { get; set; }
+        [JsonPropertyName("orchestrator")]
+        public string? Orchestrator { get; set; }
+
         /// <summary>
-        /// Options to override the default behavior of the agent's language model.
+        /// Parameters to override the behavior of the agent.
         /// </summary>
-        [JsonPropertyName("model_settings")]
-        public Dictionary<string, object>? ModelSettings { get; set; }
+        [JsonPropertyName("agent_parameters")]
+        public Dictionary<string, object>? AgentParameters { get; set; }
+
+        /// <summary>
+        /// Options to override endpoint configuration (endpoint and key) used to
+        /// access a language model by the orchstrator.
+        /// </summary>
+        [JsonPropertyName("endpoint_configuration")]
+        public Dictionary<string, object>? EndpointConfiguration { get; set; }
+
+        /// <summary>
+        /// Parameters to override the behavior of the language model as defined on the agent.
+        /// </summary>
+        [JsonPropertyName("model_parameters")]
+        public Dictionary<string, object>? ModelParameters { get; set; }
     }
 }

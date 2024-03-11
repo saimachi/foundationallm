@@ -129,3 +129,7 @@ HTTP DELETE {{baseUrl}}/instances/{{instanceId}}/providers/FoundationaLLM.Agent/
 ## Validating a knowledge management agent
 
 Once configured, the knowledge management agent can be validated using an API call to the [Core API](../exposed-apis/core-api.md) or via the [User Portal](../quickstart.md).
+
+## Overriding agent parameters
+
+The agent parameters can be overridden at the time of the API call. Refer to the [Core API](../exposed-apis/core-api.md) documentation for more information.

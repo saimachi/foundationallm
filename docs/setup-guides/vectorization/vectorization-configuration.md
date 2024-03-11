@@ -99,19 +99,27 @@ The default settings for the vectorization worker are stored in the `Foundationa
     "RequestManagers": [
         {
             "RequestSourceName": "extract",
-            "MaxHandlerInstances": 1
+            "MaxHandlerInstances": 1,
+            "QueueProcessingPace": 5,
+            "QueuePollingInterval": 60
         },
         {
             "RequestSourceName": "partition",
-            "MaxHandlerInstances": 1
+            "MaxHandlerInstances": 1,
+            "QueueProcessingPace": 5,
+            "QueuePollingInterval": 60
         },
         {
             "RequestSourceName": "embed",
-            "MaxHandlerInstances": 1
+            "MaxHandlerInstances": 1,
+            "QueueProcessingPace": 5,
+            "QueuePollingInterval": 60
         },
         {
             "RequestSourceName": "index",
-            "MaxHandlerInstances": 1
+            "MaxHandlerInstances": 1,
+            "QueueProcessingPace": 5,
+            "QueuePollingInterval": 60
         }
     ],
     "RequestSources": [
@@ -146,5 +154,7 @@ The following table provides details about the configuration parameters:
 | --- | --- |
 | `RequestManagers` | The list of request managers used by the vectorization worker. Each request manager is responsible for managing the execution of vectorization pipelines for a specific vectorization step. The configuration must include all request managers. |
 | `RequestManagers.MaxHandlerInstances` | The maximum number of request handlers that process requests for the specified request source. By default, the value is 1. You can change the value to increase the processing capacity of each vectorization worker instance. The value applies to all istances of the vectorization worker. NOTE: It is important to align the value of this setting with the level of compute and memory resources allocated to the individual vectorization worker instances. |
+| `RequestManagers.QueueProcessingPace` | **Optional** The delay in seconds to wait between requests after a request has been processed. The default value is 5. |
+| `RequestManagers.QueuePollingInterval` | **Optional** The polling interval in seconds, this is the amount of time to wait if the previous check on the queue had no items. The default value is 60. |
 | `RequestSources` | The list of request sources used by the vectorization worker. Each request source is responsible for managing the requests for a specific vectorization step. The configuration must include all request sources. |
 | `RequestSources.VisibilityTimeoutSeconds` | In the case of queue-based request sources (the default for the vectorization worker), specifies the time in seconds until a dequeued vectorization step request must be executed. During this timeout, the message will not be visible to other handler instances within the same worker or from other worker instances. If the handler fails to process the vectorization step request successfully and remove it from the queue within the specified timeout, the message will become visibile again. The default value is 600 seconds and should not be changed.|

@@ -51,3 +51,6 @@ resource kvSecrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = [
 
 output endpoint string = keyVault.properties.vaultUri
 output name string = keyVault.name
+output secretNames array = [for (secret,i) in secrets: kvSecrets[i].name]
+output secretRefs array = [for (secret,i) in secrets: kvSecrets[i].properties.secretUri]
+

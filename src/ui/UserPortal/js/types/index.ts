@@ -34,15 +34,18 @@ export interface Agent {
 	name: string;
 	object_id: string;
 	description: string;
+	orchestration_settings?: OrchestrationSettings;
 }
 
 export interface OrchestrationRequest {
     session_id?: string;
     user_prompt: string;
+	agent_name?: string;
     settings?: OrchestrationSettings;
 }
 
 export interface OrchestrationSettings {
-    agent_name?: string;
-    model_settings?: { [key: string]: any } | null;
+    orchestrator?: string;
+	endpoint_configuration?: { [key: string]: any } | null;
+	model_parameters?: { [key: string]: any } | null;
 }

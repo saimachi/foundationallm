@@ -33,6 +33,13 @@ public class ContentIdentifier
     public required string CanonicalId { get; set; }
 
     /// <summary>
+    /// Additional metadata associated with the content being vectorized.
+    /// </summary>
+    [JsonPropertyOrder(3)]
+    [JsonPropertyName("metadata")]
+    public Dictionary<string, object>? Metadata { get; set; }
+
+    /// <summary>
     /// The unique identifier of the content (i.e., document) being vectorized.
     /// The identifier is determined by concatenating the parts from <see cref="MultipartId"/>.
     /// </summary>

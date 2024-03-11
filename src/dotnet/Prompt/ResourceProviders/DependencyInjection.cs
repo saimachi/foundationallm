@@ -49,6 +49,8 @@ namespace FoundationaLLM
                     sp.GetRequiredService<IEventService>(),
                     sp.GetRequiredService<IResourceValidatorFactory>(),
                     sp.GetRequiredService<ILogger<PromptResourceProviderService>>()));
+
+            services.ActivateSingleton<IResourceProviderService>();
         }
     }
 }

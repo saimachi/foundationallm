@@ -58,8 +58,10 @@ namespace FoundationaLLM.AgentFactory.API
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_APIs);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_AgentFactory);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Agent);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_AzureAI);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_AzureOpenAI);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Events);
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Prompt);
             });
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
@@ -120,9 +122,10 @@ namespace FoundationaLLM.AgentFactory.API
 
             builder.Services.AddOptions<AgentFactorySettings>()
                 .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_AgentFactory));
-            
+
             builder.Services.AddScoped<ILLMOrchestrationService, SemanticKernelService>();
             builder.Services.AddScoped<ILLMOrchestrationService, LangChainService>();
+            builder.Services.AddScoped<ILLMOrchestrationService, AzureAIDirectService>();
 
             builder.Services.AddScoped<IAgentFactoryService, AgentFactoryService>();
             builder.Services.AddScoped<IAgentHubAPIService, AgentHubAPIService>();
@@ -137,8 +140,14 @@ namespace FoundationaLLM.AgentFactory.API
 
             builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
+            // Resource validation
             builder.Services.AddSingleton<IResourceValidatorFactory, ResourceValidatorFactory>();
+
+            //----------------------------
+            // Resource providers
+            //----------------------------
             builder.Services.AddAgentResourceProvider(builder.Configuration);
+            builder.Services.AddPromptResourceProvider(builder.Configuration);
 
             // Register the downstream services and HTTP clients.
             RegisterDownstreamServices(builder);

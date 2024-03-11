@@ -166,9 +166,8 @@ export default {
 		const orchestrationRequest: OrchestrationRequest = {
 			session_id: sessionId,
 			user_prompt: text,
-			settings: {
-				agent_name: agent.name
-			}
+			agent_name: agent.name,
+			settings: null
 		};
 		return await this.fetch(`/sessions/${sessionId}/completion`, {
 			method: 'POST',
