@@ -30,7 +30,7 @@ jobs:
           # Install AZD
           curl -fsSL https://aka.ms/install-azd.sh | bash
           cd ./deploy/starter
-          envName="fllm-test-$(git rev-parse --short HEAD)"
+          envName="fllm-test-$(git rev-parse --abbrev-ref HEAD)"
           echo "AZD Environment Name: $envName"
           mkdir -p .azure/$envName
           az storage azcopy blob download --container azd-resources --account-name fllme2etestingresources -s "*" -d ".azure/$envName/" --recursive
