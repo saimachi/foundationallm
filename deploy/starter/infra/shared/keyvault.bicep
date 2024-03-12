@@ -14,14 +14,14 @@ var defaultAccessPolicies = !empty(principalId) ? [
   }
 ] : []
 
-resource adminRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(principalId, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
-  properties: {
-    principalId: principalId
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefiniitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource adminRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(principalId, resourceGroup().id, 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+//   properties: {
+//     principalId: principalId
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefiniitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: name
