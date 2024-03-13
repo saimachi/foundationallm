@@ -1,0 +1,17 @@
+{
+    "Indexer": "AzureAISearchIndexer",
+    "Name": "AzureAISearch_Testing",
+    "Settings": {
+        "IndexName": "fllm-default-003",
+        "TopN": "3",
+        "Filters": "",
+        "EmbeddingFieldName": "Embedding",
+        "TextFieldName": "Text"
+    },
+    "ConfigurationReferences": {
+        "APIKey": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:APIKey",
+        "QueryAPIKey": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:QueryAPIKey",
+        "AuthenticationType": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:AuthenticationType",
+        "Endpoint": "FoundationaLLM:Vectorization:AzureAISearchIndexingService:Endpoint"
+    }
+}

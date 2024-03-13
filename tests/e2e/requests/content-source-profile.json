@@ -1,0 +1,9 @@
+{
+    "Type": "AzureDataLake",
+    "Name": "DefaultAzureDataLake_Testing",
+    "Settings": {},
+    "ConfigurationReferences": {
+        "AuthenticationType": "FoundationaLLM:Vectorization:ContentSources:DefaultAzureDataLake:AuthenticationType",
+        "ConnectionString": "FoundationaLLM:Vectorization:ContentSources:DefaultAzureDataLake:ConnectionString"
+    }
+}

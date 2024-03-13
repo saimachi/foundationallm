@@ -1,0 +1,37 @@
+{
+    "content_identifier": {
+        "content_source_profile_name": "DefaultAzureDataLake_Testing",
+        "multipart_id": [
+            "#AZURE_STORAGE_ACCOUNT_NAME#.dfs.core.windows.net",
+            "vectorization-input",
+            "#VECTORIZATION_INPUT_FILE_NAME#"
+        ],
+        "canonical_id": "#VECTORIZATION_INPUT_FILE_NAME#"
+    },
+    "processing_type": "Synchronous",
+    "steps":[
+        {
+            "id": "extract",
+            "parameters": {
+            }
+        },
+        {
+            "id": "partition",
+            "parameters": {
+                "text_partition_profile_name": "DefaultTokenTextPartition_Testing"
+            }
+        },
+        {
+            "id": "embed",
+            "parameters": {
+                "text_embedding_profile_name": "AzureOpenAI_Embedding_Testing"
+            }
+        },
+        {
+            "id": "index",
+            "parameters": {
+                "indexing_profile_name": "AzureAISearch_Testing"
+            }
+        }
+    ]
+}

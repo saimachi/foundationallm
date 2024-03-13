@@ -11,6 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: sandbox
+    outputs:
+      azd-env-name: ${{ steps.deploy-azd.outputs.azd-env-name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -23,6 +25,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy AZD
+        id: deploy-azd
         env:
           CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -35,6 +38,57 @@ jobs:
           mkdir -p .azure/$envName
           az storage azcopy blob download --container azd-resources --account-name fllme2etestingresources -s "*" -d ".azure/$envName/" --recursive
           sed -e "s/\${ENV_NAME}/$envName/" ./.azure/$envName/env > ./.azure/$envName/.env
+          echo "azd-env-name=$envName" >> $GITHUB_OUTPUT
           export AZURE_ENV_NAME=$envName
           azd auth login --client-id $CLIENT_ID --tenant-id $TENANT_ID --federated-credential-provider "github"
           azd up
+      - name: Store .env
+        uses: actions/upload-artifact@v4
+        with:
+          name: azd-env-file
+          path: .azure/${{ steps.deploy-azd.outputs.azd-env-name }}/.env
+          retention-days: 1
+      - name: Run E2E Test Scripts
+        env:
+          ENTRA_MANAGEMENT_REFRESH_TOKEN: ${{ secrets.ENTRA_MANAGEMENT_REFRESH_TOKEN }}
+          AZD_ENV_FILE_PATH: .azure/${{ steps.deploy-azd.outputs.azd-env-name }}/.env
+          VECTORIZATION_FILE_PARAMETERS: ${{ secrets.VECTORIZATION_FILE_PARAMETERS }}
+        run: |
+          echo "Starting E2E Vectorization..."
+          ./tests/e2e/Vectorization.ps1 -azdEnvFilePath $AZD_ENV_FILE_PATH -entraManagementRefreshToken $ENTRA_MANAGEMENT_REFRESH_TOKEN
+  
+  delete-deployment:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: delete-deployment
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Authenticate with Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Download .env file
+        uses: actions/download-artifact@v2
+        with:
+          name: azd-env-file
+          path: .
+
+      - name: Delete via AZD
+        id: deploy-azd
+        env:
+          CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          envName: ${{ needs.build.outputs.azd-env-name }}
+        run: |
+          # Install AZD
+          curl -fsSL https://aka.ms/install-azd.sh | bash
+          cd ./deploy/starter
+          echo "AZD Environment Name: $envName"
+          mkdir -p .azure/$envName
+          mv .env .azure/$envName
+          azd down --purge

@@ -1,0 +1,11 @@
+{
+    "TextSplitter": "TokenTextSplitter",
+    "Name": "DefaultTokenTextPartition_Testing",
+    "Settings": {
+        "Tokenizer": "MicrosoftBPETokenizer",
+        "TokenizerEncoder": "cl100k_base",
+        "ChunkSizeTokens": "2000",
+        "OverlapSizeTokens": "200"
+    },
+    "ConfigurationReferences": {}
+}
