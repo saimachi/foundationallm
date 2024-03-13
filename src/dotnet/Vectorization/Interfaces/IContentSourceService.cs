@@ -15,6 +15,6 @@ namespace FoundationaLLM.Vectorization.Interfaces
         /// <param name="contentId">The <see cref="ContentIdentifier"/> providing the unique identifier of the file being read.</param>
         /// <param name="cancellationToken">The cancellation token that signals that operations should be cancelled.</param>
         /// <returns>The string content of the file.</returns>
-        Task<string> ExtractTextFromFileAsync(ContentIdentifier contentId, CancellationToken cancellationToken);
+        Task<string> ExtractTextAsync(ContentIdentifier contentId, CancellationToken cancellationToken);
     }
 }

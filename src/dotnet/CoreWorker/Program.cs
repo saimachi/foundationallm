@@ -1,4 +1,3 @@
-using Azure.Identity;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Core.Interfaces;

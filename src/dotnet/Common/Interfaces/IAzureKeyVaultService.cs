@@ -13,6 +13,13 @@
         Task<string?> GetSecretValueAsync(string secretName);
 
         /// <summary>
+        /// Gets the value of a secret from Key Vault.
+        /// </summary>
+        /// <param name="secretName">The name of the secret whose value you wish to retrieve.</param>
+        /// <returns></returns>
+        string? GetSecretValue(string secretName);
+
+        /// <summary>
         /// Sets the value of a secret in Key Vault.
         /// </summary>
         /// <param name="secretName">The name of the secret whose value you wish to set.</param>

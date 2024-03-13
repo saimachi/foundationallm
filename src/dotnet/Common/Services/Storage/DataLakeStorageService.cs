@@ -1,6 +1,8 @@
 ﻿using Azure;
 using Azure.Identity;
 using Azure.Storage;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs;
 using Azure.Storage.Files.DataLake;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Exceptions;
@@ -8,6 +10,9 @@ using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Models.Configuration.Storage;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net;
+using Azure.Storage.Files.DataLake.Models;
+using System.Text;
 
 namespace FoundationaLLM.Common.Services.Storage
 {
@@ -70,22 +75,89 @@ namespace FoundationaLLM.Common.Services.Storage
         }
 
         /// <inheritdoc/>
-        public Task WriteFileAsync(
+        public async Task WriteFileAsync(
             string containerName,
             string filePath,
             Stream fileContent,
-            string? contentType,
-            CancellationToken cancellationToken) =>
-            throw new NotImplementedException();
+        string? contentType,
+            CancellationToken cancellationToken)
+        {
+            var fileSystemClient = _dataLakeClient.GetFileSystemClient(containerName);
+            var fileClient = fileSystemClient.GetFileClient(filePath);
+            var fileLeaseClient = fileClient.GetDataLakeLeaseClient();
+
+            // We are using pessimistic conccurency by default.
+            // For more details, see https://learn.microsoft.com/en-us/azure/storage/blobs/concurrency-manage.
+
+            DataLakeLease? fileLease = default;
+
+            try
+            {
+                if (await fileClient.ExistsAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    // We only need to get a lease for already existing blobs that are being updated.
+                    fileLease = await fileLeaseClient.AcquireAsync(TimeSpan.FromSeconds(60), cancellationToken: cancellationToken);
+                    if (fileLease == null)
+                    {
+                        _logger.LogError("Could not get a lease for the file {FilePath} from container {ContainerName}. Reason: unkown.", filePath, containerName);
+                        throw new StorageException($"Could not get a lease for the file {filePath} from container {containerName}. Reason: unknown.");
+                    }
+                }
+
+                fileContent.Seek(0, SeekOrigin.Begin);
+
+                DataLakeFileUploadOptions options = new()
+                {
+                    HttpHeaders = new PathHttpHeaders()
+                    {
+                        ContentType = string.IsNullOrWhiteSpace(contentType)
+                            ? "application/json"
+                            : contentType
+                    },
+                    Conditions = (fileLease != null)
+                    ? new DataLakeRequestConditions()
+                    {
+                        LeaseId = fileLease!.LeaseId
+                    }
+                    : default
+                };
+
+                await fileClient.UploadAsync(fileContent, options, cancellationToken).ConfigureAwait(false);
+            }
+            catch (RequestFailedException ex)
+            {
+                if (ex.Status == (int)HttpStatusCode.Conflict
+                        && ex.ErrorCode == "LeaseAlreadyPresent")
+                {
+                    _logger.LogError("Could not get a lease for the file {FilePath} from container {ContainerName}. " +
+                        "Reason: an existing lease is preventing acquiring a new lease.",
+                        filePath, containerName);
+                    throw new StorageException($"Could not get a lease for the file {filePath} from container {containerName}. " +
+                        "Reason: an existing lease is preventing acquiring a new lease.");
+                }
+
+                throw new StorageException($"Could not get a lease for the file {filePath} from container {containerName}. Reason: unknown.");
+            }
+            finally
+            {
+                if (fileLease != null)
+                    await fileLeaseClient.ReleaseAsync(cancellationToken: cancellationToken);
+            }
+        }
 
         /// <inheritdoc/>
-        public Task WriteFileAsync(
+        public async Task WriteFileAsync(
             string containerName,
             string filePath,
             string fileContent,
             string? contentType,
             CancellationToken cancellationToken) =>
-            throw new NotImplementedException();
+            await WriteFileAsync(
+                containerName,
+                filePath,
+                new MemoryStream(Encoding.UTF8.GetBytes(fileContent)),
+                contentType,
+                cancellationToken).ConfigureAwait(false);
 
         /// <inheritdoc/>
         public async Task<bool> FileExistsAsync(

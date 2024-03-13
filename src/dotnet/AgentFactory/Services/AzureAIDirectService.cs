@@ -17,16 +17,19 @@ namespace FoundationaLLM.AgentFactory.Core.Services
     /// <summary>
     /// The Azure AI direct orchestration service.
     /// </summary>
+    /// <param name="callContext">The <see cref="ICallContext"/> providing details about the call context.</param>
     /// <param name="logger">The logger used for logging.</param>
     /// <param name="configuration">The <see cref="IConfiguration"/> used to retrieve app settings from configuration.</param>
     /// <param name="httpClientFactoryService">The HTTP client factory service.</param>
     /// <param name="resourceProviderServices">A dictionary of <see cref="IResourceProviderService"/> resource providers hashed by resource provider name.</param>
     public class AzureAIDirectService(
+        ICallContext callContext,
         ILogger<AzureAIDirectService> logger,
         IConfiguration configuration,
         IHttpClientFactoryService httpClientFactoryService,
         IEnumerable<IResourceProviderService> resourceProviderServices) : IAzureAIDirectService
     {
+        private readonly ICallContext _callContext = callContext;
         private readonly ILogger<AzureAIDirectService> _logger = logger;
         private readonly IConfiguration _configuration = configuration;
         private readonly IHttpClientFactoryService _httpClientFactoryService = httpClientFactoryService;
@@ -59,7 +62,7 @@ namespace FoundationaLLM.AgentFactory.Core.Services
                 if (!_resourceProviderServices.TryGetValue(ResourceProviderNames.FoundationaLLM_Prompt, out var promptResourceProvider))
                     throw new ResourceProviderException($"The resource provider {ResourceProviderNames.FoundationaLLM_Prompt} was not loaded.");
 
-                var resource = await promptResourceProvider.HandleGetAsync(agent.PromptObjectId);
+                var resource = await promptResourceProvider.HandleGetAsync(agent.PromptObjectId, _callContext.CurrentUserIdentity);
                 if (resource is List<PromptBase> prompts)
                 {
                     MultipartPrompt? prompt = prompts.FirstOrDefault() as MultipartPrompt;

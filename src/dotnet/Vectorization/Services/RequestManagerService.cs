@@ -6,7 +6,6 @@ using FoundationaLLM.Vectorization.Models;
 using FoundationaLLM.Vectorization.Models.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace FoundationaLLM.Vectorization.Services
 {
@@ -83,14 +82,52 @@ namespace FoundationaLLM.Vectorization.Services
                     {
                         var requests = await _incomingRequestSourceService.ReceiveRequests(taskPoolAvailableCapacity).ConfigureAwait(false);
 
-                        // No need to use ConfigureAwait(false) since the code is going to be executed on a
-                        // thread pool thread, with no user code higher on the stack (for details, see
-                        // https://devblogs.microsoft.com/dotnet/configureawait-faq/).
-                        _taskPool.Add(
-                            requests.Select(r => Task.Run(
-                                () => { ProcessRequest(r.Request, r.MessageId, r.PopReceipt, _cancellationToken).ConfigureAwait(false); },
-                                _cancellationToken)));
-                                                
+                        foreach (var request in requests)
+                        {
+                            //check if the dequeue count is greater than the max number of retries
+                            if (request.DequeueCount > _settings.QueueMaxNumberOfRetries)
+                            {
+                                _logger.LogWarning(
+                                    "Message with id {MessageId} has been retried {DequeueCount} times and will be deleted.",
+                                    request.MessageId,
+                                    request.DequeueCount
+                                );
+
+                                // Retrieve the state of the request and log the error
+                                VectorizationRequest vectorizationRequest = request.Request;
+
+                                var state = await _vectorizationStateService.HasState(vectorizationRequest).ConfigureAwait(false)
+                                        ? await _vectorizationStateService.ReadState(vectorizationRequest).ConfigureAwait(false)
+                                        : VectorizationState.FromRequest(vectorizationRequest);
+
+                                state.LogEntries.Add(
+                                    new VectorizationLogEntry(
+                                        vectorizationRequest.Id!,
+                                        request.MessageId,
+                                        vectorizationRequest.CurrentStep ?? "RequestManagerService",
+                                        "ERROR: The message has been retried too many times and will be deleted."
+                                    )
+                                );
+
+                                // Remove the message from the queue
+                                await _incomingRequestSourceService.DeleteRequest(request.MessageId, request.PopReceipt).ConfigureAwait(false);
+
+                                // Persist the state of the vectorization request
+                                await _vectorizationStateService.SaveState(state).ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                // Add the request to the task pool for processing
+                                // No need to use ConfigureAwait(false) since the code is going to be executed on a
+                                // thread pool thread, with no user code higher on the stack (for details, see
+                                // https://devblogs.microsoft.com/dotnet/configureawait-faq/).
+                                _taskPool.Add(
+                                    requests.Select(r => Task.Run(
+                                        () => { ProcessRequest(r.Request, r.MessageId, r.PopReceipt, _cancellationToken).ConfigureAwait(false); },
+                                        _cancellationToken)));
+                            }
+                        }                          
+                        // Pace retrieving requests by a pre-determined delay           
                         await Task.Delay(TimeSpan.FromSeconds(_settings.QueueProcessingPace));
                     }
                     else

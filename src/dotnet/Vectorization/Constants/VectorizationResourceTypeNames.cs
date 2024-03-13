@@ -8,26 +8,26 @@
         /// <summary>
         /// Vectorization requests.
         /// </summary>
-        public const string VectorizationRequests = "vectorizationrequests";
+        public const string VectorizationRequests = "vectorizationRequests";
 
         /// <summary>
         /// Vectorization content sources.
         /// </summary>
-        public const string ContentSourceProfiles = "contentsourceprofiles";
+        public const string ContentSourceProfiles = "contentSourceProfiles";
 
         /// <summary>
         /// Text partitioning profiles.
         /// </summary>
-        public const string TextPartitioningProfiles = "textpartitioningprofiles";
+        public const string TextPartitioningProfiles = "textPartitioningProfiles";
 
         /// <summary>
         /// Text embedding profiles.
         /// </summary>
-        public const string TextEmbeddingProfiles = "textembeddingprofiles";
+        public const string TextEmbeddingProfiles = "textEmbeddingProfiles";
 
         /// <summary>
         /// Indexing profiles.
         /// </summary>
-        public const string IndexingProfiles = "indexingprofiles";
+        public const string IndexingProfiles = "indexingProfiles";
     }
 }

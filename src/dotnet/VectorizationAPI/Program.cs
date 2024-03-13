@@ -1,5 +1,4 @@
 using Asp.Versioning;
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FoundationaLLM;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Constants;
@@ -19,8 +18,6 @@ using FoundationaLLM.Vectorization.Services.Text;
 using FoundationaLLM.Vectorization.Services.VectorizationStates;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,38 +43,20 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 if (builder.Environment.IsDevelopment())
     builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
 
+// NOTE: This is required while the service uses API key authentication.
+// Once the service is moved over to Entra ID authentication, this must be replaced with the proper implementation.
+builder.Services.AddSingleton<IAuthorizationService, NullAuthorizationService>();
+
 // Add the Configuration resource provider
 builder.AddConfigurationResourceProvider();
 
-// Add the OpenTelemetry telemetry service and send telemetry data to Azure Monitor.
-builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
-{
-    options.ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_VectorizationAPI_AppInsightsConnectionString];
-});
+// Add OpenTelemetry.
+builder.AddOpenTelemetry(
+    AppConfigurationKeys.FoundationaLLM_APIs_VectorizationAPI_AppInsightsConnectionString,
+    ServiceNames.VectorizationAPI);
 
-// Create a dictionary of resource attributes.
-var resourceAttributes = new Dictionary<string, object> {
-    { "service.name", "VectorizationAPI" },
-    { "service.namespace", "FoundationaLLM" },
-    { "service.instance.id", Guid.NewGuid().ToString() }
-};
-
-// Configure the OpenTelemetry tracer provider to add the resource attributes to all traces.
-builder.Services.ConfigureOpenTelemetryTracerProvider((sp, builder) =>
-    builder.ConfigureResource(resourceBuilder =>
-        resourceBuilder.AddAttributes(resourceAttributes)));
-
-var allowAllCorsOrigins = "AllowAllOrigins";
-builder.Services.AddCors(policyBuilder =>
-{
-    policyBuilder.AddPolicy(allowAllCorsOrigins,
-        policy =>
-        {
-            policy.AllowAnyOrigin();
-            policy.WithHeaders("DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range", "Authorization", "X-AGENT-HINT");
-            policy.AllowAnyMethod();
-        });
-});
+// CORS policies
+builder.AddCorsPolicies();
 
 // Add configurations to the container
 builder.Services.AddInstanceProperties(builder.Configuration);
@@ -116,7 +95,7 @@ builder.Services.AddSingleton<IVectorizationStateService, MemoryVectorizationSta
 builder.Services.AddSingleton<IResourceValidatorFactory, ResourceValidatorFactory>();
 
 // Vectorization resource provider
-builder.Services.AddVectorizationResourceProvider(builder.Configuration);
+builder.AddVectorizationResourceProvider();
 
 // Service factories
 builder.Services.AddSingleton<IVectorizationServiceFactory<IContentSourceService>, ContentSourceServiceFactory>();

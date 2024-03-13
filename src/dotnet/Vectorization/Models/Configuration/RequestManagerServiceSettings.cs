@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace FoundationaLLM.Vectorization.Models.Configuration
 {
@@ -35,5 +30,11 @@ namespace FoundationaLLM.Vectorization.Models.Configuration
         /// </summary>
         [JsonPropertyOrder(4)]
         public int QueuePollingInterval { get; set; } = 60;
+
+        /// <summary>
+        /// The maximum number of retries to process a request in case of a failure.
+        /// </summary>
+        [JsonPropertyOrder(5)]
+        public int QueueMaxNumberOfRetries { get; set; } = 5;
     }
 }

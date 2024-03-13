@@ -2,22 +2,17 @@
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Exceptions;
 using FoundationaLLM.Common.Interfaces;
-using FoundationaLLM.Common.Models.Agents;
 using FoundationaLLM.Common.Models.Configuration.AppConfiguration;
 using FoundationaLLM.Common.Models.Configuration.Instance;
 using FoundationaLLM.Common.Models.Events;
+using FoundationaLLM.Common.Models.ResourceProviders;
 using FoundationaLLM.Common.Services;
 using FoundationaLLM.Common.Services.ResourceProviders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace FoundationaLLM.Configuration.Services
 {
@@ -25,6 +20,7 @@ namespace FoundationaLLM.Configuration.Services
     /// Implements the FoundationaLLM.Configuration resource provider.
     /// </summary>
     /// <param name="instanceOptions">The options providing the <see cref="InstanceSettings"/> with instance settings.</param>
+    /// <param name="authorizationService">The <see cref="IAuthorizationService"/> providing authorization services.</param>
     /// <param name="storageService">The <see cref="IStorageService"/> providing storage services.</param>
     /// <param name="eventService">The <see cref="IEventService"/> providing event services.</param>
     /// <param name="resourceValidatorFactory">The <see cref="IResourceValidatorFactory"/> providing the factory to create resource validators.</param>
@@ -34,6 +30,7 @@ namespace FoundationaLLM.Configuration.Services
     /// <param name="logger">The <see cref="ILogger"/> used for logging.</param>
     public class ConfigurationResourceProviderService(
         IOptions<InstanceSettings> instanceOptions,
+        IAuthorizationService authorizationService,
         [FromKeyedServices(DependencyInjectionKeys.FoundationaLLM_ResourceProvider_Configuration)] IStorageService storageService,
         IEventService eventService,
         IResourceValidatorFactory resourceValidatorFactory,
@@ -43,6 +40,7 @@ namespace FoundationaLLM.Configuration.Services
         ILogger<ConfigurationResourceProviderService> logger)
         : ResourceProviderServiceBase(
             instanceOptions.Value,
+            authorizationService,
             storageService,
             eventService,
             resourceValidatorFactory,
@@ -61,6 +59,9 @@ namespace FoundationaLLM.Configuration.Services
         /// <inheritdoc/>
         protected override async Task InitializeInternal() =>
             await Task.CompletedTask;
+
+        /// <inheritdoc/>
+        protected override Dictionary<string, ResourceTypeDescriptor> GetResourceTypes() => [];
 
         #region Event handling
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FoundationaLLM.Common.Constants
+﻿namespace FoundationaLLM.Common.Constants
 {
     /// <summary>
     /// Contains constants for environment variables used by the application.
@@ -31,5 +25,10 @@ namespace FoundationaLLM.Common.Constants
         /// This allows the caller to connect to the Azure App Configuration service.
         /// </summary>
         public const string FoundationaLLM_AppConfig_ConnectionString = "FoundationaLLM:AppConfig:ConnectionString";
+
+        /// <summary>
+        /// They key for the FoundationaLLM:Configuration:KeyVaultURI environment variable.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_KeyVaultURI = "FoundationaLLM:AuthorizationAPI:KeyVaultURI";
     }
 }

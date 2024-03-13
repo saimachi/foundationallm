@@ -35,7 +35,7 @@ namespace FoundationaLLM.Vectorization.Services.ContentSources
         /// contentId[1] = the container name.
         /// contentId[2] = path of the file relative to the container name.
         /// </remarks>
-        public async Task<string> ExtractTextFromFileAsync(ContentIdentifier contentId, CancellationToken cancellationToken)
+        public async Task<string> ExtractTextAsync(ContentIdentifier contentId, CancellationToken cancellationToken)
         {   
             contentId.ValidateMultipartId(3);
 

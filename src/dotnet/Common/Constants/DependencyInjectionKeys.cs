@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -72,6 +73,11 @@ namespace FoundationaLLM.Common.Constants
         /// The dependency injection key for the FoundationaLLM.DataSource resource provider.
         /// </summary>
         public const string FoundationaLLM_ResourceProvider_DataSource = "FoundationaLLM:ResourceProvider:DataSource";
+
+        /// <summary>
+        /// The dependency injection key for the FoundationaLLM.Authorization resource provider.
+        /// </summary>
+        public const string FoundationaLLM_ResourceProvider_Authorization = "FoundationaLLM:ResourceProvider:Authorization";
 
         #endregion
     }

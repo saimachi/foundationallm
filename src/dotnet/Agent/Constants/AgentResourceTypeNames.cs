@@ -6,10 +6,6 @@
     public class AgentResourceTypeNames
     {
         /// <summary>
-        /// Agent references.
-        /// </summary>
-        public const string AgentReferences = "agentreferences";
-        /// <summary>
         /// Agents.
         /// </summary>
         public const string Agents = "agents";

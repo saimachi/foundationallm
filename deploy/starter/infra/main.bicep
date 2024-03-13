@@ -529,6 +529,7 @@ module acaServices './app/acaService.bicep' = [for service in services: {
 }]
 
 output AZURE_APP_CONFIG_NAME string = appConfig.outputs.name
+output AZURE_AUTHORIZATION_STORAGE_ACCOUNT_NAME string = authStore.outputs.name
 output AZURE_COGNITIVE_SEARCH_ENDPOINT string = cogSearch.outputs.endpoint
 output AZURE_CONTENT_SAFETY_ENDPOINT string = contentSafety.outputs.endpoint
 output AZURE_COSMOS_DB_ENDPOINT string = cosmosDb.outputs.endpoint
@@ -540,6 +541,8 @@ output AZURE_OPENAI_ENDPOINT string = azureOpenAiEndpoint
 output AZURE_STORAGE_ACCOUNT_NAME string = storage.outputs.name
 
 var appRegNames = [for appRegistration in appRegistrations: appRegistration.name]
+
+output ENTRA_AUTH_API_SCOPE string = authAppRegistration.scopes
 
 output ENTRA_CHAT_UI_CLIENT_ID string = appRegistrations[indexOf(appRegNames, 'chat-ui')].clientId
 output ENTRA_CHAT_UI_SCOPES string = appRegistrations[indexOf(appRegNames, 'chat-ui')].scopes

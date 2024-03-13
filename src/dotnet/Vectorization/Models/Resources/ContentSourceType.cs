@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FoundationaLLM.Vectorization.Models.Resources
+﻿namespace FoundationaLLM.Vectorization.Models.Resources
 {
     /// <summary>
     /// Types of content sources from which documents can be retrieved.
@@ -24,6 +18,11 @@ namespace FoundationaLLM.Vectorization.Models.Resources
         /// <summary>
         /// Azure SQL Database.
         /// </summary>
-        AzureSQLDatabase
+        AzureSQLDatabase,
+
+        /// <summary>
+        /// Web page.
+        /// </summary>
+        Web
     }
 }

@@ -1,0 +1,14 @@
+{{- $name := include "authorization-api.fullname" . -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "cfg-{{ $name }}"
+  labels:
+    app: {{ template "authorization-api.name" . }}
+    chart: {{ template "authorization-api.chart" .}}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data: 
+  AZURE_CLIENT_ID: {{ .Values.azureWorkloadIdentity.authorizationApiClientId }}
+  FoundationaLLM__AuthorizationAPI__KeyVaultUri: {{ .Values.authKeyvaultUri }}

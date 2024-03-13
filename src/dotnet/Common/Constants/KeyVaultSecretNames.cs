@@ -152,5 +152,57 @@ namespace FoundationaLLM.Common.Constants
         /// The connection string to the Azure Storage account used for the data source resource provider.
         /// </summary>
         public const string FoundationaLLM_DataSource_ResourceProvider_Storage_ConnectionString = "foundationallm-datasource-resourceprovider-storage-connectionstring";
+
+        #region Authorization API
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-appinsights-connectionstring Key Vault secret name.
+        /// The connection string used by OpenTelemetry to connect to App Insights.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_AppInsights_ConnectionString = "foundationallm-authorizationapi-appinsights-connectionstring";
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-entra- Key Vault secret name.
+        /// The Entra ID instance.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_Entra_Instance = "foundationallm-authorizationapi-entra-instance";
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-entra- Key Vault secret name.
+        /// The Entra ID tenant id.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_Entra_TenantId = "foundationallm-authorizationapi-entra-tenantid";
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-entra- Key Vault secret name.
+        /// Entra ID client id.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_Entra_ClientId = "foundationallm-authorizationapi-entra-clientid";
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-entra- Key Vault secret name.
+        /// The Entr ID client secret.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_Entra_ClientSecret = "foundationallm-authorizationapi-entra-clientsecret";
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-entra- Key Vault secret name.
+        /// The Entra ID scopes.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_Entra_Scopes = "foundationallm-authorizationapi-entra-scopes";
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-entra- Key Vault secret name.
+        /// The name of the storage account used by the Authorization API.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_Storage_AccountName = "foundationallm-authorizationapi-storage-accountname";
+
+        /// <summary>
+        /// The foundationallm-authorizationapi-entra- Key Vault secret name.
+        /// The comma separated list of the identifiers of FoundationaLLM instances managed by the authorization core.
+        /// </summary>
+        public const string FoundationaLLM_AuthorizationAPI_InstanceIds= "foundationallm-authorizationapi-instanceids";
+
+        #endregion
     }
 }

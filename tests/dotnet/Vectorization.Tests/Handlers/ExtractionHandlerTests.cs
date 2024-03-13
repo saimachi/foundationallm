@@ -13,7 +13,7 @@ namespace Vectorization.Tests.Handlers
 {
     internal class MockContentSourceService : ContentSourceServiceBase, IContentSourceService
     {
-        public Task<string> ExtractTextFromFileAsync(ContentIdentifier contentId, CancellationToken cancellationToken)
+        public Task<string> ExtractTextAsync(ContentIdentifier contentId, CancellationToken cancellationToken)
         {
             return Task.FromResult("This is the PDF document data.");
         }
