@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Azure.Identity;
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Extensions;
@@ -18,8 +16,6 @@ using FoundationaLLM.Gatekeeper.Core.Models.ConfigurationOptions;
 using FoundationaLLM.Gatekeeper.Core.Services;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Polly;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -58,23 +54,11 @@ namespace FoundationaLLM.Gatekeeper.API
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
 
             // Add services to the container.
-            // Add the OpenTelemetry telemetry service and send telemetry data to Azure Monitor.
-            builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
-            {
-                options.ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperAPI_AppInsightsConnectionString];
-            });
-            
-            // Create a dictionary of resource attributes.
-            var resourceAttributes = new Dictionary<string, object> {
-                { "service.name", "GatekeeperAPI" },
-                { "service.namespace", "FoundationaLLM" },
-                { "service.instance.id", Guid.NewGuid().ToString() }
-            };
 
-            // Configure the OpenTelemetry tracer provider to add the resource attributes to all traces.
-            builder.Services.ConfigureOpenTelemetryTracerProvider((sp, builder) =>
-                builder.ConfigureResource(resourceBuilder =>
-                    resourceBuilder.AddAttributes(resourceAttributes)));
+            // Add OpenTelemetry.
+            builder.AddOpenTelemetry(
+                AppConfigurationKeys.FoundationaLLM_APIs_GatekeeperAPI_AppInsightsConnectionString,
+                ServiceNames.GatekeeperAPI);
 
             builder.Services.AddControllers();
 

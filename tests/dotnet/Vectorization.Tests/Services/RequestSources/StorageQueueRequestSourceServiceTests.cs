@@ -1,5 +1,7 @@
 ﻿using Azure.Storage.Queues;
+using FakeItEasy;
 using FoundationaLLM.Common.Models.TextEmbedding;
+using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models;
 using FoundationaLLM.Vectorization.Models.Configuration;
 using FoundationaLLM.Vectorization.Services.RequestSources;
@@ -11,9 +13,11 @@ namespace Vectorization.Tests.Services.RequestSources
     {
         private StorageQueueRequestSourceService _storageQueueRequestSourceService;
         private QueueClient _queueClient;
+        private IVectorizationStateService _stateService;
         
         public StorageQueueRequestSourceServiceTests()
         {
+            _stateService = A.Fake<IVectorizationStateService>();
             RequestSourceServiceSettings requestManagerServiceSettings = new RequestSourceServiceSettings()
             {
                 Name = Environment.GetEnvironmentVariable("StorageQueueServiceTestsQueueName") ?? "testing",

@@ -50,6 +50,20 @@
       "tags": {}
     },
     {
+      "key": "FoundationaLLM:APIs:AuthorizationAPI:APIUrl",
+      "value": "${env:SERVICE_AUTH_API_ENDPOINT_URL}",
+      "label": null,
+      "content_type": "",
+      "tags": {}
+    },
+    {
+      "key": "FoundationaLLM:APIs:AuthorizationAPI:APIScope",
+      "value": "${env:ENTRA_AUTH_API_SCOPE}",
+      "label": null,
+      "content_type": "",
+      "tags": {}
+    },
+    {
       "key": "FoundationaLLM:APIs:CoreAPI:APIUrl",
       "value": "${env:SERVICE_CORE_API_ENDPOINT_URL}",
       "label": null,

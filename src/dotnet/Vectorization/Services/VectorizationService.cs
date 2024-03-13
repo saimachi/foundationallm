@@ -1,10 +1,12 @@
-﻿using FoundationaLLM.Common.Constants;
+﻿using DocumentFormat.OpenXml.Office.Word;
+using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Vectorization.Constants;
 using FoundationaLLM.Vectorization.Exceptions;
 using FoundationaLLM.Vectorization.Handlers;
 using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models;
+using FoundationaLLM.Vectorization.Models.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -98,16 +100,36 @@ namespace FoundationaLLM.Vectorization.Services
 
             if (vectorizationRequest.RemainingSteps == null || vectorizationRequest.RemainingSteps.Count == 0)
                 throw new VectorizationException("The list of the remaining steps of the vectorization request should not be empty.");
-            
-            // Validate the file extension is supported by vectorization
-            string fileNameExtension = Path.GetExtension(vectorizationRequest.ContentIdentifier!.FileName);            
-            if (string.IsNullOrWhiteSpace(fileNameExtension))
-                throw new VectorizationException("The file does not have an extension.");
 
-            if(!FileExtensions.AllowedFileExtensions
-                .Select(ext => ext.ToLower())
-                .Contains(fileNameExtension.ToLower()))
-                throw new VectorizationException($"The file extension {fileNameExtension} is not supported.");
+            // check request content source profile -> content_source type for multi-part validation
+            var contentSourceProfile = _vectorizationResourceProviderService.GetResource<ContentSourceProfile>(
+                $"/{VectorizationResourceTypeNames.ContentSourceProfiles}/{vectorizationRequest.ContentIdentifier.ContentSourceProfileName}");
+
+            switch (contentSourceProfile.ContentSource)
+            {
+                // file-based content sources
+                case ContentSourceType.AzureDataLake:
+                case ContentSourceType.SharePointOnline:
+                case ContentSourceType.AzureSQLDatabase:
+                    // Validate the file extension is supported by vectorization
+                    string fileNameExtension = Path.GetExtension(vectorizationRequest.ContentIdentifier!.FileName);
+                    if (string.IsNullOrWhiteSpace(fileNameExtension))
+                        throw new VectorizationException("The file does not have an extension.");
+
+                    if (!FileExtensions.AllowedFileExtensions
+                        .Select(ext => ext.ToLower())
+                        .Contains(fileNameExtension.ToLower()))
+                        throw new VectorizationException($"The file extension {fileNameExtension} is not supported.");
+                    break;
+                case ContentSourceType.Web:
+                    // Validate the protocol passed in is http or https
+                    string protocol = vectorizationRequest.ContentIdentifier[0];
+                    if (!new[] { "http", "https" }.Contains(protocol.ToLower()))
+                        throw new VectorizationException($"The protocol {protocol} is not supported.");
+                    break;
+                default:
+                    throw new VectorizationException($"The content source type {contentSourceProfile.ContentSource} is not supported.");
+            } 
         }
 
         private async Task<VectorizationProcessingResult> ProcessRequestInternal(VectorizationRequest request)

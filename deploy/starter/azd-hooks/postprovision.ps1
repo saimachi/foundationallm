@@ -52,6 +52,15 @@ $env:FOUNDATIONALLM_VECTORIZATION_API_EVENT_GRID_PROFILE = Get-Content ./config/
 cat ./config/vectorization-worker-event-profile.template.json | envsubst > ./config/vectorization-worker-event-profile.json
 $env:FOUNDATIONALLM_VECTORIZATION_WORKER_EVENT_GRID_PROFILE = Get-Content ./config/vectorization-worker-event-profile.json
 
+$env:GUID01=$($(New-Guid).Guid)
+$env:GUID02=$($(New-Guid).Guid)
+$env:DEPLOY_TIME=$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffffffZ'))
+$roleAssignmentsJson = cat ./data/role-assignments/DefaultRoleAssignments.template.json 
+echo "" > ./data/role-assignments/DefaultRoleAssignments.json
+ForEach ($line in $roleAssignmentsJson) {
+    envsubst $line >> ./data/role-assignments/DefaultRoleAssignments.json
+}
+
 $appConfigJson = cat ./config/appconfig.template.json
 echo "" > ./config/appconfig.json
 ForEach ($line in $appConfigJson) {
@@ -122,4 +131,14 @@ Invoke-AndRequireSuccess "Uploading Resource Providers" {
         --only-show-errors `
         --auth-mode key `
         --output none   
+}
+
+Invoke-AndRequireSuccess "Uploading Default Role Assignments to Authorization Store" {
+    az storage azcopy blob upload `
+        -c role-assignments `
+        --account-name $env:AZURE_AUTHORIZATION_STORAGE_ACCOUNT_NAME `
+        -s "./data/role-assignments/DefaultRoleAssignments.json" `
+        --recursive `
+        --only-show-errors `
+        --output none
 }

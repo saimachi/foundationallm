@@ -1,9 +1,5 @@
-﻿using FoundationaLLM.Common.Models.Configuration.KeyVault;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FoundationaLLM.Common.Constants;
+using FoundationaLLM.Common.Models.Configuration.KeyVault;
 
 namespace FoundationaLLM.Configuration.Catalog
 {
@@ -13,233 +9,177 @@ namespace FoundationaLLM.Configuration.Catalog
     public static class KeyVaultSecretsCatalog
     {
         /// <summary>
-        /// The list of Key Vault secret entries.
+        /// The list of generic Key Vault secret entries.
         /// </summary>
-        public static readonly List<KeyVaultSecretEntry> Entries =
+        public static readonly List<KeyVaultSecretEntry> GenericEntries =
         [
             new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_AgentHub_StorageManager_BlobStorage_ConnectionString,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_Agent_ResourceProvider_Storage_ConnectionString,
                 minimumVersion: "0.3.0",
                 description: "The connection string to the Azure Storage account used for the agent resource provider."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_AgentFactoryAPI_APIKey,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_AgentFactoryAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
+                secretName: KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_AgentHubAPI_APIKey,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_AgentHubAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_DataSourceHubAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_GatekeeperAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_DataSourceHubAPI_APIKey,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_GatekeeperIntegrationAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_LangChainAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_GatekeeperAPI_APIKey,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_GatekeeperIntegrationAPI_APIKey,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_LangChainAPI_APIKey,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_Prompt_ResourceProvider_Storage_ConnectionString,
                 minimumVersion: "0.3.0",
                 description: "The connection string to the Azure Storage account used for the prompt resource provider."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_PromptHubAPI_APIKey,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_PromptHubAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_SemanticKernelAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_SemanticKernelAPI_APIKey,
+                secretName: KeyVaultSecretNames.FoundationaLLM_AzureContentSafety_APIKey,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
+                secretName: KeyVaultSecretNames.FoundationaLLM_AzureOpenAI_Api_Key,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_AzureContentSafety_APIKey,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_AzureOpenAI_Api_Key,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_BlobStorageMemorySource_Blobstorageconnection,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
+                secretName: KeyVaultSecretNames.FoundationaLLM_CosmosDB_Key,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_CosmosDB_Key,
-                minimumVersion: "0.3.0",
-                description: ""
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_DataSourceHub_StorageManager_BlobStorage_ConnectionString,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_DataSourceHub_StorageManager_BlobStorage_ConnectionString,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_OpenAI_Api_Key,
+                secretName: KeyVaultSecretNames.FoundationaLLM_OpenAI_Api_Key,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_PromptHub_StorageManager_BlobStorage_ConnectionString,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_SemanticKernelAPI_OpenAI_Key,
+                secretName: KeyVaultSecretNames.FoundationaLLM_SemanticKernelAPI_OpenAI_Key,
                 minimumVersion: "0.3.0",
                 description: ""
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_VectorizationAPI_APIKey,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_VectorizationAPI_APIKey,
                 minimumVersion: "0.3.0",
                 description: "The API key of the vectorization API."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
-                minimumVersion: "0.3.0",
-                description: "The connection string to the Application Insights instance used by the vectorization API."
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_APIs_VectorizationWorker_APIKey,
+                secretName: KeyVaultSecretNames.FoundationaLLM_APIs_VectorizationWorker_APIKey,
                 minimumVersion: "0.3.0",
                 description: "The API key of the vectorization worker API."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_App_Insights_Connection_String,
-                minimumVersion: "0.3.0",
-                description:
-                "The connection string to the Application Insights instance used by the vectorization worker API."
-            ),
-            new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
+                secretName: KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
                 minimumVersion: "0.3.0",
                 description:
                 "The connection string to the Azure Storage account used for the embed vectorization queue."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
+                secretName: KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
                 minimumVersion: "0.3.0",
                 description:
                 "The connection string to the Azure Storage account used for the extract vectorization queue."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
+                secretName: KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
                 minimumVersion: "0.3.0",
                 description:
                 "The connection string to the Azure Storage account used for the index vectorization queue."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
+                secretName: KeyVaultSecretNames.FoundationaLLM_Vectorization_Queues_ConnectionString,
                 minimumVersion: "0.3.0",
                 description:
                 "The connection string to the Azure Storage account used for the partition vectorization queue."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_Vectorization_State_ConnectionString,
+                secretName: KeyVaultSecretNames.FoundationaLLM_Vectorization_State_ConnectionString,
                 minimumVersion: "0.3.0",
                 description:
                 "The connection string to the Azure Storage account used for the vectorization state service."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_Vectorization_ResourceProvider_Storage_ConnectionString,
                 minimumVersion: "0.3.0",
                 description:
                 "The connection string to the Azure Storage account used for the vectorization state service."
             ),
-            new (
-                secretName: Common.Constants.KeyVaultSecretNames.FoundationaLLM_Events_AzureEventGrid_APIKey,
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_Events_AzureEventGrid_APIKey,
                 minimumVersion: "0.4.0",
                 description:
                 "The API key for the Azure Event Grid service."
             ),
             new(
-                secretName: Common.Constants.KeyVaultSecretNames
+                secretName: KeyVaultSecretNames
                     .FoundationaLLM_DataSource_ResourceProvider_Storage_ConnectionString,
                 minimumVersion: "0.5.0",
                 description: "The connection string to the Azure Storage account used for the data source resource provider."
@@ -247,11 +187,60 @@ namespace FoundationaLLM.Configuration.Catalog
         ];
 
         /// <summary>
+        /// The list of Key Vault secret entries specific to the Authorization API.
+        /// </summary>
+        public static readonly List<KeyVaultSecretEntry> AuthorizationEntries =
+        [
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_AppInsights_ConnectionString,
+                minimumVersion: "0.5.0",
+                description: "The connection string used by OpenTelemetry to connect to App Insights."
+            ),
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_Entra_Instance,
+                minimumVersion: "0.5.0",
+                description: "The Entra ID instance."
+            ),
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_Entra_TenantId,
+                minimumVersion: "0.5.0",
+                description: "The Entra ID tenant id."
+            ),
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_Entra_ClientId,
+                minimumVersion: "0.5.0",
+                description: "The Entra ID client id."
+            ),
+            new(secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_Entra_ClientSecret,
+                minimumVersion: "0.5.0",
+                description: "The Entra ID client secret."
+            ),
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_Entra_Scopes,
+                minimumVersion: "0.5.0",
+                description: "The Entra ID scopes."
+            ),
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_Storage_AccountName,
+                minimumVersion: "0.5.0",
+                description: "The name of the storage account used by the Authorization API."
+            ),
+            new(
+                secretName: KeyVaultSecretNames.FoundationaLLM_AuthorizationAPI_InstanceIds,
+                minimumVersion: "0.5.0",
+                description: "The comma separated list of the identifiers of FoundationaLLM instances managed by the authorization core."
+            )
+        ];
+
+        /// <summary>
         /// Returns the list of all the Key Vault secrets for this solution that are required for the given version.
         /// </summary>
         /// <param name="version">The current version of the caller.</param>
+        /// <param name="serviceName">Optional service name. When not specified, the generic key vault secrets list is returned.</param>
         /// <returns></returns>
-        public static IEnumerable<KeyVaultSecretEntry> GetRequiredKeyVaultSecretsForVersion(string version)
+        public static IEnumerable<KeyVaultSecretEntry> GetRequiredKeyVaultSecretsForVersion(
+            string version,
+            string serviceName = "")
         {
             // Extract the numeric part of the version, ignoring pre-release tags.
             var numericVersionPart = version.Split('-')[0];
@@ -260,8 +249,12 @@ namespace FoundationaLLM.Configuration.Catalog
                 throw new ArgumentException($"Invalid version format for the provided version ({version}).", nameof(version));
             }
 
+            var entriesList =  (serviceName == ServiceNames.AuthorizationAPI)
+                ? AuthorizationEntries
+                : GenericEntries;
+
             // Compare based on the Major, Minor, and Build numbers only.
-            return Entries.Where(entry =>
+            return entriesList.Where(entry =>
             {
                 if (string.IsNullOrWhiteSpace(entry.MinimumVersion))
                 {

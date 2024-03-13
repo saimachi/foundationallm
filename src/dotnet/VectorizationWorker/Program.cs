@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Azure.Identity;
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FoundationaLLM;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Constants;
@@ -15,14 +13,11 @@ using FoundationaLLM.SemanticKernel.Core.Models.Configuration;
 using FoundationaLLM.SemanticKernel.Core.Services;
 using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models.Configuration;
-using FoundationaLLM.Vectorization.ResourceProviders;
 using FoundationaLLM.Vectorization.Services.ContentSources;
 using FoundationaLLM.Vectorization.Services.Text;
 using FoundationaLLM.Vectorization.Services.VectorizationStates;
 using FoundationaLLM.Vectorization.Worker;
 using Microsoft.Extensions.Options;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,35 +46,13 @@ if (builder.Environment.IsDevelopment())
 // Add the Configuration resource provider
 builder.AddConfigurationResourceProvider();
 
-// Add the OpenTelemetry telemetry service and send telemetry data to Azure Monitor.
-builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
-{
-    options.ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_VectorizationWorker_AppInsightsConnectionString];
-});
+// Add OpenTelemetry.
+builder.AddOpenTelemetry(
+    AppConfigurationKeys.FoundationaLLM_APIs_VectorizationWorker_AppInsightsConnectionString,
+    ServiceNames.VectorizationWorker);
 
-// Create a dictionary of resource attributes.
-var resourceAttributes = new Dictionary<string, object> {
-    { "service.name", "VectorizationWorker" },
-    { "service.namespace", "FoundationaLLM" },
-    { "service.instance.id", Guid.NewGuid().ToString() }
-};
-
-// Configure the OpenTelemetry tracer provider to add the resource attributes to all traces.
-builder.Services.ConfigureOpenTelemetryTracerProvider((sp, builder) =>
-    builder.ConfigureResource(resourceBuilder =>
-        resourceBuilder.AddAttributes(resourceAttributes)));
-
-var allowAllCorsOrigins = "AllowAllOrigins";
-builder.Services.AddCors(policyBuilder =>
-{
-    policyBuilder.AddPolicy(allowAllCorsOrigins,
-        policy =>
-        {
-            policy.AllowAnyOrigin();
-            policy.WithHeaders("DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range", "Authorization");
-            policy.AllowAnyMethod();
-        });
-});
+// CORS policies
+builder.AddCorsPolicies();
 
 // Add configurations to the container
 builder.Services.AddInstanceProperties(builder.Configuration);
@@ -136,7 +109,7 @@ builder.Services.AddSingleton<IVectorizationStateService, BlobStorageVectorizati
 builder.Services.AddSingleton<IResourceValidatorFactory, ResourceValidatorFactory>();
 
 // Vectorization resource provider
-builder.Services.AddVectorizationResourceProvider(builder.Configuration);
+builder.AddVectorizationResourceProvider();
 
 // Service factories
 builder.Services.AddSingleton<IVectorizationServiceFactory<IContentSourceService>, ContentSourceServiceFactory>();

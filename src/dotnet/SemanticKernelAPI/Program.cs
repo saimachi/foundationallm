@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Azure.Identity;
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Extensions;
@@ -11,8 +9,6 @@ using FoundationaLLM.SemanticKernel.Core.Interfaces;
 using FoundationaLLM.SemanticKernel.Core.Plugins;
 using Microsoft.Extensions.Options;
 //using FoundationaLLM.SemanticKernel.Core.Models.ConfigurationOptions;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace FoundationaLLM.SemanticKernel.API
@@ -109,23 +105,10 @@ namespace FoundationaLLM.SemanticKernel.API
             // Simple, static system prompt service
             //builder.Services.AddSingleton<ISystemPromptService, InMemorySystemPromptService>();
 
-            // Add the OpenTelemetry telemetry service and send telemetry data to Azure Monitor.
-            builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
-            {
-                options.ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_SemanticKernelAPI_AppInsightsConnectionString];
-            });
-
-            // Create a dictionary of resource attributes.
-            var resourceAttributes = new Dictionary<string, object> {
-                { "service.name", "SemanticKernelAPI" },
-                { "service.namespace", "FoundationaLLM" },
-                { "service.instance.id", Guid.NewGuid().ToString() }
-            };
-
-            // Configure the OpenTelemetry tracer provider to add the resource attributes to all traces.
-            builder.Services.ConfigureOpenTelemetryTracerProvider((sp, builder) =>
-                builder.ConfigureResource(resourceBuilder =>
-                    resourceBuilder.AddAttributes(resourceAttributes)));
+            // Add OpenTelemetry.
+            builder.AddOpenTelemetry(
+                AppConfigurationKeys.FoundationaLLM_APIs_SemanticKernelAPI_AppInsightsConnectionString,
+                ServiceNames.SemanticKernelAPI);
 
             builder.Services.Configure<RouteOptions>(options =>
             {

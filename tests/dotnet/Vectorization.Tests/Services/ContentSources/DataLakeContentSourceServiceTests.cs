@@ -25,7 +25,7 @@ namespace Vectorization.Tests.Services.ContentSources
             // TXT
             Assert.Equal(
                 "This is a test string in the Vectorization Data Lake.",
-                await _dataLakeContentSourceService.ExtractTextFromFileAsync(
+                await _dataLakeContentSourceService.ExtractTextAsync(
                     new ContentIdentifier
                     {
                         CanonicalId = "vectorization-content-test.txt",
@@ -43,7 +43,7 @@ namespace Vectorization.Tests.Services.ContentSources
             // DOCX
             Assert.Equal(
                 "This is a test string in the Vectorization Data Lake.",
-                await _dataLakeContentSourceService.ExtractTextFromFileAsync(
+                await _dataLakeContentSourceService.ExtractTextAsync(
                     new ContentIdentifier
                     {
                         CanonicalId = "vectorization-content-test.docx",

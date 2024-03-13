@@ -9,6 +9,7 @@ using FoundationaLLM.Vectorization.ResourceProviders;
 using FoundationaLLM.Vectorization.Validation.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -22,15 +23,14 @@ namespace FoundationaLLM
         /// <summary>
         /// Register the handler as a hosted service, passing the step name to the handler ctor.
         /// </summary>
-        /// <param name="services">Application builder service collection.</param>
-        /// <param name="configuration">The <see cref="IConfigurationManager"/> providing access to configuration.</param>
-        public static void AddVectorizationResourceProvider(this IServiceCollection services, IConfigurationManager configuration)
+        /// <param name="builder">The application builder.</param>
+        public static void AddVectorizationResourceProvider(this IHostApplicationBuilder builder)
         {
-            services.AddOptions<BlobStorageServiceSettings>(
+            builder.Services.AddOptions<BlobStorageServiceSettings>(
                 DependencyInjectionKeys.FoundationaLLM_ResourceProvider_Vectorization)
-                .Bind(configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_ResourceProviderService_Storage));
+                .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_Vectorization_ResourceProviderService_Storage));
 
-            services.AddSingleton<IStorageService, BlobStorageService>(sp =>
+            builder.Services.AddSingleton<IStorageService, BlobStorageService>(sp =>
             {
                 var settings = sp.GetRequiredService<IOptionsMonitor<BlobStorageServiceSettings>>()
                     .Get(DependencyInjectionKeys.FoundationaLLM_ResourceProvider_Vectorization);
@@ -45,22 +45,23 @@ namespace FoundationaLLM
             });
 
             // Register validators.
-            services.AddSingleton<IValidator<ContentSourceProfile>, ContentSourceProfileValidator>();
-            services.AddSingleton<IValidator<TextPartitioningProfile>, TextPartitioningProfileValidator>();
-            services.AddSingleton<IValidator<TextEmbeddingProfile>, TextEmbeddingProfileValidator>();
-            services.AddSingleton<IValidator<IndexingProfile>, IndexingProfileValidator>();
+            builder.Services.AddSingleton<IValidator<ContentSourceProfile>, ContentSourceProfileValidator>();
+            builder.Services.AddSingleton<IValidator<TextPartitioningProfile>, TextPartitioningProfileValidator>();
+            builder.Services.AddSingleton<IValidator<TextEmbeddingProfile>, TextEmbeddingProfileValidator>();
+            builder.Services.AddSingleton<IValidator<IndexingProfile>, IndexingProfileValidator>();
 
             // Register the resource provider services (cannot use Keyed singletons due to the Microsoft Identity package being incompatible):
-            services.AddSingleton<IResourceProviderService, VectorizationResourceProviderService>(sp =>
+            builder.Services.AddSingleton<IResourceProviderService, VectorizationResourceProviderService>(sp =>
                 new VectorizationResourceProviderService(
                     sp.GetRequiredService<IOptions<InstanceSettings>>(),
+                    sp.GetRequiredService<IAuthorizationService>(),
                     sp.GetRequiredService<IEnumerable<IStorageService>>()
                         .Single(s => s.InstanceName == DependencyInjectionKeys.FoundationaLLM_ResourceProvider_Vectorization),
                     sp.GetRequiredService<IEventService>(),
                     sp.GetRequiredService<IResourceValidatorFactory>(),
                     sp.GetRequiredService<ILogger<VectorizationResourceProviderService>>()));
 
-            services.ActivateSingleton<IResourceProviderService>();
+            builder.Services.ActivateSingleton<IResourceProviderService>();
         }
     }
 }

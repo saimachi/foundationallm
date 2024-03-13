@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Immutable;
 
 namespace FoundationaLLM.Common.Constants
 {
@@ -35,5 +31,21 @@ namespace FoundationaLLM.Common.Constants
         /// The name of the FoundationaLLM.DataSource resource provider.
         /// </summary>
         public const string FoundationaLLM_DataSource = "FoundationaLLM.DataSource";
+
+        /// <summary>
+        /// The name of the FoundationaLLM.Authorization resource provider.
+        /// </summary>
+        public const string FoundationaLLM_Authorization = "FoundationaLLM.Authorization";
+
+        /// <summary>
+        /// Contains all the resource provider names.
+        /// </summary>
+        public readonly static ImmutableList<string> All = [
+            FoundationaLLM_Vectorization,
+            FoundationaLLM_Agent,
+            FoundationaLLM_Configuration,
+            FoundationaLLM_Prompt,
+            FoundationaLLM_DataSource,
+            FoundationaLLM_Authorization];
     }
 }

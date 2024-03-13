@@ -63,5 +63,9 @@ namespace FoundationaLLM.Common.Constants
         /// The name of the Vectorization Worker service.
         /// </summary>
         public const string VectorizationWorker = "VectorizationWorker";
+        /// <summary>
+        /// The name of the Authorization API service.
+        /// </summary>
+        public const string AuthorizationAPI = "AuthorizationAPI";
     }
 }

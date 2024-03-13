@@ -6,12 +6,8 @@
     internal class DataSourceResourceTypeNames
     {
         /// <summary>
-        /// Data source references.
-        /// </summary>
-        public const string DataSourceReferences = "datasourcereferences";
-        /// <summary>
         /// Data sources.
         /// </summary>
-        public const string DataSources = "datasources";
+        public const string DataSources = "dataSources";
     }
 }

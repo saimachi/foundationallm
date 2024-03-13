@@ -1,5 +1,6 @@
 ﻿using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Models.Authentication;
+using Microsoft.Identity.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +25,10 @@ namespace FoundationaLLM.Common.Services.Security
             }
             return new UnifiedUserIdentity
             {
-                Name = userPrincipal.FindFirstValue("name"),
+                Name = userPrincipal.FindFirstValue(ClaimConstants.Name),
                 Username = ResolveUsername(userPrincipal),
-                UPN = ResolveUsername(userPrincipal)
+                UPN = ResolveUsername(userPrincipal),
+                UserId = userPrincipal.FindFirstValue(ClaimConstants.Oid) ?? userPrincipal.FindFirstValue(ClaimConstants.ObjectId)
             };
         }
 
@@ -38,7 +40,7 @@ namespace FoundationaLLM.Common.Services.Security
         private string ResolveUsername(ClaimsPrincipal? userPrincipal)
         {
             // Depending on which Microsoft Entra ID license the user has, the username may be extracted from the Identity.Name value or the preferred_username claim.
-            return (!string.IsNullOrWhiteSpace(userPrincipal?.Identity?.Name) ? userPrincipal.Identity.Name : userPrincipal?.FindFirstValue("preferred_username")) ?? string.Empty;
+            return (!string.IsNullOrWhiteSpace(userPrincipal?.Identity?.Name) ? userPrincipal.Identity.Name : userPrincipal?.FindFirstValue(ClaimConstants.PreferredUserName)) ?? string.Empty;
         }
     }
 }

@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Azure.Identity;
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FoundationaLLM.AgentFactory.Core.Interfaces;
 using FoundationaLLM.AgentFactory.Core.Models.ConfigurationOptions;
 using FoundationaLLM.AgentFactory.Core.Services;
@@ -23,8 +21,6 @@ using FoundationaLLM.Common.Services.Security;
 using FoundationaLLM.Common.Settings;
 using FoundationaLLM.Common.Validation;
 using Microsoft.Extensions.Options;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Polly;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -67,23 +63,11 @@ namespace FoundationaLLM.AgentFactory.API
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
 
             // Add services to the container.
-            // Add the OpenTelemetry telemetry service and send telemetry data to Azure Monitor.
-            builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
-            {
-                options.ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_AgentFactoryAPI_AppInsightsConnectionString];
-            });
 
-            // Create a dictionary of resource attributes.
-            var resourceAttributes = new Dictionary<string, object> {
-                { "service.name", "AgentFactoryAPI" },
-                { "service.namespace", "FoundationaLLM" },
-                { "service.instance.id", Guid.NewGuid().ToString() }
-            };
-
-            // Configure the OpenTelemetry tracer provider to add the resource attributes to all traces.
-            builder.Services.ConfigureOpenTelemetryTracerProvider((sp, builder) =>
-                builder.ConfigureResource(resourceBuilder =>
-                    resourceBuilder.AddAttributes(resourceAttributes)));
+            // Add OpenTelemetry.
+            builder.AddOpenTelemetry(
+                AppConfigurationKeys.FoundationaLLM_APIs_AgentFactoryAPI_AppInsightsConnectionString,
+                ServiceNames.AgentFactoryAPI);
 
             builder.Services.AddInstanceProperties(builder.Configuration);
 
@@ -146,8 +130,8 @@ namespace FoundationaLLM.AgentFactory.API
             //----------------------------
             // Resource providers
             //----------------------------
-            builder.Services.AddAgentResourceProvider(builder.Configuration);
-            builder.Services.AddPromptResourceProvider(builder.Configuration);
+            builder.AddAgentResourceProvider();
+            builder.AddPromptResourceProvider();
 
             // Register the downstream services and HTTP clients.
             RegisterDownstreamServices(builder);

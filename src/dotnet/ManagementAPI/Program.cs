@@ -1,6 +1,4 @@
 using Asp.Versioning;
-using Azure.Identity;
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using FoundationaLLM.Common.Authentication;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Interfaces;
@@ -11,23 +9,14 @@ using FoundationaLLM.Common.OpenAPI;
 using FoundationaLLM.Common.Services;
 using FoundationaLLM.Common.Services.API;
 using FoundationaLLM.Common.Services.Azure;
-using FoundationaLLM.Common.Services.Security;
 using FoundationaLLM.Common.Settings;
 using FoundationaLLM.Common.Validation;
-using FoundationaLLM.Configuration.Interfaces;
-using FoundationaLLM.Configuration.Services;
-using FoundationaLLM.Configuration.Validation;
 using FoundationaLLM.Management.Interfaces;
 using FoundationaLLM.Management.Models.Configuration;
 using FoundationaLLM.Management.Services;
 using FoundationaLLM.Management.Services.APIServices;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Polly;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -70,21 +59,11 @@ namespace FoundationaLLM.Management.API
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
 
-            // Add the Configuration resource provider
-            builder.AddConfigurationResourceProvider();
+            builder.AddGroupMembership();
+            builder.AddAuthorizationService();
 
-            var allowAllCorsOrigins = "AllowAllOrigins";
-            builder.Services.AddCors(policyBuilder =>
-            {
-                policyBuilder.AddPolicy(allowAllCorsOrigins,
-                    policy =>
-                    {
-                        policy.AllowAnyOrigin();
-                        policy.WithHeaders("DNT", "Keep-Alive", "User-Agent", "X-Requested-With", "If-Modified-Since",
-                            "Cache-Control", "Content-Type", "Range", "Authorization");
-                        policy.AllowAnyMethod();
-                    });
-            });
+            // CORS policies
+            builder.AddCorsPolicies();
 
             builder.Services.AddOptions<CosmosDbSettings>()
                 .Bind(builder.Configuration.GetSection(AppConfigurationKeySections.FoundationaLLM_CosmosDB));
@@ -115,42 +94,35 @@ namespace FoundationaLLM.Management.API
             builder.Services.AddScoped<ICallContext, CallContext>();
             builder.Services.AddScoped<IHttpClientFactoryService, HttpClientFactoryService>();
 
-            // Add event services
+            // Add event services.
             builder.Services.AddAzureEventGridEvents(
                 builder.Configuration,
                 AppConfigurationKeySections.FoundationaLLM_Events_AzureEventGridEventService);
 
-            // Resource validation
+            // Resource validation.
             builder.Services.AddSingleton<IResourceValidatorFactory, ResourceValidatorFactory>();
 
             //----------------------------
             // Resource providers
             //----------------------------
-            builder.Services.AddVectorizationResourceProvider(builder.Configuration);
-            builder.Services.AddAgentResourceProvider(builder.Configuration);
-            builder.Services.AddPromptResourceProvider(builder.Configuration);
-            builder.Services.AddDataSourceResourceProvider(builder.Configuration);
+            builder.AddAuthorizationResourceProvider();
+            builder.AddConfigurationResourceProvider();
+            builder.AddVectorizationResourceProvider();
+            builder.AddAgentResourceProvider();
+            builder.AddPromptResourceProvider();
+            builder.AddDataSourceResourceProvider();
 
-            // Register the authentication services:
-            RegisterAuthConfiguration(builder);
+            // Add authentication configuration.
+            builder.AddAuthenticationConfiguration(
+                AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_Instance,
+                AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_TenantId,
+                AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_ClientId,
+                AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_Scopes);
 
-            // Add the OpenTelemetry telemetry service and send telemetry data to Azure Monitor.
-            builder.Services.AddOpenTelemetry().UseAzureMonitor(options =>
-            {
-                options.ConnectionString = builder.Configuration[AppConfigurationKeys.FoundationaLLM_APIs_ManagementAPI_AppInsightsConnectionString];
-            });
-
-            // Create a dictionary of resource attributes.
-            var resourceAttributes = new Dictionary<string, object> {
-                { "service.name", "ManagementAPI" },
-                { "service.namespace", "FoundationaLLM" },
-                { "service.instance.id", Guid.NewGuid().ToString() }
-            };
-
-            // Configure the OpenTelemetry tracer provider to add the resource attributes to all traces.
-            builder.Services.ConfigureOpenTelemetryTracerProvider((sp, builder) =>
-                builder.ConfigureResource(resourceBuilder =>
-                    resourceBuilder.AddAttributes(resourceAttributes)));
+            // Add OpenTelemetry.
+            builder.AddOpenTelemetry(
+                AppConfigurationKeys.FoundationaLLM_APIs_ManagementAPI_AppInsightsConnectionString,
+                ServiceNames.ManagementAPI);
 
             // Register the downstream services and HTTP clients.
             RegisterDownstreamServices(builder);
@@ -228,7 +200,7 @@ namespace FoundationaLLM.Management.API
             var app = builder.Build();
 
             // Set the CORS policy before other middleware.
-            app.UseCors(allowAllCorsOrigins);
+            app.UseCors(CorsPolicyNames.AllowAllOrigins);
 
             // For the CoreAPI, we need to make sure that UseAuthentication is called before the UserIdentityMiddleware.
             app.UseAuthentication();
@@ -389,41 +361,5 @@ namespace FoundationaLLM.Management.API
 
             builder.Services.AddSingleton<IDownstreamAPISettings>(downstreamAPISettings);
         }
-
-        /// <summary>
-        /// Register the authentication services.
-        /// </summary>
-        /// <param name="builder"></param>
-        public static void RegisterAuthConfiguration(WebApplicationBuilder builder)
-        {
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddMicrosoftIdentityWebApi(jwtOptions => { },
-                    identityOptions =>
-                    {
-                        identityOptions.ClientSecret =
-                            builder.Configuration[AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_ClientSecret];
-                        identityOptions.Instance = builder.Configuration[AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_Instance] ?? "";
-                        identityOptions.TenantId = builder.Configuration[AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_TenantId];
-                        identityOptions.ClientId = builder.Configuration[AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_ClientId];
-                    });
-            //.EnableTokenAcquisitionToCallDownstreamApi()
-            //.AddInMemoryTokenCaches();
-
-            //builder.Services.AddScoped<IAuthenticatedHttpClientFactory, EntraAuthenticatedHttpClientFactory>();
-            builder.Services.AddScoped<IUserClaimsProviderService, EntraUserClaimsProviderService>();
-
-            // Configure the scope used by the API controllers:
-            var requiredScope = builder.Configuration[AppConfigurationKeys.FoundationaLLM_ManagementAPI_Entra_Scopes] ?? "";
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequiredScope", policyBuilder =>
-                {
-                    policyBuilder.RequireAuthenticatedUser();
-                    policyBuilder.RequireClaim("http://schemas.microsoft.com/identity/claims/scope",
-                        requiredScope.Split(' '));
-                });
-            });
-        }
-
     }
 }

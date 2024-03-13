@@ -1,11 +1,8 @@
 ﻿using Azure.Storage.Queues;
-using Azure.Storage.Queues.Models;
 using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models;
 using FoundationaLLM.Vectorization.Models.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.Linq;
 using System.Text.Json;
 
 namespace FoundationaLLM.Vectorization.Services.RequestSources
@@ -17,7 +14,6 @@ namespace FoundationaLLM.Vectorization.Services.RequestSources
     {
         private readonly RequestSourceServiceSettings _settings;
         private readonly ILogger<StorageQueueRequestSourceService> _logger;
-
         private readonly QueueClient _queueClient;
 
         /// <inheritdoc/>
@@ -28,15 +24,18 @@ namespace FoundationaLLM.Vectorization.Services.RequestSources
         /// </summary>
         /// <param name="settings">The <see cref="RequestSourceServiceSettings"/> object providing the settings.</param>
         /// <param name="logger">The logger used for logging.</param>
+        
         public StorageQueueRequestSourceService(
             RequestSourceServiceSettings settings,
-            ILogger<StorageQueueRequestSourceService> logger)
+            ILogger<StorageQueueRequestSourceService> logger
+            )
         {
             _settings = settings;
             _logger = logger;
 
             var queueServiceClient = new QueueServiceClient(_settings.ConnectionString);
             _queueClient = queueServiceClient.GetQueueClient(_settings.Name);
+           
         }
 
         /// <inheritdoc/>
@@ -47,11 +46,11 @@ namespace FoundationaLLM.Vectorization.Services.RequestSources
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<(VectorizationRequest Request, string MessageId, string PopReceipt)>> ReceiveRequests(int count)
+        public async Task<IEnumerable<(VectorizationRequest Request, string MessageId, string PopReceipt, long DequeueCount)>> ReceiveRequests(int count)
         {
             var receivedMessages = await _queueClient.ReceiveMessagesAsync(count, TimeSpan.FromSeconds(_settings.VisibilityTimeoutSeconds)).ConfigureAwait(false);
 
-            var result = new List<(VectorizationRequest, string, string)>();
+            var result = new List<(VectorizationRequest, string, string, long)>();
 
             if (receivedMessages.HasValue)
             {
@@ -60,10 +59,12 @@ namespace FoundationaLLM.Vectorization.Services.RequestSources
                     try
                     {
                         var vectorizationRequest = JsonSerializer.Deserialize<VectorizationRequest>(m.Body.ToString());
+                                               
                         result.Add(new(
                             vectorizationRequest!,
                             m.MessageId,
-                            m.PopReceipt));
+                            m.PopReceipt,
+                            m.DequeueCount));
                     }
                     catch (Exception ex)
                     {

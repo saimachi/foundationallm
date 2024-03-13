@@ -34,7 +34,7 @@ namespace FoundationaLLM.Vectorization.Services.ContentSources
         /// contentId[3] = the column containing the file names.
         /// contentId[4] = the name of the file.
         /// </remarks>
-        public async Task<string> ExtractTextFromFileAsync(ContentIdentifier contentId, CancellationToken cancellationToken)
+        public async Task<string> ExtractTextAsync(ContentIdentifier contentId, CancellationToken cancellationToken)
         {
             contentId.ValidateMultipartId(5);
 

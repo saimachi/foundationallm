@@ -1,6 +1,4 @@
-﻿using Azure.Identity;
-using FoundationaLLM.Common.Authentication;
-using FoundationaLLM.Common.Constants;
+﻿using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Models.Configuration.Instance;
 using FoundationaLLM.Common.Models.Configuration.Storage;
@@ -24,24 +22,19 @@ namespace FoundationaLLM
     public static partial class DependencyInjection
     {
         /// <summary>
-        /// Register the handler as a hosted service, passing the step name to the handler ctor.
+        /// Register the FoundatiionaLLM.Configuration resource provider with the dependency injection container.
         /// </summary>
         /// <param name="builder">Application builder.</param>
         public static void AddConfigurationResourceProvider(this IHostApplicationBuilder builder)
         {
+            builder.AddAzureKeyVaultService(AppConfigurationKeys.FoundationaLLM_Configuration_KeyVaultURI);
+
             builder.Services.AddAzureClients(clientBuilder =>
             {
-                var keyVaultUri = builder.Configuration[AppConfigurationKeys.FoundationaLLM_Configuration_KeyVaultURI];
-                clientBuilder.AddSecretClient(new Uri(keyVaultUri!))
-                    .WithCredential(DefaultAuthentication.GetAzureCredential());
                 clientBuilder.AddConfigurationClient(
                     builder.Configuration[EnvironmentVariables.FoundationaLLM_AppConfig_ConnectionString]);
             });
-            // Configure logging to filter out Azure Core and Azure Key Vault informational logs.
-            builder.Logging.AddFilter("Azure.Core", LogLevel.Warning);
-            builder.Logging.AddFilter("Azure.Security.KeyVault.Secrets", LogLevel.Warning);
 
-            builder.Services.AddSingleton<IAzureKeyVaultService, AzureKeyVaultService>();
             builder.Services.AddSingleton<IAzureAppConfigurationService, AzureAppConfigurationService>();
             builder.Services.AddSingleton<IConfigurationHealthChecks, ConfigurationHealthChecks>();
             builder.Services.AddHostedService<ConfigurationHealthCheckService>();
@@ -67,6 +60,7 @@ namespace FoundationaLLM
             builder.Services.AddSingleton<IResourceProviderService, ConfigurationResourceProviderService>(sp =>
                 new ConfigurationResourceProviderService(
                     sp.GetRequiredService<IOptions<InstanceSettings>>(),
+                    sp.GetRequiredService<IAuthorizationService>(),
                     sp.GetRequiredService<IEnumerable<IStorageService>>()
                         .Single(s => s.InstanceName == DependencyInjectionKeys.FoundationaLLM_ResourceProvider_Configuration),
                     sp.GetRequiredService<IEventService>(),

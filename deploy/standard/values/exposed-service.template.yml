@@ -19,6 +19,7 @@ azureWorkloadIdentity:
   vectorizationJobClientId: {{vectorizationJobMiClientId}}
   tenantId: {{tenantId}}
 baseUrl: {{servicePath}}
+authKeyvaultUri: {{authKeyvaultUri}}
 
 ingress:
   enabled: true

@@ -25,6 +25,13 @@ namespace FoundationaLLM.Common.Services
         }
 
         /// <inheritdoc/>
+        public string? GetSecretValue(string secretName)
+        {
+            var secret = _secretClient.GetSecret(secretName);
+            return secret.Value?.Value;
+        }
+
+        /// <inheritdoc/>
         public async Task SetSecretValueAsync(string secretName, string secretValue) => await _secretClient.SetSecretAsync(secretName, secretValue);
 
         /// <inheritdoc/>

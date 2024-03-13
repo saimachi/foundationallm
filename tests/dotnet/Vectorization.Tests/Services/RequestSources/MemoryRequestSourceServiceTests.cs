@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using FoundationaLLM.Vectorization.Interfaces;
 using FoundationaLLM.Vectorization.Models;
 using FoundationaLLM.Vectorization.Models.Configuration;
 using FoundationaLLM.Vectorization.Services.RequestSources;
@@ -13,7 +14,7 @@ namespace Vectorization.Tests.Services.RequestSources
         {
             RequestSourceServiceSettings requestSourceServiceSettings = A.Fake<RequestSourceServiceSettings>();
             ILogger<MemoryRequestSourceService> logger = A.Fake<ILogger<MemoryRequestSourceService>>();
-            VectorizationRequest vectorizationRequest = A.Fake<VectorizationRequest>();
+            VectorizationRequest vectorizationRequest = A.Fake<VectorizationRequest>();            
             requestSourceServiceSettings.Name = "MemorySource";
 
             MemoryRequestSourceService memoryRequestSourceService = new MemoryRequestSourceService(

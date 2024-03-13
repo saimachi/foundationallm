@@ -48,7 +48,7 @@ namespace FoundationaLLM.AgentFactory.Tests.Orchestration
             var agentResourceProvider = Substitute.For<IResourceProviderService>();
             var knowledgeManagementAgent = new KnowledgeManagementAgent() { Name = "knowledge-management", ObjectId = "Test_objectid", Type = AgentTypes.KnowledgeManagement };
             var agentList = new List<AgentBase> { knowledgeManagementAgent };
-            agentResourceProvider.HandleGetAsync($"/{AgentResourceTypeNames.Agents}/{completionRequest.AgentName}").Returns(agentList);
+            agentResourceProvider.HandleGetAsync($"/{AgentResourceTypeNames.Agents}/{completionRequest.AgentName}", _callContext.CurrentUserIdentity).Returns(agentList);
 
             _resourceProviderServices.Add(ResourceProviderNames.FoundationaLLM_Agent, agentResourceProvider);
 
