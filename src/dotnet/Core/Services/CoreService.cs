@@ -11,6 +11,7 @@ using FoundationaLLM.Core.Models;
 using FoundationaLLM.Core.Models.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime;
+using FoundationaLLM.Common.Models.Orchestration.Direct;
 
 namespace FoundationaLLM.Core.Services;
 
@@ -148,20 +149,21 @@ public partial class CoreService(
     /// <summary>
     /// Provides a completion for a user prompt, without a session.
     /// </summary>
-    public async Task<Completion> GetCompletionAsync(DirectCompletionRequest directCompletionRequest)
+    public async Task<Completion> GetCompletionAsync(CompletionRequest directCompletionRequest)
     {
         try
         {
-            var completionRequest = new CompletionRequest
-            {
-                SessionId = null,
-                UserPrompt = directCompletionRequest.UserPrompt,
-                MessageHistory = null,
-                Settings = directCompletionRequest.Settings
-            };
+            //var completionRequest = new CompletionRequest
+            //{
+            //    SessionId = null,
+            //    AgentName = directCompletionRequest.AgentName,
+            //    UserPrompt = directCompletionRequest.UserPrompt,
+            //    MessageHistory = null,
+            //    Settings = directCompletionRequest.Settings
+            //};
 
             // Generate the completion to return to the user.
-            var result = await GetDownstreamAPIService().GetCompletion(completionRequest);
+            var result = await GetDownstreamAPIService().GetCompletion(directCompletionRequest);
 
             return new Completion { Text = result.Completion };
         }

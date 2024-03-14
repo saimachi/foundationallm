@@ -53,7 +53,9 @@ namespace FoundationaLLM.Gatekeeper.API
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
 
-            // Add services to the container.
+            // Add authorization services.
+            builder.AddGroupMembership();
+            builder.AddAuthorizationService();
 
             // Add OpenTelemetry.
             builder.AddOpenTelemetry(
@@ -62,7 +64,7 @@ namespace FoundationaLLM.Gatekeeper.API
 
             builder.Services.AddControllers();
 
-            // Add API Key Authorization
+            // Add API Key Authorization.
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<APIKeyAuthenticationFilter>();
             builder.Services.AddOptions<APIKeyValidationSettings>()

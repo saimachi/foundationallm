@@ -10,7 +10,6 @@ namespace FoundationaLLM.AgentFactory.Tests.Orchestration
     {
         private KnowledgeManagementOrchestration _knowledgeManagementOrchestration;
         private KnowledgeManagementAgent _agent = new KnowledgeManagementAgent() { Name = "Test_agent", ObjectId="Test_objctid", Type = AgentTypes.KnowledgeManagement };
-        private ICacheService _cacheService = Substitute.For<ICacheService>();
         private ICallContext _callContext = Substitute.For<ICallContext>();
         private ILLMOrchestrationService _orchestrationService = Substitute.For<ILLMOrchestrationService>();
         private IPromptHubAPIService _promptHubService = Substitute.For<IPromptHubAPIService>();
@@ -21,7 +20,6 @@ namespace FoundationaLLM.AgentFactory.Tests.Orchestration
         {
             _knowledgeManagementOrchestration = new KnowledgeManagementOrchestration(
                 _agent,
-                _cacheService,
                 _callContext,
                 _orchestrationService,
                 _promptHubService,

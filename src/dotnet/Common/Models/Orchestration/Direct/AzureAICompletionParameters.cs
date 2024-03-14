@@ -1,41 +1,12 @@
 ﻿using System.Text.Json.Serialization;
+using FoundationaLLM.Common.Interfaces;
 
-namespace FoundationaLLM.Common.Models.Orchestration
+namespace FoundationaLLM.Common.Models.Orchestration.Direct
 {
-    /// <summary>
-    /// Input for a direct Azure AI request.
-    /// </summary>
-    public class AzureAIDirectRequest
-    {
-        /// <summary>
-        /// Input data for a direct request to an Azure AI model.
-        /// </summary>
-        [JsonPropertyName("input_data")]
-        public InputData? InputData { get; set; }
-    }
-
-    /// <summary>
-    /// Input data for a direct request to an Azure AI model.
-    /// </summary>
-    public class InputData
-    {
-        /// <summary>
-        /// Object defining the required input role and content key value pairs.
-        /// </summary>
-        [JsonPropertyName("input_string")]
-        public InputString[]? InputString { get; set; }
-
-        /// <summary>
-        /// Model configuration parameters.
-        /// </summary>
-        [JsonPropertyName("parameters")]
-        public Parameters? Parameters { get; set; }
-    }
-
     /// <summary>
     /// Supported model configuration parameters.
     /// </summary>
-    public class Parameters
+    public class AzureAICompletionParameters
     {
         /// <summary>
         /// Controls randomness in the model.
@@ -91,26 +62,5 @@ namespace FoundationaLLM.Common.Models.Orchestration
         [JsonPropertyName("ignore_eos")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? IgnoreEOS { get; set; }
-    }
-
-    /// <summary>
-    /// Object defining the required input role and content key value pairs.
-    /// </summary>
-    public class InputString
-    {
-        /// <summary>
-        /// The role of the chat persona creating content.
-        /// Value will be either "user" or "assistant".
-        /// </summary>
-        [JsonPropertyName("role")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Role { get; set; }
-
-        /// <summary>
-        /// The text either input into or output by the model.
-        /// </summary>
-        [JsonPropertyName("content")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string? Content { get; set; }
     }
 }

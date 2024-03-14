@@ -51,6 +51,7 @@ namespace FoundationaLLM.AgentFactory.API
                 {
                     options.SetCredential(DefaultAuthentication.GetAzureCredential());
                 });
+                options.Select(AppConfigurationKeyFilters.FoundationaLLM_Instance);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_APIs);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_AgentFactory);
                 options.Select(AppConfigurationKeyFilters.FoundationaLLM_Agent);
@@ -71,10 +72,10 @@ namespace FoundationaLLM.AgentFactory.API
 
             builder.Services.AddInstanceProperties(builder.Configuration);
 
-            // Add Azure ARM services
+            // Add Azure ARM services.
             builder.Services.AddAzureResourceManager();
 
-            // Add event services
+            // Add event services.
             builder.Services.AddAzureEventGridEvents(
                 builder.Configuration,
                 AppConfigurationKeySections.FoundationaLLM_Events_AzureEventGridEventService_Profiles_AgentFactoryAPI);
@@ -110,6 +111,7 @@ namespace FoundationaLLM.AgentFactory.API
             builder.Services.AddScoped<ILLMOrchestrationService, SemanticKernelService>();
             builder.Services.AddScoped<ILLMOrchestrationService, LangChainService>();
             builder.Services.AddScoped<ILLMOrchestrationService, AzureAIDirectService>();
+            builder.Services.AddScoped<ILLMOrchestrationService, AzureOpenAIDirectService>();
 
             builder.Services.AddScoped<IAgentFactoryService, AgentFactoryService>();
             builder.Services.AddScoped<IAgentHubAPIService, AgentHubAPIService>();
@@ -126,6 +128,10 @@ namespace FoundationaLLM.AgentFactory.API
 
             // Resource validation
             builder.Services.AddSingleton<IResourceValidatorFactory, ResourceValidatorFactory>();
+
+            // Add authorization services.
+            builder.AddGroupMembership();
+            builder.AddAuthorizationService();
 
             //----------------------------
             // Resource providers

@@ -51,6 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Authorization\Authorization.csproj" />
     <ProjectReference Include="..\Gatekeeper\Gatekeeper.csproj" />
   </ItemGroup>
 
