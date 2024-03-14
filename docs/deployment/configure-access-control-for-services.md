@@ -4,7 +4,7 @@ FoundationaLLM takes a least privilege approach to access control. This means th
 
 ## Prerequisites
 
-- You have a FoundationaLLM solution [deployed](deployment-starter.md) and running.
+- You have a FoundationaLLM solution [deployed](deployment-quick-start.md) and running.
 - You have a user account with the `Contributor` role on the Azure resource group or subscription where the solution is deployed.
 
 ## Azure App Configuration service

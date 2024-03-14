@@ -384,5 +384,5 @@ log
 **/core-api-event-profile.json
 **/vectorization-api-event-profile.json
 **/vectorization-worker-event-profile.json
-deploy/starter/.env
+deploy/quick-start/.env
 **/management-api-event-profile.json
