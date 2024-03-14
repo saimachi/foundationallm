@@ -55,6 +55,7 @@ jobs:
           VECTORIZATION_FILE_PARAMETERS: ${{ secrets.VECTORIZATION_FILE_PARAMETERS }}
         run: |
           echo "Starting E2E Vectorization..."
+          chmod +x ./tests/e2e/Vectorization.ps1
           ./tests/e2e/Vectorization.ps1 -azdEnvFilePath $AZD_ENV_FILE_PATH -entraManagementRefreshToken $ENTRA_MANAGEMENT_REFRESH_TOKEN
   
   delete-deployment:

@@ -508,26 +508,19 @@ module acaServices './app/acaService.bicep' = [for service in services: {
     appDefinition: serviceDefinition
     hasIngress: service.hasIngress
     imageName: service.image
-    envSettings: [
+    envSettings: service.useEndpoint ? [
       {
         name: service.appConfigEnvironmentVarName
         value: appConfig.outputs.endpoint
       }
+    ] : []
+    secretSettings: service.useEndpoint ? [] : [
+      {
+        name: service.appConfigEnvironmentVarName
+        value: appConfig.outputs.connectionStringSecretRef
+        secretRef: 'appconfig-connection-string'
+      }
     ]
-    secretSettings: []
-    // envSettings: service.useEndpoint ? [
-    //   {
-    //     name: service.appConfigEnvironmentVarName
-    //     value: appConfig.outputs.endpoint
-    //   }
-    // ] : []
-    // secretSettings: service.useEndpoint ? [] : [
-    //   {
-    //     name: service.appConfigEnvironmentVarName
-    //     value: appConfig.outputs.connectionStringSecretRef
-    //     secretRef: 'appconfig-connection-string'
-    //   }
-    // ]
     apiKeySecretName: service.apiKeySecretName
     serviceName: service.name
   }
