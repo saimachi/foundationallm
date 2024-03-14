@@ -46,12 +46,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: azd-env-file
-          path: .azure/${{ steps.deploy-azd.outputs.azd-env-name }}/.env
+          path: ./deploy/starter/.azure/${{ steps.deploy-azd.outputs.azd-env-name }}/.env
           retention-days: 1
       - name: Run E2E Test Scripts
         env:
           ENTRA_MANAGEMENT_REFRESH_TOKEN: ${{ secrets.ENTRA_MANAGEMENT_REFRESH_TOKEN }}
-          AZD_ENV_FILE_PATH: .azure/${{ steps.deploy-azd.outputs.azd-env-name }}/.env
+          AZD_ENV_FILE_PATH: ./deploy/starter/.azure/${{ steps.deploy-azd.outputs.azd-env-name }}/.env
           VECTORIZATION_FILE_PARAMETERS: ${{ secrets.VECTORIZATION_FILE_PARAMETERS }}
         run: |
           echo "Starting E2E Vectorization..."
