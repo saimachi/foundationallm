@@ -174,7 +174,7 @@ namespace FoundationaLLM.Common.Services.ResourceProviders
         {
             if (!_isInitialized)
                 throw new ResourceProviderException($"The resource provider {_name} is not initialized.");
-            var parsedResourcePath = new ResourcePath(
+             var parsedResourcePath = new ResourcePath(
                 resourcePath,
                 _allowedResourceProviders,
                 _allowedResourceTypes,
@@ -355,7 +355,7 @@ namespace FoundationaLLM.Common.Services.ResourceProviders
             {
                 _logger.LogWarning("The {ActionType} access to the resource path {ResourcePath} was not authorized for user {UserName}.",
                     actionType, resourcePath.GetObjectId(_instanceSettings.Id, _name), userIdentity!.Username);
-                new ResourceProviderException("Access is not authorized.", StatusCodes.Status403Forbidden);
+                throw new ResourceProviderException("Access is not authorized.", StatusCodes.Status403Forbidden);
             }
             catch (Exception ex)
             {
