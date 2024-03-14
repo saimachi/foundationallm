@@ -135,29 +135,12 @@ namespace FoundationaLLM.Common.Models.ResourceProvider
         /// <summary>
         /// Computes the object id of the resource identifier.
         /// </summary>
-        /// <returns>The object id.</returns>
-        public string GetObjectId()
-        {
-            if (_instanceId == null
-            || _resourceProvider == null
-            || _resourceTypeInstances == null
-            || _resourceTypeInstances.Count == 0)
-                throw new ResourceProviderException("The resource path does not reprezent a fully qualified resource identifier.",
-                    StatusCodes.Status400BadRequest);
-            else
-                return $"/instances/{_instanceId}/providers/{_resourceProvider}/{string.Join("/",
-                    _resourceTypeInstances.Select(i => $"{i.ResourceType}/{i.ResourceId}").ToArray())}";
-        }
-
-        /// <summary>
-        /// Computes the object id of the resource identifier providing the instance id and resource provider.
-        /// </summary>
-        /// <param name="instanceId">The FoundationaLLM instance id.</param>
-        /// <param name="resourceProvider">The name of the resource provider.</param>
+        /// <param name="instanceId">The FoundationaLLM instance id. Provide this if the resource does not have a fully-qualified resource identifier.</param>
+        /// <param name="resourceProvider">The name of the resource provider. Provide this if the resource does not have a fully-qualified resource identifier.</param>
         /// <returns>The object id.</returns>
         public string GetObjectId(
-            string instanceId,
-            string resourceProvider)
+            string? instanceId,
+            string? resourceProvider)
         {
             if (_instanceId == null && _resourceProvider == null)
             {
@@ -169,10 +152,18 @@ namespace FoundationaLLM.Common.Models.ResourceProvider
                     return $"/instances/{instanceId}/providers/{resourceProvider}/{string.Join("/",
                         _resourceTypeInstances.Select(i => i.ResourceId == null ? $"{i.ResourceType}" : $"{i.ResourceType}/{i.ResourceId}").ToArray())}";
             }
-
-            throw new ResourceProviderException(
-                "The resource path already has a valid FoundationaLLM instance id and/or a resource provider name.",
-                StatusCodes.Status400BadRequest);
+            else
+            {
+                if (_instanceId == null
+                    || _resourceProvider == null
+                    || _resourceTypeInstances == null
+                    || _resourceTypeInstances.Count == 0)
+                    throw new ResourceProviderException("The resource path does not represent a fully qualified resource identifier.",
+                        StatusCodes.Status400BadRequest);
+                else
+                    return $"/instances/{_instanceId}/providers/{_resourceProvider}/{string.Join("/",
+                        _resourceTypeInstances.Select(i => $"{i.ResourceType}/{i.ResourceId}").ToArray())}";
+            }
         }
 
         /// <summary>

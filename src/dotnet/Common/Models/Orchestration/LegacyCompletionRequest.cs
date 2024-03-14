@@ -35,11 +35,5 @@ namespace FoundationaLLM.Common.Models.Orchestration
         /// </summary>
         [JsonPropertyName("embedding_model")]
         public EmbeddingModel? EmbeddingModel { get; set; }
-
-        /// <summary>
-        /// Message history list
-        /// </summary>
-        [JsonPropertyName("message_history")]
-        public List<MessageHistoryItem>? MessageHistory { get; set; }
     }
 }

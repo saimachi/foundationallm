@@ -1,37 +1,36 @@
 ﻿using FoundationaLLM.AgentFactory.Core.Interfaces;
 using FoundationaLLM.Common.Constants;
 using FoundationaLLM.Common.Exceptions;
+using FoundationaLLM.Common.Extensions;
 using FoundationaLLM.Common.Interfaces;
 using FoundationaLLM.Common.Models.Agents;
 using FoundationaLLM.Common.Models.Orchestration;
+using FoundationaLLM.Common.Models.Orchestration.Direct;
 using FoundationaLLM.Common.Settings;
 using FoundationaLLM.Prompt.Models.Metadata;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Text.Json;
-using FoundationaLLM.Common.Extensions;
-using FoundationaLLM.Common.Models.Orchestration.Direct;
 
 namespace FoundationaLLM.AgentFactory.Core.Services
 {
     /// <summary>
-    /// The Azure AI direct orchestration service.
+    /// The Azure OpenAI direct orchestration service.
     /// </summary>
-    /// <param name="callContext">The <see cref="ICallContext"/> providing details about the call context.</param>
     /// <param name="logger">The logger used for logging.</param>
     /// <param name="configuration">The <see cref="IConfiguration"/> used to retrieve app settings from configuration.</param>
     /// <param name="httpClientFactoryService">The HTTP client factory service.</param>
     /// <param name="resourceProviderServices">A dictionary of <see cref="IResourceProviderService"/> resource providers hashed by resource provider name.</param>
-    public class AzureAIDirectService(
+    public class AzureOpenAIDirectService(
         ICallContext callContext,
-        ILogger<AzureAIDirectService> logger,
+        ILogger<AzureOpenAIDirectService> logger,
         IConfiguration configuration,
         IHttpClientFactoryService httpClientFactoryService,
-        IEnumerable<IResourceProviderService> resourceProviderServices) : IAzureAIDirectService
+        IEnumerable<IResourceProviderService> resourceProviderServices) : IAzureOpenAIDirectService
     {
         private readonly ICallContext _callContext = callContext;
-        private readonly ILogger<AzureAIDirectService> _logger = logger;
+        private readonly ILogger<AzureOpenAIDirectService> _logger = logger;
         private readonly IConfiguration _configuration = configuration;
         private readonly IHttpClientFactoryService _httpClientFactoryService = httpClientFactoryService;
         private readonly JsonSerializerOptions _jsonSerializerOptions = CommonJsonSerializerOptions.GetJsonSerializerOptions();
@@ -57,116 +56,109 @@ namespace FoundationaLLM.AgentFactory.Core.Services
 
             var endpointSettings = GetEndpointSettings(endpointConfiguration);
 
-            SystemCompletionMessage? systemPrompt = null;
-            CompletionMessage? assistantPrompt = null;
-            if (!string.IsNullOrWhiteSpace(agent.PromptObjectId))
-            {
-                if (!_resourceProviderServices.TryGetValue(ResourceProviderNames.FoundationaLLM_Prompt, out var promptResourceProvider))
-                    throw new ResourceProviderException($"The resource provider {ResourceProviderNames.FoundationaLLM_Prompt} was not loaded.");
-
-                var resource = await promptResourceProvider.HandleGetAsync(agent.PromptObjectId, _callContext.CurrentUserIdentity);
-                if (resource is List<PromptBase> prompts)
-                {
-                    var prompt = prompts.FirstOrDefault() as MultipartPrompt;
-                    // We are adding an empty assistant prompt and setting the system prompt to the user role to support
-                    // some models (like Mistral) that require user/assistant prompts and not system prompts.
-                    systemPrompt = new SystemCompletionMessage
-                    {
-                        Role = InputMessageRoles.User,
-                        Content = prompt?.Prefix ?? string.Empty
-                    };
-                    assistantPrompt = new CompletionMessage
-                    {
-                        Role = InputMessageRoles.Assistant,
-                        Content = string.Empty
-                    };
-                }
-            }
 
             var inputStrings = new List<CompletionMessage>();
-            // Add system prompt, if exists.
-            if (systemPrompt != null)
+            SystemCompletionMessage? systemPrompt = null;
+
+            if (endpointSettings.OperationType == OperationTypes.Chat)
             {
-                inputStrings.Add(systemPrompt);
-                inputStrings.Add(assistantPrompt!);
-            }
-            // Add conversation history.
-            if (agent.ConversationHistory?.Enabled == true && request.MessageHistory != null)
-            {
-                var messageHistoryItems = request.MessageHistory?.TakeLast(agent.ConversationHistory.MaxHistory);
-                foreach(var item in messageHistoryItems!)
+                if (!string.IsNullOrWhiteSpace(agent.PromptObjectId))
                 {
-                    inputStrings.Add(new CompletionMessage
+                    if (!_resourceProviderServices.TryGetValue(ResourceProviderNames.FoundationaLLM_Prompt, out var promptResourceProvider))
+                        throw new ResourceProviderException($"The resource provider {ResourceProviderNames.FoundationaLLM_Prompt} was not loaded.");
+
+                    var resource = await promptResourceProvider.HandleGetAsync(agent.PromptObjectId, _callContext.CurrentUserIdentity);
+                    if (resource is List<PromptBase> prompts)
                     {
-                        Role = item.Sender.ToLower(),
-                        Content = item.Text
-                    });
+                        var prompt = prompts.FirstOrDefault() as MultipartPrompt;
+                        systemPrompt = new SystemCompletionMessage
+                        {
+                            Role = InputMessageRoles.System,
+                            Content = prompt?.Prefix ?? string.Empty
+                        };
+                    }
                 }
+
+                // Add system prompt, if exists.
+                if (systemPrompt != null) inputStrings.Add(systemPrompt);
+                // Add conversation history.
+                if (agent.ConversationHistory?.Enabled == true && request.MessageHistory != null)
+                {
+                    var messageHistoryItems = request.MessageHistory?.TakeLast(agent.ConversationHistory.MaxHistory);
+                    foreach (var item in messageHistoryItems!)
+                    {
+                        inputStrings.Add(new CompletionMessage
+                        {
+                            Role = item.Sender.ToLower(),
+                            Content = item.Text
+                        });
+                    }
+                }
+                // Add current user prompt.
+                var userPrompt = new UserCompletionMessage { Content = request.UserPrompt };
+                inputStrings.Add(userPrompt);
             }
-            // Add current user prompt.
-            var userPrompt = new UserCompletionMessage { Content = request.UserPrompt };
-            inputStrings.Add(userPrompt);
 
             if (!string.IsNullOrWhiteSpace(endpointSettings.Endpoint) && !string.IsNullOrWhiteSpace(endpointSettings.APIKey))
             {
-                var client = _httpClientFactoryService.CreateClient(HttpClients.AzureAIDirect);
+                var client = _httpClientFactoryService.CreateClient(HttpClients.AzureOpenAIDirect);
                 if (endpointSettings.AuthenticationType == "key" && !string.IsNullOrWhiteSpace(endpointSettings.APIKey))
                 {
-                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
-                        "Bearer", endpointSettings.APIKey
-                    );
+                    client.DefaultRequestHeaders.Add("api-key", endpointSettings.APIKey);
                 }
                 
                 client.BaseAddress = new Uri(endpointSettings.Endpoint);
                 
                 var modelParameters = agent.OrchestrationSettings?.ModelParameters;
                 var modelOverrides = request.Settings?.ModelParameters;
-                
-                AzureAICompletionRequest azureAiCompletionRequest;
 
                 if (modelParameters != null)
                 {
-                    azureAiCompletionRequest = new()
+                    var azureOpenAIDirectRequest = modelParameters.ToObject<AzureOpenAICompletionRequest>(modelOverrides);
+                    var chatOperation = string.Empty;
+
+                    switch (endpointSettings.OperationType)
                     {
-                        InputData = new()
-                        {
-                            InputString = [.. inputStrings],
-                            Parameters = modelParameters.ToObject<AzureAICompletionParameters>(modelOverrides)
-                        }
-                    };
+                        case OperationTypes.Completions:
+                            azureOpenAIDirectRequest.Prompt = request.UserPrompt;
+                            break;
+                        case OperationTypes.Chat:
+                            chatOperation = "/chat";
+                            azureOpenAIDirectRequest.Messages = [.. inputStrings];
+                            break;
+                    }
 
                     if (modelOverrides != null && modelOverrides.ContainsKey(ModelParameterKeys.DeploymentName))
                     {
                         modelParameters[ModelParameterKeys.DeploymentName] = modelOverrides[ModelParameterKeys.DeploymentName];
                     }
 
-                    var body = JsonSerializer.Serialize(azureAiCompletionRequest, _jsonSerializerOptions);
+                    var body = JsonSerializer.Serialize(azureOpenAIDirectRequest, _jsonSerializerOptions);
                     var content = new StringContent(body, Encoding.UTF8, "application/json");
-                    if (modelParameters.TryGetValue(ModelParameterKeys.DeploymentName, out var deployment))
-                    {
-                        content.Headers.Add("azureml-model-deployment", deployment.ToString());
-                    }
+                    modelParameters.TryGetValue(ModelParameterKeys.DeploymentName, out var deployment);
 
-                    var responseMessage = await client.PostAsync("", content);
+                    var responseMessage = await client.PostAsync($"/openai/deployments/{deployment}{chatOperation}/completions?api-version={endpointSettings.APIVersion}", content);
                     var responseContent = await responseMessage.Content.ReadAsStringAsync();
 
                     if (responseMessage.IsSuccessStatusCode)
                     {
-                        var completionResponse = JsonSerializer.Deserialize<AzureAICompletionResponse>(responseContent);
+                        var completionResponse = JsonSerializer.Deserialize<AzureOpenAICompletionResponse>(responseContent);
 
                         return new LLMCompletionResponse
                         {
-                            Completion = completionResponse!.Output,
+                            Completion = endpointSettings.OperationType == OperationTypes.Chat
+                                ? completionResponse!.Choices?[0].Message?.Content
+                                : completionResponse!.Choices?[0].Text,
                             UserPrompt = request.UserPrompt,
                             FullPrompt = body,
                             PromptTemplate = systemPrompt?.Content,
                             AgentName = agent.Name,
-                            PromptTokens = 0,
-                            CompletionTokens = 0
+                            PromptTokens = completionResponse!.Usage!.PromptTokens,
+                            CompletionTokens = completionResponse!.Usage!.CompletionTokens
                         };
                     }
 
-                    _logger.LogWarning("The AzureAIDirect orchestration service returned status code {StatusCode}: {ResponseContent}",
+                    _logger.LogWarning("The AzureOpenAIDirect orchestration service returned status code {StatusCode}: {ResponseContent}",
                         responseMessage.StatusCode, responseContent);
                 }
             }
@@ -206,12 +198,23 @@ namespace FoundationaLLM.AgentFactory.Core.Services
 
                 apiKey = _configuration.GetValue<string>(apiKeyKeyName?.ToString()!)!;
             }
-            
+
+            if (!endpointConfiguration.TryGetValue(EndpointConfigurationKeys.APIVersion, out var apiVersionKeyName))
+                throw new Exception("An API version must be passed in via an Azure App Config key name.");
+
+            var apiVersion = _configuration.GetValue<string>(apiVersionKeyName?.ToString()!);
+
+            var operationType = string.Empty;
+            if (endpointConfiguration.TryGetValue(EndpointConfigurationKeys.OperationType, out var operationTypeKeyName))
+                operationType = _configuration.GetValue<string>(operationTypeKeyName?.ToString()!) ?? OperationTypes.Chat;
+
             return new EndpointSettings
             {
                 Endpoint = endpoint!,
                 APIKey = apiKey!,
-                AuthenticationType = authenticationType!
+                APIVersion = apiVersion!,
+                AuthenticationType = authenticationType!,
+                OperationType = operationType
             };
         }
     }

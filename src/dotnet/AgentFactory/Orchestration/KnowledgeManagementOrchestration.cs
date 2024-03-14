@@ -13,7 +13,6 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
     /// Constructor for default agent.
     /// </remarks>
     /// <param name="agent">The <see cref="KnowledgeManagementAgent"/> agent.</param>
-    /// <param name="cacheService">The <see cref="ICacheService"/> used to cache agent-related artifacts.</param>
     /// <param name="callContext">The call context of the request being handled.</param>
     /// <param name="orchestrationService"></param>
     /// <param name="promptHubService"></param>
@@ -21,15 +20,12 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
     /// <param name="logger">The logger used for logging.</param>
     public class KnowledgeManagementOrchestration(
         KnowledgeManagementAgent agent,
-        ICacheService cacheService,
         ICallContext callContext,
         ILLMOrchestrationService orchestrationService,
         IPromptHubAPIService promptHubService,
         IDataSourceHubAPIService dataSourceHubService,
         ILogger<OrchestrationBase> logger) : OrchestrationBase(null, orchestrationService, promptHubService, dataSourceHubService)
     {
-        private readonly KnowledgeManagementCompletionRequest _completionRequestTemplate = null!;
-        private readonly ICacheService _cacheService = cacheService;
         private readonly ICallContext _callContext = callContext;
         private readonly ILogger<OrchestrationBase> _logger = logger;
         private readonly KnowledgeManagementAgent _agent = agent;

@@ -54,6 +54,7 @@ namespace FoundationaLLM.Core.API
             if (builder.Environment.IsDevelopment())
                 builder.Configuration.AddJsonFile("appsettings.development.json", true, true);
 
+            // Add authorization services.
             builder.AddGroupMembership();
             builder.AddAuthorizationService();
 

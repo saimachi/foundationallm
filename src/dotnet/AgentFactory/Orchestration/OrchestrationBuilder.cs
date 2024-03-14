@@ -75,8 +75,6 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
                 }
             }
 
-            ILLMOrchestrationService? orchestrationService = null;
-
             if (agentBase == null) return null;
             
             if (agentBase.AgentType == typeof(KnowledgeManagementAgent) || agentBase.AgentType == typeof(InternalContextAgent))
@@ -89,7 +87,7 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
                 if (!validType)
                     throw new ArgumentException($"The agent factory does not support the {orchestrationType} orchestration type.");
 
-                orchestrationService = SelectOrchestrationService(llmOrchestrationType, orchestrationServices);
+                var orchestrationService = SelectOrchestrationService(llmOrchestrationType, orchestrationServices);
 
                 // Hydrate overridable values from config and assign them back to the agent's LanguageModel.
                 var deploymentName = configuration.GetValue<string>(agentBase.LanguageModel?.Deployment!);
@@ -115,8 +113,7 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
                 if(agentBase.AgentType == typeof(KnowledgeManagementAgent))
                 {
                     var kmOrchestration = new KnowledgeManagementOrchestration(
-                        (KnowledgeManagementAgent)agentBase!,
-                        cacheService,
+                        (KnowledgeManagementAgent)agentBase,
                         callContext,
                         orchestrationService,
                         promptHubAPIService,
@@ -129,8 +126,7 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
                 else
                 {
                     var icOrchestration = new InternalContextOrchestration(
-                        (InternalContextAgent)agentBase!,
-                        cacheService,
+                        (InternalContextAgent)agentBase,
                         callContext,
                         orchestrationService,
                         promptHubAPIService,
@@ -161,6 +157,7 @@ namespace FoundationaLLM.AgentFactory.Core.Orchestration
             orchestrationServiceType = orchestrationType switch
             {
                 LLMOrchestrationService.AzureAIDirect => typeof(IAzureAIDirectService),
+                LLMOrchestrationService.AzureOpenAIDirect => typeof(IAzureOpenAIDirectService),
                 LLMOrchestrationService.LangChain => typeof(ILangChainService),
                 LLMOrchestrationService.SemanticKernel => typeof(ISemanticKernelService),
                 _ => throw new ArgumentException($"The orchestration type {orchestrationType} is not supported."),
