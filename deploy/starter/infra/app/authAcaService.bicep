@@ -80,12 +80,12 @@ resource app 'Microsoft.App/containerApps@2023-04-01-preview' = {
         targetPort: 80
         transport: 'auto'
       } : null
-      registries: [
-        {
-          server: 'cropseastus2svinternal.azurecr.io'
-          identity: identity.id
-        }
-      ]
+      // registries: [
+      //   {
+      //     server: 'cropseastus2svinternal.azurecr.io'
+      //     identity: identity.id
+      //   }
+      // ]
       secrets: union([
       ],
       map(secrets, secret => {

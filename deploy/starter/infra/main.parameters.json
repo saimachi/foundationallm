@@ -96,7 +96,7 @@
       "authService": {
         "value": {
           "name": "auth-api",
-          "image": "cropseastus2svinternal.azurecr.io/auth-api:prerelease-050",
+          "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
           "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString"
         }
       },
@@ -106,7 +106,7 @@
             "name": "agent-factory-api",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/agentfactory-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-agentfactoryapi-apikey"
           },
@@ -114,7 +114,7 @@
             "name": "agent-hub-api",
             "useEndpoint": true,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/agenthub-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "foundationallm-app-configuration-uri",
             "apiKeySecretName": "foundationallm-apis-agenthubapi-apikey"
           },
@@ -122,7 +122,7 @@
             "name": "chat-ui",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/chat-ui:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "NUXT_APP_CONFIG_ENDPOINT",
             "apiKeySecretName": "foundationallm-apis-chatui-apikey"
           },
@@ -130,7 +130,7 @@
             "name": "core-api",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/core-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-coreapi-apikey"
           },
@@ -138,7 +138,7 @@
             "name": "core-job",
             "useEndpoint": false,
             "hasIngress": false,
-            "image": "cropseastus2svinternal.azurecr.io/core-job:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-corejob-apikey"
           },
@@ -146,7 +146,7 @@
             "name": "data-source-hub-api",
             "useEndpoint": true,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/datasourcehub-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "foundationallm-app-configuration-uri",
             "apiKeySecretName": "foundationallm-apis-datasourcehubapi-apikey"
           },
@@ -154,7 +154,7 @@
             "name": "gatekeeper-api",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/gatekeeper-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-gatekeeperapi-apikey"
           },
@@ -162,7 +162,7 @@
             "name": "gatekeeper-integration-api",
             "useEndpoint": true,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/gatekeeperintegration-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "foundationallm-app-configuration-uri",
             "apiKeySecretName": "foundationallm-apis-gatekeeperintegrationapi-apikey"
           },
@@ -170,7 +170,7 @@
             "name": "langchain-api",
             "useEndpoint": true,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/langchain-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "foundationallm-app-configuration-uri",
             "apiKeySecretName": "foundationallm-apis-langchainapi-apikey"
           },
@@ -178,7 +178,7 @@
             "name": "management-api",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/management-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-managementapi-apikey"
           },
@@ -186,7 +186,7 @@
             "name": "management-ui",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/management-ui:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "NUXT_APP_CONFIG_ENDPOINT",
             "apiKeySecretName": "foundationallm-apis-managementui-apikey"
           },
@@ -194,7 +194,7 @@
             "name": "prompt-hub-api",
             "useEndpoint": true,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/prompthub-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "foundationallm-app-configuration-uri",
             "apiKeySecretName": "foundationallm-apis-prompthubapi-apikey"
           },
@@ -202,7 +202,7 @@
             "name": "semantic-kernel-api",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/semantickernel-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-semantickernelapi-apikey"
           },
@@ -210,7 +210,7 @@
             "name": "vectorization-api",
             "useEndpoint": false,
             "hasIngress": true,
-            "image": "cropseastus2svinternal.azurecr.io/vectorization-api:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-vectorizationapi-apikey"
           },
@@ -218,7 +218,7 @@
             "name": "vectorization-job",
             "useEndpoint": false,
             "hasIngress": false,
-            "image": "cropseastus2svinternal.azurecr.io/vectorization-job:prerelease-050",
+            "image": "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest",
             "appConfigEnvironmentVarName": "FoundationaLLM__AppConfig__ConnectionString",
             "apiKeySecretName": "foundationallm-apis-vectorizationworker-apikey"
           }
