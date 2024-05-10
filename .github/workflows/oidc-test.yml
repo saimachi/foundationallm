@@ -24,4 +24,6 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Test
+        env:
+          FoundationaLLM_AppConfig_ConnectionString: ${{ secrets.APPCONFIG_CONNECTION_STRING }}
         run: dotnet test --filter "FullyQualifiedName=FoundationaLLM.Core.Examples.Example0001_FoundationaLLMAgentInteraction.RunAsync" ./tests/dotnet/Core.Examples/Core.Examples.csproj
