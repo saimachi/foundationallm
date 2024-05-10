@@ -24,4 +24,4 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Test
-        run: dotnet test --filter "FullyQualifiedName=FoundationaLLM.Core.Examples.Example0001_FoundationaLLMAgentInteraction.RunAsync" .\tests\dotnet\Core.Examples\Core.Examples.csproj
+        run: dotnet test --filter "FullyQualifiedName=FoundationaLLM.Core.Examples.Example0001_FoundationaLLMAgentInteraction.RunAsync" ./tests/dotnet/Core.Examples/Core.Examples.csproj
